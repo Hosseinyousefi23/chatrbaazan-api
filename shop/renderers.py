@@ -15,6 +15,13 @@ class CustomJSONRenderer:
 
         return Response(response_data, status=status)
 
+    def renderData(self, data=None, status=200):
+        # call super to render the response
+        response = {
+            'data': data
+        }
+        return Response(response, status=status)
+
     def render404(self, model_name, params):
         response_data = {
             "errors": [
