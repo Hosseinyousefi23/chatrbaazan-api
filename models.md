@@ -1,4 +1,8 @@
-## user
+# chatrbaazan
+
+database models
+
+### user
 
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
@@ -9,7 +13,7 @@ email | character varying | None | NO
 phone | int | None | NO
 create_at | timestamp without time zone | (timezone('utc'::text, now()) + '1 day'::interval) | YES 
 
-## city
+### city
 
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
@@ -19,7 +23,7 @@ english_name | character | NO |NO
 available | boolean |TRUE | NO
 
 
-## category
+### category
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
 id | integer | nextval | NO | YES
@@ -28,7 +32,7 @@ english_name | character | NO | NO
 available | boolean |TRUE | NO 
 
 
-## company
+### company
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
 id | Integer | nextval | NO | YES
@@ -39,7 +43,7 @@ category_id | int | None | YES
 available | Boolean |TRUE | No 
 
 
-## Product
+### Product
 
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
@@ -60,7 +64,7 @@ available | Boolean |TRUE | No
 
 
 
-## user_product
+### user_product
 
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
@@ -69,17 +73,21 @@ product_id | Integer |  None | NO
 user_id | Integer | None | NO
 create_at | timestamp | None | NO
 
-## transaction
+### transaction
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
 id | Integer | nextval | NO | YES
 product_id | Integer |  None | NO
 user_id | Integer | None | NO
-state | Integer | sucess:1 | NO 
+status | Integer | sucess:1 | NO 
 price |double | None |NO
-
-
-## contact
+```
+status :
+        sucess
+        fail
+        
+```
+### contact
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
 id | Integer | nextval | NO | YES
@@ -88,7 +96,7 @@ email | character varying | None | NO
 description | Text | None | YES |
 
 
-## banner
+### banner
 Column | Type | Default | Nullable | PK
 --- | --- | --- | --- |---
 id | Integer | nextval | NO | YES
