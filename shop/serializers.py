@@ -14,6 +14,7 @@ from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
 from shop.adapters import CustomUserAccountAdapter
+from shop.models import City
 
 User = get_user_model()
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -28,46 +29,6 @@ def validate_mobile(mobile):
         if not re.match('^09[\d]{9}$', mobile):
             raise ValidationError(u'شماره موبایل صحیح نمی باشد.')
         return mobile
-
-
-# class CustomJWTSerializer(JSONWebTokenSerializer):
-#     mobile_field = 'email'
-#
-#     def validate(self, attrs):
-#
-#         password = attrs.get("password")
-#         user_obj = User.objects.filter(email=attrs.get("mobile_or_email")).first() or User.objects.filter(
-#             mobile=attrs.get("mobile_or_email")).first()
-#         if user_obj is not None:
-#             credentials = {
-#                 'mobile': user_obj.mobile,
-#                 'password': password
-#             }
-#             if all(credentials.values()):
-#                 user = authenticate(**credentials)
-#                 if user:
-#                     if not user.is_active:
-#                         msg = _('User account is disabled.')
-#                         raise serializers.ValidationError(msg)
-#
-#                     payload = jwt_payload_handler(user)
-#
-#                     return {
-#                         'token': jwt_encode_handler(payload),
-#                         'user': user
-#                     }
-#                 else:
-#                     msg = _('Unable to log in with provided credentials.')
-#                     raise serializers.ValidationError(msg)
-#
-#             else:
-#                 msg = _('Must include "{mobile_field}" and "password".')
-#                 msg = msg.format(mobile_field=self.mobile_field)
-#                 raise serializers.ValidationError(msg)
-#
-#         else:
-#             msg = _('Account with this email/mobile does not exists')
-#             raise serializers.ValidationError(msg)
 
 
 class RegisterSerializerCustom(serializers.Serializer):
@@ -88,17 +49,21 @@ class RegisterSerializerCustom(serializers.Serializer):
         return CustomUserAccountAdapter().clean_password(password)
 
     def validate(self, data):
+        if User.objects.filter(mobile=data['mobile']).exists():
+            raise serializers.ValidationError(
+                _("Mobile Number Exists."))
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
                 _("The two password fields didn't match."))
         return data
 
     def get_cleaned_data(self):
+        print(str(self.validated_data.get('password1', '')))
         return {
             'first_name': self.validated_data.get('first_name', ''),
             'last_name': self.validated_data.get('last_name', ''),
             'mobile': self.validated_data.get('address', ''),
-            'password': self.validated_data.get('password1', ''),
+            'password1': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', ''),
         }
 
@@ -110,3 +75,9 @@ class RegisterSerializerCustom(serializers.Serializer):
         setup_user_email(request, user, [])
         user.save()
         return user
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ('id', 'name', 'english_name')
