@@ -8,7 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from shop.models import City
 from shop.renderers import CustomJSONRenderer
+from shop.serializers import CitySerializer
 
 
 def test(request):
@@ -74,6 +76,9 @@ class GetCity(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
+        print(str(City.objects.count()))
+        dt = CitySerializer(City.objects.all(), many=True)
+        return CustomJSONRenderer().renderData(dt.data)
         data = [{"id": "47d935e2-4ca2-4f31-8cd6-922380685e79", "parent": None, "name": "مشهد", "eng_name": "Mashhad"***REMOVED***,
                 {"id": "b7c8e489-d272-40b5-b25f-c94a19cb287f", "parent": None, "name": "ساری", "eng_name": "Sari"***REMOVED***,
                 {"id": "de13066f-1fe8-498e-bb42-303b92a848ef", "parent": None, "name": "انزلی", "eng_name": "Anzali"***REMOVED***,
