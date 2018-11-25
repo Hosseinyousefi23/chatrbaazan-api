@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -13,6 +13,16 @@ from shop.renderers import CustomJSONRenderer
 
 def test(request):
     return render(request, 'index.html')
+
+
+class TestAPi(APIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_methods = ('GET',)
+
+    # renderer_classes = (JSONRenderer,)
+
+    def get(self, request, format=None, ):
+        return Response("test")
 
 
 def testr(request):

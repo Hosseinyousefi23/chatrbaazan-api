@@ -21,6 +21,6 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.test),
+    path('', views.TestAPi.as_view()),
 ]
 
