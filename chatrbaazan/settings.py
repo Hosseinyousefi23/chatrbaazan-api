@@ -46,9 +46,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 ]
 
-# ACCOUNT_USERNAME_REQUIRED = False
-# ACCOUNT_EMAIL_VERIFICATION = "none"
-# SOCIALACCOUNT_QUERY_EMAIL = True
 LOGIN_REDIRECT_URL = "/"
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # ACCOUNT_EMAIL_REQUIRED = True
@@ -154,3 +151,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'shop.serializers.RegisterSerializerCustom',
+}
+
+
+AUTH_USER_MODEL = 'shop.User'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'

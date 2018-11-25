@@ -18,15 +18,17 @@ from django.urls import path
 from django.conf.urls import  url,include
 
 from rest_framework import routers
-from rest_framework_jwt.views import refresh_jwt_token
+from rest_framework_jwt.views import refresh_jwt_token, ObtainJSONWebToken
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
+from shop import serializers
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^', include('shop.urls')),
-    path('auth/login/', obtain_jwt_token),
+    path('auth/login/', ObtainJSONWebToken.as_view()),
     path('auth/registration/', include('rest_auth.registration.urls')),
+    # path('auth/registration/', include('rest_auth.registration.urls')),
     path('auth/refresh/', refresh_jwt_token),
     path('auth/verify/', verify_jwt_token),
 
