@@ -8,9 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from shop.models import City
+from shop.models import City, Banner
 from shop.renderers import CustomJSONRenderer
-from shop.serializers import CitySerializer
+from shop.serializers import CitySerializer, BannerSerializer
 
 
 def test(request):
@@ -79,34 +79,6 @@ class GetCity(APIView):
         print(str(City.objects.count()))
         dt = CitySerializer(City.objects.all(), many=True)
         return CustomJSONRenderer().renderData(dt.data)
-        data = [{"id": "47d935e2-4ca2-4f31-8cd6-922380685e79", "parent": None, "name": "مشهد", "eng_name": "Mashhad"***REMOVED***,
-                {"id": "b7c8e489-d272-40b5-b25f-c94a19cb287f", "parent": None, "name": "ساری", "eng_name": "Sari"***REMOVED***,
-                {"id": "de13066f-1fe8-498e-bb42-303b92a848ef", "parent": None, "name": "انزلی", "eng_name": "Anzali"***REMOVED***,
-                {"id": "dd504850-449d-4d55-9af6-96e4a8d627d6", "parent": None, "name": "رشت", "eng_name": "Rasht"***REMOVED***,
-                {"id": "1c4b4ada-29ae-4504-ae37-436ad1f1c4a7", "parent": None, "name": "لاهیجان",
-                 "eng_name": "Lahijan"***REMOVED***,
-                {"id": "38af91e2-29e3-4d25-9359-a31ba8e45ef9", "parent": None, "name": "ارومیه", "eng_name": "Urmia"***REMOVED***,
-                {"id": "74d6a077-1bce-4ecf-ada6-ec88cbcf7b79", "parent": None, "name": "نیشابور",
-                 "eng_name": "Neyshabur"***REMOVED***,
-                {"id": "bb8317af-8a97-4555-975f-6bc545f524c1", "parent": None, "name": "سبزوار",
-                 "eng_name": "Sabzevar"***REMOVED***,
-                {"id": "88036f54-bb92-4324-aa08-e0e045a982bb", "parent": None, "name": "اردکان",
-                 "eng_name": "Ardekan"***REMOVED***,
-                {"id": "854c3346-e1be-44f5-83e0-4f201a78f8d4", "parent": None, "name": "یزد", "eng_name": "Yazd"***REMOVED***,
-                {"id": "7baaa4e6-bce3-4d87-bd41-041ca894a993", "parent": None, "name": "طبس", "eng_name": "Tabas"***REMOVED***,
-                {"id": "0fcb9703-e4d4-4c63-86b6-fa6b3c421a49", "parent": None, "name": "کرمان", "eng_name": "kerman"***REMOVED***,
-                {"id": "ca6eb434-3673-472b-8528-d1494d47fee7", "parent": None, "name": "اهواز", "eng_name": "Ahwaz"***REMOVED***,
-                {"id": "91080a00-3cab-4ebf-a317-f334bba70de7", "parent": None, "name": "تبریز", "eng_name": "Tabriz"***REMOVED***,
-                {"id": "b6feecc2-7d42-4944-8844-d4bf33eefa9a", "parent": None, "name": "قم", "eng_name": "Qom"***REMOVED***,
-                {"id": "5ea747d4-24e4-4f40-b4fd-e35c2e2b4ce9", "parent": None, "name": "اصفهان",
-                 "eng_name": "Esfehan"***REMOVED***,
-                {"id": "3093442d-515c-4ea0-8673-09690400c86e", "parent": None, "name": "شیراز", "eng_name": "Shiraz"***REMOVED***,
-                {"id": "da232ac7-5466-44e9-ba78-97f9ab775de0", "parent": None, "name": "کرج", "eng_name": "Karaj"***REMOVED***,
-                {"id": "ae4a76be-4614-4ac3-80d1-b48aa244b7dc", "parent": None, "name": "گرگان", "eng_name": "Gorgan"***REMOVED***,
-                {"id": "8ac96a83-f16f-4940-9d40-c7d566984a53", "parent": None, "name": "کیش", "eng_name": "Kish"***REMOVED***,
-                {"id": "0a1eb53b-f8d4-4b90-88cc-012c0a42c11b", "parent": None, "name": "تهران", "eng_name": "Tehran"***REMOVED***,
-                {"all_chatrbazi": 329700.0***REMOVED***]
-        return CustomJSONRenderer().renderData(data)
 
 
 class GetBanner(APIView):
@@ -116,13 +88,7 @@ class GetBanner(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
-        data = [
-            {"id": "d65deacd-9b35-44f6-b039-2e0088dd1169", "link": "http://chatrbaazan.ir/changal", "is_active": True,
-             "image": "http://chatrbaazan.ir/media/banner/changal.jpg"***REMOVED***,
-            {"id": "17f75c12-8c6a-4ff3-913f-91617b2030ec", "link": "http://chatrbaazan.ir/mrbilit", "is_active": True,
-             "image": "http://chatrbaazan.ir/media/banner/mrbilit.jpg"***REMOVED***,
-            {"id": "688c3c98-f356-4437-8637-0edea2e614ad", "link": "http://chatrbaazan.ir/company/bimehbazar",
-             "is_active": True, "image": "http://chatrbaazan.ir/media/banner/Untitled-2.png"***REMOVED***]
+        data = BannerSerializer(Banner.objects.all(), many=True).data
         return CustomJSONRenderer().renderData(data)
 
 

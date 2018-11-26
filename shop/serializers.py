@@ -14,7 +14,7 @@ from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
 from shop.adapters import CustomUserAccountAdapter
-from shop.models import City
+from shop.models import City, Banner
 
 User = get_user_model()
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -81,3 +81,15 @@ class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = ('id', 'name', 'english_name')
+
+
+class BannerSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Banner
+        fields = ('id', 'title', 'image', 'is_slider')
+
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url

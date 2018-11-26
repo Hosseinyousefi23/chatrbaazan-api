@@ -17,12 +17,16 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
 from rest_auth.views import LogoutView
+from django.conf.urls.static import static
+
 
 from rest_framework import routers
 from rest_framework_jwt.views import refresh_jwt_token, ObtainJSONWebToken
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
+
+from chatrbaazan import settings
 from shop import serializers
 
 urlpatterns = [
@@ -35,3 +39,5 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
     url(r'^api/v1/', include('shop.routers')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
