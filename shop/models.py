@@ -2,14 +2,24 @@ from platform import release
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import User, PermissionsMixin, AbstractUser
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.translation import gettext as _
 
 # Create your models here.
 from django.db.models.expressions import Combinable
 import re
+import os
 
 from rest_framework.exceptions import ValidationError
+
+from chatrbaazan.settings import BASE_DIR
+
+fs = FileSystemStorage(location=BASE_DIR)
+
+
+def generate_filename_participiantPic(instance, filename):
+    return os.path.join(u"UpLoadedFiles", "Banner", str(instance.id), (filename))
 
 
 def validate_mobile(mobile):
@@ -146,12 +156,14 @@ class Product(models.Model):
 
 class Banner(models.Model):
     title = models.CharField(max_length=150, null=False, blank=False, verbose_name=u"عنوان")
-    image = models.ImageField(upload_to='banner/', default='banner/None/no-img.jpg', verbose_name=u"تصویر")
+    image = models.ImageField(storage=fs, upload_to=generate_filename_participiantPic, verbose_name=u"تصویر",
+                              blank=True, null=True, max_length=500)
     category = models.ForeignKey(Category, related_name="banner_category", blank=True, null=True,
                                  verbose_name=u"دسته بندی", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="banner_product", blank=True, null=True,
                                 verbose_name=u"محصول")
     is_slider = models.BooleanField(default=False, verbose_name=u"قرار دادن در اسلایدر")
+    link = models.CharField(max_length=500,default=None,null=True,blank=True,verbose_name=u"لینک")
 
 
 class Contact(models.Model):
