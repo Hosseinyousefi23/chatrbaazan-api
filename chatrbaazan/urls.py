@@ -19,7 +19,6 @@ from django.conf.urls import url, include
 from rest_auth.views import LogoutView
 from django.conf.urls.static import static
 
-
 from rest_framework import routers
 from rest_framework_jwt.views import refresh_jwt_token, ObtainJSONWebToken
 from rest_framework_jwt.views import obtain_jwt_token
