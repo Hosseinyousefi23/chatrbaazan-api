@@ -163,32 +163,38 @@ class Banner(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="banner_product", blank=True, null=True,
                                 verbose_name=u"محصول")
     is_slider = models.BooleanField(default=False, verbose_name=u"قرار دادن در اسلایدر")
-    link = models.CharField(max_length=500,default=None,null=True,blank=True,verbose_name=u"لینک")
+    link = models.CharField(max_length=500, default=None, null=True, blank=True, verbose_name=u"لینک")
+
+    class Meta:
+        verbose_name = u"بنر"
+        verbose_name_plural = u"بنر"
+
+    def __unicode__(self):
+        return 'بنر {***REMOVED***'.format(self.title)
 
 
-class Contact(models.Model):
-    name = models.CharField(max_length=300, null=False, blank=False, verbose_name=u"نام")
-    family = models.CharField(max_length=350, null=True, blank=True, verbose_name=u"فامیلی")
-    phone = models.CharField(max_length=13, null=True, blank=True, verbose_name=u"تلفن")
-    mobile = models.CharField(max_length=13, null=True, blank=True, verbose_name=u"همراه")
-    email = models.CharField(max_length=50, null=False, blank=False, verbose_name=u"ایمیل")
-    contact = models.TextField(null=False, blank=False, verbose_name=u"متن")
+class Transaction(models.Model):
+    STATUS = (
+        (0, u'موفق'),
+        (1, u'خطا در پرداخت'),
+        (2, u'کنسل شده'),
+        (3, u'در حال پرداخت')
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="transaction_product",
+                                verbose_name=u"کالا")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transaction_user",
+                             verbose_name=u"کاربر")
+    status = models.PositiveSmallIntegerField(choices=STATUS, verbose_name=u"وضعیت", default=3)
+    price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    class Transaction(models.Model):
-        STATUS = (
-            (0, u'موفق'),
-            (1, u'خطا در پرداخت'),
-            (2, u'کنسل شده'),
-            (3, u'در حال پرداخت')
-        )
-        product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="transaction_product",
-                                    verbose_name=u"کالا")
-        user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transaction_user",
-                                 verbose_name=u"کاربر")
-        status = models.PositiveSmallIntegerField(choices=STATUS, verbose_name=u"وضعیت", default=3)
-        price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        verbose_name = u"بنر"
+        verbose_name_plural = u"بنر"
+
+    def __unicode__(self):
+        return 'بنر {***REMOVED***'.format(self.title)
 
     class UserProduct(models.Model):
         product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="userProduct_product",

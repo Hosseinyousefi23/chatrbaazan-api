@@ -13,6 +13,7 @@ import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shop',
+    'contact',
     'rest_framework',
     'rest_auth',
     'rest_auth.registration',
@@ -140,7 +142,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-
 # Media files
 
 MEDIA_URL = '/media/'
@@ -163,9 +164,12 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'shop.serializers.RegisterSerializerCustom',
 ***REMOVED***
 
-
 AUTH_USER_MODEL = 'shop.User'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+REST_USE_JWT = True
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'shop.serializers.CustomUserDetailsSerializer'
+***REMOVED***

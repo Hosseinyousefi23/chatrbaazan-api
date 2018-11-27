@@ -11,6 +11,7 @@ from rest_framework.viewsets import ModelViewSet
 from shop.models import City, Banner
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer
+from rest_auth.registration.views import RegisterView
 
 
 def test(request):
