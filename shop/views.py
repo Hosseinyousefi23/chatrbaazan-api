@@ -95,16 +95,16 @@ class GetOffer(APIView, PageNumberPagination):
 
         cityId = request.GET.get('city', None)
         categoryId = request.GET.get('category', None)
+        products = Product.objects.all().order_by(ordering, '-expiration_date')
         if cityId is not None:
             city = City.objects.filter(id=cityId)
             if city.count() == 0:
                 return None
-            products = Product.objects.filter(city__id=city.id).order_by(ordering, '-expiration_date')[:limits]
-
-        # if
-        else:
-            products = Product.objects.all().order_by(ordering, '-expiration_date')[:limits]
-
+            products = products.filter(city__id__in=city.values('id'))
+        elif categoryId is not None:
+            category = Category.objects.filter(id=categoryId)
+            if category.count() == 0:
+                products = products.filter(category__id__in=category.values('id'))
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
