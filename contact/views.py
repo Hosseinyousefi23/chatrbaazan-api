@@ -14,17 +14,9 @@ class ContactView(mixins.ListModelMixin,
                   mixins.CreateModelMixin,
                   generics.GenericAPIView):
     permission_classes = (AllowAny,)
-    allowed_methods = ('GET', 'POST',)
+    allowed_methods = ('POST',)
     serializer_class = ContactSerializer
-    queryset = Contact.objects.all()
-
-    def get(self, request, format=None, *args, **kwargs):
-        # return self.list(request, *args, **kwargs)
-        return CustomJSONRenderer().render400()
+    # queryset = Contact.objects.all()
 
     def post(self, request, format=None, *args, **kwargs):
-        # print(str(self.is_valid()))
-        # print(str(request))
-        # if formData.is_valid():
         return self.create(request, *args, **kwargs)
-        # return CustomJSONRenderer().renderData(formData.error_messages)
