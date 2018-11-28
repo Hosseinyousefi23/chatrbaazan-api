@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shop',
     'contact',
+    'like',
+    'accounts',
     'rest_framework',
     'rest_auth',
     'rest_auth.registration',
@@ -161,15 +163,15 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 ***REMOVED***
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'shop.serializers.RegisterSerializerCustom',
+    'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializerCustom',
 ***REMOVED***
 
-AUTH_USER_MODEL = 'shop.User'
+AUTH_USER_MODEL = 'accounts.User'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 REST_USE_JWT = True
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'shop.serializers.CustomUserDetailsSerializer'
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer'
 ***REMOVED***

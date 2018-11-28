@@ -3,17 +3,10 @@ from rest_framework.response import Response
 
 
 class CustomJSONRenderer:
-    def render(self, message=None, data=None, error=None, status=200):
-        response_data = {
-            'message': message,
-            'data': data,
-            'error': error,
-            'status': status
-
-        ***REMOVED***
+    def render(self, response=None, status=200):
         # call super to render the response
 
-        return Response(response_data, status=status)
+        return Response(response, status=status)
 
     def renderData(self, data=None, status=200):
         # call super to render the response
@@ -44,6 +37,18 @@ class CustomJSONRenderer:
                     "status": 401,
                     "code": "Can Not Accept Request.",
                     "detail": "{***REMOVED***".format(detail)
+                ***REMOVED***
+            ]
+        ***REMOVED***
+
+        return Response(response_data)
+
+    def render400(self):
+        response_data = {
+            "errors": [
+                {
+                    "status": 400,
+                    "code": "Bad Request!",
                 ***REMOVED***
             ]
         ***REMOVED***
