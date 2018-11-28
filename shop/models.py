@@ -29,8 +29,14 @@ def generate_filename_ProductPic(instance, filename):
 
 def validate_mobile(mobile):
     if mobile:
-        if not re.match('^09[\d]{9***REMOVED***$', mobile):
-            raise ValidationError(u'شماره موبایل صحیح نمی باشد.')
+        if not re.match('^09[\d]{9***REMOVED***$', str(mobile)):
+            raise ValidationError(u'not Invalid Mobile')
+
+
+def validate_phone(phone):
+    if phone:
+        if not re.match('^0[\d]{10***REMOVED***$', str(phone)):
+            raise ValidationError(u'not Invalid Phone')
 
 
 class City(models.Model):

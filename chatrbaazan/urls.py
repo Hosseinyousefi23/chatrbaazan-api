@@ -36,6 +36,7 @@ urlpatterns = [
     path('auth/refresh/', refresh_jwt_token),
     path('auth/verify/', verify_jwt_token),
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
+    url(r'^api/v1/contact/', include('contact.routers')),
     url(r'^api/v1/', include('shop.routers')),
 ]
 if settings.DEBUG:
