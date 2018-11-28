@@ -27,6 +27,6 @@ urlpatterns = [
     url(r'^category/$', views.GetCategory.as_view()),
     url(r'^city/$', views.GetCity.as_view()),
     url(r'^banner/$', views.GetBanner.as_view()),
-    url(r'^offer$', views.GetOffer.as_view()),
+    url(r'^offer/$', views.GetOffer.as_view()),
     url(r'^route/', include(router.urls)),
 ]

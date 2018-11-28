@@ -1,7 +1,7 @@
 from platform import release
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import User, PermissionsMixin, AbstractUser
+from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.translation import gettext as _
@@ -13,93 +13,24 @@ import os
 
 from rest_framework.exceptions import ValidationError
 
+from accounts.models import User
 from chatrbaazan.settings import BASE_DIR
 
 fs = FileSystemStorage(location=BASE_DIR)
 
 
-def generate_filename_participiantPic(instance, filename):
+def generate_filename_bannerPic(instance, filename):
     return os.path.join(u"UpLoadedFiles", "Banner", str(instance.id), (filename))
+
+
+def generate_filename_ProductPic(instance, filename):
+    return os.path.join(u"UpLoadedFiles", "Product", str(instance.id), (filename))
 
 
 def validate_mobile(mobile):
     if mobile:
         if not re.match('^09[\d]{9}$', mobile):
             raise ValidationError(u'شماره موبایل صحیح نمی باشد.')
-
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, mobile, password=None):
-        """
-        Creates and saves a User with the given email, date of
-        birth and password.
-        """
-        if not email:
-            raise ValueError('Users must have an email address')
-
-        user = self.model(
-            email=self.normalize_email(email),
-            mobile=mobile,
-        )
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password):
-        """
-        Creates and saves a superuser with the given email, date of
-        birth and password.
-        """
-        user = self.create_user(
-            email,
-            password=password,
-            mobile=None
-        )
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
-
-
-class User(AbstractBaseUser):
-    email = models.EmailField(
-        verbose_name='email address',
-        max_length=255,
-        unique=True,
-    )
-    is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
-    mobile = models.CharField(max_length=11, blank=True, null=True,
-                              verbose_name="mobile", db_index=True, validators=[validate_mobile], unique=True)
-    first_name = models.CharField(max_length=150, verbose_name="first name")
-    last_name = models.CharField(max_length=150, verbose_name="last name")
-
-    objects = UserManager()
-
-    # REQUIRED_FIELDS = ['email', 'mobile']
-    USERNAME_FIELD = 'email'
-
-    class Meta:
-        unique_together = ('email',)
-
-    def __str__(self):
-        return self.email
-
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
-        return True
-
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
 
 
 class City(models.Model):
@@ -126,6 +57,15 @@ class ProductLabel(models.Model):
     available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
 
 
+class Discount(models.Model):
+    discount = models.CharField(max_length=500, verbose_name=u"کد تخفیف")
+    available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
+
+    class Meta:
+        verbose_name = u"کدتخفیف"
+        verbose_name_plural = u"کد تخفیف"
+
+
 class Product(models.Model):
     PRIORITY = (
         (1, u"فعال"),
@@ -137,15 +77,21 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=300, blank=False, null=False, verbose_name=u"نام")
     category = models.ManyToManyField(Category, related_name="product_category", verbose_name=u"دسته بندی")
-    company = models.ManyToManyField(Company, related_name="product_company", verbose_name=u"کمپانی")
-    label = models.ManyToManyField(ProductLabel, related_name="product_label", verbose_name=u"تگ")
-    priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=1, verbose_name=u"اولویت", )
+    company = models.ManyToManyField(Company, related_name="product_company", verbose_name=u"کمپانی", null=True,
+                                     blank=True)
+    discount = models.ForeignKey(Discount, null=True, blank=True, verbose_name=u"کد تخفیف", on_delete=models.CASCADE)
+    label = models.ManyToManyField(ProductLabel, related_name="product_label", verbose_name=u"تگ", null=True,
+                                   blank=True)
+    priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=1, verbose_name=u"اولویت")
     explanation = models.TextField(blank=True, null=True, verbose_name=u"توضیح")
     expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
-    city = models.ManyToManyField(City, related_name="product_city", verbose_name=u"شهر")
+    city = models.ManyToManyField(City, related_name="product_city", verbose_name=u"شهر", null=True, blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
+    chatrbazi = models.CharField(max_length=150, default=None, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
     is_free = models.BooleanField(default=False, verbose_name=u"رایگان")
     english_name = models.CharField(max_length=500, blank=True, null=True, verbose_name=u"نام کالا به انگلیسی‌")
+    image = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, verbose_name=u"تصویر",
+                              blank=True, null=True, max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -156,7 +102,7 @@ class Product(models.Model):
 
 class Banner(models.Model):
     title = models.CharField(max_length=150, null=False, blank=False, verbose_name=u"عنوان")
-    image = models.ImageField(storage=fs, upload_to=generate_filename_participiantPic, verbose_name=u"تصویر",
+    image = models.ImageField(storage=fs, upload_to=generate_filename_bannerPic, verbose_name=u"تصویر",
                               blank=True, null=True, max_length=500)
     category = models.ForeignKey(Category, related_name="banner_category", blank=True, null=True,
                                  verbose_name=u"دسته بندی", on_delete=models.CASCADE)
@@ -197,10 +143,11 @@ class Transaction(models.Model):
     def __unicode__(self):
         return 'بنر {}'.format(self.title)
 
-    class UserProduct(models.Model):
-        product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="userProduct_product",
-                                    verbose_name=u"محصول")
-        user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userProduct_user",
-                                 verbose_name=u"کاربر")
-        created_at = models.DateTimeField(auto_now_add=True)
-        updated_at = models.DateTimeField(auto_now=True)
+
+class UserProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="userProduct_product",
+                                verbose_name=u"محصول")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userProduct_user",
+                             verbose_name=u"کاربر")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

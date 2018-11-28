@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='banner',
             name='image',
-            field=models.ImageField(blank=True, max_length=500, null=True, storage=django.core.files.storage.FileSystemStorage(location='/home/chavoshipour/sites/chatrbaazan/chatrbaazan'), upload_to=shop.models.generate_filename_participiantPic, verbose_name='تصویر'),
+            field=models.ImageField(blank=True, max_length=500, null=True, storage=django.core.files.storage.FileSystemStorage(location='/home/chavoshipour/sites/chatrbaazan/chatrbaazan'), upload_to=shop.models.generate_filename_bannerPic, verbose_name='تصویر'),
         ),
     ]
