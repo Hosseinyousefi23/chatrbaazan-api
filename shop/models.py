@@ -164,6 +164,7 @@ class Banner(models.Model):
                                 verbose_name=u"محصول")
     is_slider = models.BooleanField(default=False, verbose_name=u"قرار دادن در اسلایدر")
     link = models.CharField(max_length=500, default=None, null=True, blank=True, verbose_name=u"لینک")
+    available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
 
     class Meta:
         verbose_name = u"بنر"

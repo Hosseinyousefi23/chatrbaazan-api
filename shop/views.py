@@ -8,9 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from shop.models import City, Banner
+from shop.models import City, Banner, Category
 from shop.renderers import CustomJSONRenderer
-from shop.serializers import CitySerializer, BannerSerializer
+from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer
 from rest_auth.registration.views import RegisterView
 
 
@@ -67,7 +67,10 @@ class GetCategory(APIView):
                  "open_chatrbazi": 1, "all_chatrbazi": 25000.0***REMOVED***,
                 {"id": "84969685-91d4-4e01-95b7-753557c98d35", "parent": None, "name": "گردشگری",
                  "eng_name": "Tourism", "open_chatrbazi": 0, "all_chatrbazi": None***REMOVED***]
-        return CustomJSONRenderer().renderData(data)
+        categoryData = Category.objects.filter(available=True)
+        categoryDataSerializer = CategorySerializer(categoryData, many=True).data
+        # TODO Cache Data Category
+        return CustomJSONRenderer().renderData(categoryDataSerializer)
 
 
 class GetCity(APIView):
@@ -89,7 +92,8 @@ class GetBanner(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
-        data = BannerSerializer(Banner.objects.all(), many=True).data
+        bannerData = Banner.objects.filter(available=True).order_by('-id')[:6]
+        data = BannerSerializer(bannerData, many=True).data
         return CustomJSONRenderer().renderData(data)
 
 
