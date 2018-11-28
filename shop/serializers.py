@@ -117,12 +117,13 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     label = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = (
             'name', 'priority', 'explanation', 'expiration_date', 'price', 'chatrbazi', 'is_free', 'english_name',
-            'image', 'category', 'label', 'city', 'company')
+            'image', 'category', 'label', 'city', 'company', 'discount')
 
     def get_image(self, obj):
         if obj.image:
@@ -143,6 +144,12 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_label(self, obj):
         if obj.label:
             return ProductLabelSerializer(obj.label.all(), many=True, pop=['available']).data
+
+    def get_discount(self, obj):
+        if obj.discount and obj.is_free:
+            return obj.discount.discount
+        else:
+            pass
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)

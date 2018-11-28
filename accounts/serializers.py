@@ -1,8 +1,21 @@
+from allauth.account.utils import setup_user_email
 from allauth.utils import email_address_exists
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from rest_framework import serializers
+from rest_framework_jwt.serializers import JSONWebTokenSerializer
+from rest_auth.registration.serializers import RegisterSerializer
+
+from django.contrib.auth import authenticate, get_user_model
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from accounts.adapters import CustomUserAccountAdapter
+from rest_framework_jwt.settings import api_settings
+
+from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel
 from .models import User
+import re
 
 
 class RegisterSerializerCustom(serializers.Serializer):

@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from django.db.models import Q
 
 from shop.models import City, Banner, Category, Product
 from shop.renderers import CustomJSONRenderer
@@ -83,11 +84,10 @@ class GetOffer(APIView, PageNumberPagination):
         limits = request.GET.get('limits', 10)
         try:
             limits = int(limits)
-        except(ValueError):
+        except ValueError as e:
             limits = 5
         if limits >= 30:
             limits = 30
-
         ordering = request.GET.get('ordering', '-priority')
         order = ['priority', '-priority', 'created_at']
         if ordering not in order:
@@ -96,6 +96,8 @@ class GetOffer(APIView, PageNumberPagination):
         cityId = request.GET.get('city', None)
         categoryId = request.GET.get('category', None)
         products = Product.objects.all().order_by(ordering, '-expiration_date')
+        search = request.GET.get('search', None)
+
         if cityId is not None:
             city = City.objects.filter(id=cityId)
             if city.count() == 0:
@@ -105,6 +107,8 @@ class GetOffer(APIView, PageNumberPagination):
             category = Category.objects.filter(id=categoryId)
             if category.count() == 0:
                 products = products.filter(category__id__in=category.values('id'))
+        if search is not None:
+            products = products.filter(Q(name__contains=search) | Q(explanation__contains=search))
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
