@@ -175,3 +175,4 @@ REST_USE_JWT = True
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer'
 ***REMOVED***
+
