@@ -100,12 +100,11 @@ class GetOffer(APIView, PageNumberPagination):
 
         if cityId is not None:
             city = City.objects.filter(id=cityId)
-            if city.count() == 0:
-                return None
-            products = products.filter(city__id__in=city.values('id'))
+            if city.count() > 0:
+                products = products.filter(city__id__in=city.values('id'))
         elif categoryId is not None:
             category = Category.objects.filter(id=categoryId)
-            if category.count() == 0:
+            if category.count() > 0:
                 products = products.filter(category__id__in=category.values('id'))
         if search is not None:
             products = products.filter(Q(name__contains=search) | Q(explanation__contains=search))
