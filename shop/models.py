@@ -92,7 +92,7 @@ class Product(models.Model):
     explanation = models.TextField(blank=True, null=True, verbose_name=u"توضیح")
     expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
     city = models.ManyToManyField(City, related_name="product_city", verbose_name=u"شهر", null=True, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
     chatrbazi = models.CharField(max_length=150, default=None, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
     is_free = models.BooleanField(default=False, verbose_name=u"رایگان")
     english_name = models.CharField(max_length=500, blank=True, null=True, verbose_name=u"نام کالا به انگلیسی‌")
@@ -138,7 +138,7 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transaction_user",
                              verbose_name=u"کاربر")
     status = models.PositiveSmallIntegerField(choices=STATUS, verbose_name=u"وضعیت", default=3)
-    price = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
