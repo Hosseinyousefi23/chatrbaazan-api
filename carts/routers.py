@@ -24,5 +24,5 @@ from . import views
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    url(r'^add/$', views.AddCart.as_view()),
+    url(r'^$', views.AddCart.as_view()),
 ]

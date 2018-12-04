@@ -20,7 +20,6 @@ from rest_framework.exceptions import ValidationError
 from social_core.utils import slugify
 
 from accounts.models import User
-from chatrbaazan.service import unique_slugify
 from chatrbaazan.settings import BASE_DIR
 
 fs = FileSystemStorage(location=BASE_DIR)
