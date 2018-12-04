@@ -65,8 +65,13 @@ class AddCart(mixins.CreateModelMixin,
             print('error when create item', str(e))
             return Response({'message': 'Problem When Add product To Cart Try Again.'})
         # Create Item Product
-        return CustomJSONRenderer().renderData(CartSerializer(Cart.objects.get(pk=cart.data['id']), many=False).data,
-                                               status=201)
+        cart = Cart.objects.get(pk=cart.data['id'])
+        return CustomJSONRenderer().render(
+            {
+                'count': cart.count(),
+                'result': CartSerializer(cart, many=True).data
+            }, status=201
+        )
 
     def get(self, request, format=None, *args, **kwargs):
         cart = Cart.objects.filter(user=request.user)
