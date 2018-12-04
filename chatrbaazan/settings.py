@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'contact',
     'carts',
     'like',
+    'emm',
     'accounts',
     'rest_framework',
     'rest_auth',
