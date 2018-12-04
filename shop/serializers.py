@@ -110,7 +110,7 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         if obj.image:
-            return obj.image.url
+            return self.context['request'].build_absolute_uri(obj.image.url)
         else:
             pass
 
@@ -146,9 +146,9 @@ class ProductSerializer(serializers.ModelSerializer):
             'name', 'priority', 'explanation', 'expiration_date', 'price', 'chatrbazi', 'is_free', 'english_name',
             'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug')
 
-    def get_image(self, obj):
+    def get_image(self, obj, **kwargs):
         if obj.image:
-            return obj.image.url
+            return self.context['request'].build_absolute_uri(obj.image.url)
 
     def get_city(self, obj):
         if obj.city:
@@ -174,12 +174,11 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_gallery(self, obj):
         if obj.gallery:
-            return ProductGallerySerializer(obj.gallery.all(), many=True).data
+            return ProductGallerySerializer(obj.gallery.all(), context=self.context, many=True).data
         else:
             pass
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
-
         for fd in pop:
             self.fields.pop(fd)
