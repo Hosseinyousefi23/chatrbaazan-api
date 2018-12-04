@@ -119,7 +119,7 @@ class GetOffers(APIView, PageNumberPagination):
                 ('count', self.page.paginator.count),
                 ('next', self.get_next_link()),
                 ('previous', self.get_previous_link()),
-                ('results', ProductSerializer(products, many=True).data)
+                ('results', ProductSerializer(products, many=True, context={'request': request}).data)
             ])
         )
 
@@ -132,4 +132,5 @@ class GetOffer(APIView, PageNumberPagination):
         product = Product.objects.filter(slug=slug)
         if not product.exists():
             return CustomJSONRenderer().render400()
-        return CustomJSONRenderer().renderData(ProductSerializer(product.first(), many=False).data)
+        return CustomJSONRenderer().renderData(
+            ProductSerializer(product.first(), context={'request': request}, many=False).data)
