@@ -73,7 +73,7 @@ class GetBanner(APIView):
         return CustomJSONRenderer().renderData(data)
 
 
-class GetOffer(APIView, PageNumberPagination):
+class GetOffers(APIView, PageNumberPagination):
     permission_classes = (AllowAny,)
     allowed_methods = ('GET',)
     page_size = 20
@@ -122,3 +122,14 @@ class GetOffer(APIView, PageNumberPagination):
                 ('results', ProductSerializer(products, many=True).data)
             ])
         )
+
+
+class GetOffer(APIView, PageNumberPagination):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, slug, format=None, ):
+        product = Product.objects.filter(slug=slug)
+        if not product.exists():
+            return CustomJSONRenderer().render400()
+        return CustomJSONRenderer().renderData(ProductSerializer(product.first(), many=False).data)

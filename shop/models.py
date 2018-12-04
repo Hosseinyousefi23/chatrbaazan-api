@@ -1,9 +1,14 @@
 from platform import release
 
+import itertools
+
+from datetime import date
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils.translation import gettext as _
 
 # Create your models here.
@@ -12,18 +17,30 @@ import re
 import os
 
 from rest_framework.exceptions import ValidationError
+from social_core.utils import slugify
 
 from accounts.models import User
+from chatrbaazan.service import unique_slugify
 from chatrbaazan.settings import BASE_DIR
 
 fs = FileSystemStorage(location=BASE_DIR)
 
 
 def generate_filename_bannerPic(instance, filename):
+    if not instance.id:
+        instance.id = date.today().year
     return os.path.join(u"UpLoadedFiles", "Banner", str(instance.id), (filename))
 
 
 def generate_filename_ProductPic(instance, filename):
+    if not instance.id:
+        instance.id = date.today().year
+    return os.path.join(u"UpLoadedFiles", "Product", str(instance.id), (filename))
+
+
+def generate_filename_ProductPic(instance, filename):
+    if not instance.id:
+        instance.id = date.today().year
     return os.path.join(u"UpLoadedFiles", "Product", str(instance.id), (filename))
 
 
@@ -72,6 +89,17 @@ class Discount(models.Model):
         verbose_name_plural = u"کد تخفیف"
 
 
+class ProductGallery(models.Model):
+    title = models.CharField(max_length=300, null=True, blank=True, verbose_name=u"نام فایل")
+    image = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, verbose_name=u"تصویر",
+                              blank=True, null=True, max_length=500)
+
+    # def save(self, *args, **kwargs):
+    #     super(ProductGallery, self).save(*args, **kwargs)
+    # self.title = 's'
+    # self.save()
+
+
 class Product(models.Model):
     PRIORITY = (
         (1, u"فعال"),
@@ -98,12 +126,25 @@ class Product(models.Model):
     english_name = models.CharField(max_length=500, blank=True, null=True, verbose_name=u"نام کالا به انگلیسی‌")
     image = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, verbose_name=u"تصویر",
                               blank=True, null=True, max_length=500)
+    gallery = models.ManyToManyField(ProductGallery, related_name="product_gallery", null=True, blank=True,
+                                     verbose_name=u"گالری")
+    slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = u"محصولات"
         verbose_name_plural = u"محصولات"
+
+    def save(self, **kwargs):
+        self.slug = orig = str((self.name)).replace(' ', '-')
+        for x in itertools.count(1):
+            if not Product.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                break
+            self.slug = '%s-%d' % (orig, x)
+        # self.save()
+        print(str(self.slug))
+        super(Product, self).save(**kwargs)
 
 
 class Banner(models.Model):

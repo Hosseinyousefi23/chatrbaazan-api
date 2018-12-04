@@ -1,3 +1,4 @@
+import os
 from allauth.account.utils import setup_user_email
 from allauth.utils import email_address_exists
 from django.contrib.auth import get_user_model
@@ -13,7 +14,7 @@ from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
 
-from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel
+from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel, ProductGallery
 from accounts.models import User
 import re
 
@@ -60,7 +61,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi')
+        fields = ('id', 'name', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi')
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -99,6 +100,25 @@ class ProductLabelSerializer(serializers.ModelSerializer):
             self.fields.pop(fd)
 
 
+class ProductGallerySerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductGallery
+        fields = '__all__'
+
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        else:
+            pass
+
+    def get_title(self, obj):
+        pass
+        # return os.path.split(obj.image.url)[0]
+
+
 class DiscountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discount
@@ -118,12 +138,13 @@ class ProductSerializer(serializers.ModelSerializer):
     label = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
+    gallery = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = (
             'name', 'priority', 'explanation', 'expiration_date', 'price', 'chatrbazi', 'is_free', 'english_name',
-            'image', 'category', 'label', 'city', 'company', 'discount')
+            'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug')
 
     def get_image(self, obj):
         if obj.image:
@@ -148,6 +169,12 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_discount(self, obj):
         if obj.discount and obj.is_free:
             return obj.discount.discount
+        else:
+            pass
+
+    def get_gallery(self, obj):
+        if obj.gallery:
+            return ProductGallerySerializer(obj.gallery.all(), many=True).data
         else:
             pass
 
