@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^api/v1/like/', include('like.routers')),
     url(r'^api/v1/cart/', include('carts.routers')),
     url(r'^api/v1/about/', include('about.routers')),
+    url(r'^api/v1/user/', include('accounts.routers')),
     url(r'^api/v1/', include('shop.routers')),
 ]
 if settings.DEBUG:

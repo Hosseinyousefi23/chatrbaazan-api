@@ -13,6 +13,8 @@ from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
 
+from accounts.adapters import CustomUserAccountAdapter
+from accounts.models import UserSendCode
 from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel
 from .models import User
 import re
@@ -69,3 +71,13 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email',)
         read_only_fields = ('email',)
+
+
+class UserSendCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserSendCode
+        fields = '__all__'
+        extra_kwargs = {
+            'user': {'write_only': True***REMOVED***,
+            'status': {'write_only': True***REMOVED***
+        ***REMOVED***
