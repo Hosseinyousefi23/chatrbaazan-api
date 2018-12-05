@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from django.db.models import Count, Max
 
 from django.contrib.auth.models import User
 from django.shortcuts import render
@@ -12,6 +13,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
 
+from like.models import Like
+from like.serializers import LikeSerializer
 from shop.models import City, Banner, Category, Product, Company
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer
@@ -88,17 +91,25 @@ class GetOffers(APIView, PageNumberPagination):
             limits = 5
         if limits >= 30:
             limits = 30
-        ordering = request.GET.get('ordering', '-priority')
-        order = ['priority', '-priority', 'created_at']
+        ordering = request.GET.get('ordering', 'created_at')
+        order = ['favorites', 'topchatrbazi', 'created_at']
         if ordering not in order:
-            ordering = '-ordering'
+            ordering = '-created_at'
 
         cityId = request.GET.get('city', None)
         categoryId = request.GET.get('category', None)
         companyId = request.GET.get('company', None)
-        products = Product.objects.all().order_by(ordering, '-expiration_date')
         search = request.GET.get('search', None)
 
+        if ordering == 'created_at':
+            products = Product.objects.all().order_by(ordering, '-expiration_date')
+        else:
+            if ordering == 'favorites':
+                like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')).order_by(
+                    '-count')
+                products = Product.objects.filter(id__in=like.values('product__id'))
+            elif ordering == 'topchatrbazi':
+                products = Product.objects.all().order('-chatrbazi')
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
             if city.count() > 0:
