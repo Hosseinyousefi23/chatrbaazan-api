@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Q
 
-from shop.models import City, Banner, Category, Product
+from shop.models import City, Banner, Category, Product, Company
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer
 from rest_auth.registration.views import RegisterView
@@ -95,17 +95,28 @@ class GetOffers(APIView, PageNumberPagination):
 
         cityId = request.GET.get('city', None)
         categoryId = request.GET.get('category', None)
+        companyId = request.GET.get('company', None)
         products = Product.objects.all().order_by(ordering, '-expiration_date')
         search = request.GET.get('search', None)
 
         if cityId is not None:
-            city = City.objects.filter(id=cityId)
+            city = City.objects.filter(id=convert_to_int(cityId))
             if city.count() > 0:
                 products = products.filter(city__id__in=city.values('id'))
+            else:
+                return None
         elif categoryId is not None:
-            category = Category.objects.filter(id=categoryId)
+            category = Category.objects.filter(id=convert_to_int(categoryId))
             if category.count() > 0:
                 products = products.filter(category__id__in=category.values('id'))
+            else:
+                return None
+        elif companyId is not None:
+            company = Company.objects.filter(id=convert_to_int(companyId))
+            if company.count() > 0:
+                products = products.filter(company__id__in=company.values('id'))
+            else:
+                return None
         if search is not None:
             products = products.filter(Q(name__contains=search) | Q(explanation__contains=search))
         return self.paginate_queryset(products, self.request)
@@ -134,3 +145,13 @@ class GetOffer(APIView, PageNumberPagination):
             return CustomJSONRenderer().render400()
         return CustomJSONRenderer().renderData(
             ProductSerializer(product.first(), context={'request': request***REMOVED***, many=False).data)
+
+
+def convert_to_int(number):
+    try:
+        cnumber = int(number)
+        return cnumber
+    except ValueError as verr:
+        return 0
+    except Exception as ex:
+        return 0
