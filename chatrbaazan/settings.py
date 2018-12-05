@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'carts',
     'like',
     'emm',
+    'about',
     'accounts',
     'rest_framework',
     'rest_auth',
