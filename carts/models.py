@@ -23,19 +23,31 @@ class Cart(models.Model):
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE, related_name="cart_user",
                              verbose_name=u"کاربر")
     price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
-    total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
+                                      verbose_name=u"مبلغ نهایی")
     status = models.PositiveSmallIntegerField(choices=STATUS, default=1, verbose_name=u"وضعیت")
     # session = models.ForeignKey(CartSession, on_delete=models.CASCADE, related_name="cart_session",
     #                             verbose_name=u"جلسه")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = u"سبد خرید"
+        verbose_name_plural = u"سبد خرید"
+
 
 class CartItem(models.Model):
     product = models.ForeignKey(Product, models.CASCADE, related_name="cartItem_product", verbose_name=u"محصول")
     price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
-    total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ نهایی")
     cart = models.ForeignKey(Cart, models.CASCADE, related_name="cartItem_cart", verbose_name=u"سبد خرید")
     count = models.IntegerField(default=1, verbose_name=u"تعداد")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = u"آیتم های سبد خرید"
+        verbose_name_plural = u"آیتم های سبد خرید"
+
+    def __str__(self):
+        return str(self.product)

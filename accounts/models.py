@@ -98,6 +98,10 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
+    class Meta:
+        verbose_name = u"کاربران"
+        verbose_name_plural = u"کاربران"
+
 
 class UserSendCode(models.Model):
     STATUS = (
@@ -112,3 +116,7 @@ class UserSendCode(models.Model):
     expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
     chatrbazi = models.CharField(max_length=150, default=None, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
     status = models.PositiveSmallIntegerField(choices=STATUS, default=2, verbose_name=u"وضعیت")
+
+    class Meta:
+        verbose_name = u"کدهای ارسال کاربران"
+        verbose_name_plural = u"کدهای ارسال کاربران"
