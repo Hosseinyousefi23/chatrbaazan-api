@@ -22,3 +22,10 @@ class About(models.Model):
     status = models.PositiveSmallIntegerField(choices=STATUS, default=2, verbose_name=u"وضعیت")
     image = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, verbose_name=u"تصویر",
                               blank=True, null=True, max_length=500)
+
+    class Meta:
+        verbose_name_plural = u"درباره ما"
+        verbose_name = u"درباره ما"
+
+    def __str__(self):
+        return 'متن {} صفحه درباره ما'.format(self.pk)
