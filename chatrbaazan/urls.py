@@ -31,6 +31,7 @@ from shop import serializers
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     path('admin/', admin.site.urls),
     url(r'^', include('shop.urls')),
     path('auth/login/', ObtainJSONWebToken.as_view()),
@@ -44,6 +45,7 @@ urlpatterns = [
     url(r'^api/v1/about/', include('about.routers')),
     url(r'^api/v1/user/', include('accounts.routers')),
     url(r'^api/v1/', include('shop.routers')),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

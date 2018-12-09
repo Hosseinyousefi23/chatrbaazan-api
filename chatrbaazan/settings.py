@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'ckeditor',
+    'ckeditor_uploader',
     'jet.dashboard',
     'jet',
     'django.contrib.admin',
@@ -53,8 +55,78 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_framework.authtoken',
-]
 
+
+]
+# CKEDITOR_BASEPATH = "/public/assets/ckeditor/ckeditor"
+# CKEDITOR_JQUERY_URL = STATIC_ROOT + '/js/jquery.min.js'
+CKEDITOR_UPLOAD_PATH = "editor/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'skin': 'moono',
+        # 'skin': 'office2013',
+        'toolbar_Basic': [
+            ['Source', '-', 'Bold', 'Italic']
+        ],
+        'toolbar_YourCustomToolbarConfig': [
+            {'name': 'document', 'items': ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']***REMOVED***,
+            {'name': 'clipboard', 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']***REMOVED***,
+            {'name': 'editing', 'items': ['Find', 'Replace', '-', 'SelectAll']***REMOVED***,
+            {'name': 'forms',
+             'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
+                       'HiddenField']***REMOVED***,
+            '/',
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']***REMOVED***,
+            {'name': 'paragraph',
+             'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
+                       'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl',
+                       'Language']***REMOVED***,
+            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']***REMOVED***,
+            {'name': 'insert',
+             'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']***REMOVED***,
+            '/',
+            {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']***REMOVED***,
+            {'name': 'colors', 'items': ['TextColor', 'BGColor']***REMOVED***,
+            {'name': 'tools', 'items': ['Maximize', 'ShowBlocks']***REMOVED***,
+            {'name': 'about', 'items': ['About']***REMOVED***,
+            '/',  # put this to force next toolbar on new line
+            {'name': 'yourcustomtools', 'items': [
+                # put the name of your editor.ui.addButton here
+                'Preview',
+                'Maximize',
+
+            ]***REMOVED***,
+        ],
+        'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
+        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] ***REMOVED***],
+        # 'height': 291,
+        # 'width': '100%',
+        # 'filebrowserWindowHeight': 725,
+        # 'filebrowserWindowWidth': 940,
+        # 'toolbarCanCollapse': True,
+        # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'tabSpaces': 4,
+        'extraPlugins': ','.join([
+            'uploadimage',  # the upload image feature
+            # your extra plugins here
+            'div',
+            'autolink',
+            'autoembed',
+            'embedsemantic',
+            'autogrow',
+            # 'devtools',
+            'widget',
+            'lineutils',
+            'clipboard',
+            'dialog',
+            'dialogui',
+            'elementspath'
+        ]),
+    ***REMOVED***
+***REMOVED***
+# end config edit
 LOGIN_REDIRECT_URL = "/"
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # ACCOUNT_EMAIL_REQUIRED = True
