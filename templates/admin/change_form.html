@@ -1,0 +1,19 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{% load static %}
+<script src="{% static "jquery/jquery.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+<script>
+//    CKEDITOR.replaceClass('vLargeTextField');
+$(document).ready(function () {
+        $("textarea").each(function(){
+            console.log(this)
+            CKEDITOR.replace( this );
+        });
+})
+</script>
+{{ block.super }}
+{% endblock %}
