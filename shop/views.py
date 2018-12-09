@@ -72,7 +72,7 @@ class GetBanner(APIView):
 
     def get(self, request, format=None, ):
         bannerData = Banner.objects.filter(available=True).order_by('-id')[:6]
-        data = BannerSerializer(bannerData, many=True).data
+        data = BannerSerializer(bannerData, many=True, context={'request': request***REMOVED***).data
         return CustomJSONRenderer().renderData(data)
 
 
