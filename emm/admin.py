@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 # Register your models here.
 
-class EmailLogAdmin(admin.ModelAdmin):
+class EmailAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         # print(str(obj.user.all().count()))
         if not obj.pk:
@@ -33,5 +33,10 @@ class EmailLogAdmin(admin.ModelAdmin):
             super(EmailLogAdmin, self).save_model(request, obj, form, change)
 
 
-admin.site.register(EmailEMM, EmailLogAdmin)
-admin.site.register(EmailLog)
+class EmailLogAdmin(admin.ModelAdmin):
+    list_display = ['user', 'email']
+    list_display_links = ['user']
+
+
+admin.site.register(EmailEMM, EmailAdmin)
+admin.site.register(EmailLog, EmailLogAdmin)

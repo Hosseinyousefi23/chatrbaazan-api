@@ -12,3 +12,11 @@ pip install -r package.txt
 ```$xslt
 python 3.6
 ```
+
+### Config For Jet Dashboard
+```$xslt
+python manage.py migrate jet
+python manage.py migrate dashboard
+python manage.py collectstatic
+
+```

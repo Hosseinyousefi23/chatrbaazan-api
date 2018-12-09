@@ -11,10 +11,18 @@ from django.dispatch import receiver
 
 # Create your models here.
 class EmailEMM(models.Model):
+    title = models.CharField(max_length=250, blank=True, null=True, default=None, verbose_name=u"عنوان ایمیل")
     user = models.ManyToManyField(User, related_name="emailEmm_user", verbose_name=u"کاربر")
     text = models.TextField(verbose_name=u"متن ایمیل", blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = u"ایمیل مارکتینگ"
+        verbose_name_plural = u"ایمیل مارکتینگ"
+
+    def __str__(self):
+        return str(self.title) if self.title else 'ایمیل ' + str(self.created_at)
 
 
 class EmailLog(models.Model):
@@ -29,6 +37,12 @@ class EmailLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name = u"ایمیل های داخل صف"
+        verbose_name_plural = u"ایمیل های داخل صف"
+
+    def __str__(self):
+        return str(self.user)
 
 # @receiver(post_save, sender=EmailEMM)
 # def send_user_data_when_created_by_admin(sender, instance, created=True, raw=True, *args, **kwargs):
