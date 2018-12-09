@@ -140,7 +140,8 @@ class GetOffers(APIView, PageNumberPagination):
             else:
                 return None
         if search is not None:
-            products = products.filter(Q(name__contains=search) | Q(explanation__contains=search))
+            products = products.filter(Q(name__contains=search) | Q(explanation__contains=search) |
+                                       Q(company__name=search) | Q(category__name=search))
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
