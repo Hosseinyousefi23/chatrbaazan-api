@@ -46,7 +46,8 @@ class BannerSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         if obj.image:
-            return obj.image.url
+            return self.context['request'].build_absolute_uri(obj.image.url)
+            # return obj.image.url
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)

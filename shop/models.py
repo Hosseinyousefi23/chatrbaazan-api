@@ -68,7 +68,7 @@ class Category(models.Model):
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
 
     def __str__(self):
-        return 
+        return self.name or ''
 
     def save(self, **kwargs):
         self.slug = orig = str((self.name)).replace(' ', '-')
@@ -193,9 +193,8 @@ class Banner(models.Model):
         verbose_name = u"بنر"
         verbose_name_plural = u"بنر"
 
-    def __unicode__(self):
-        return 'بنر {}'.format(self.title)
-
+    def __str__(self):
+        return self.title or ''
 
 class Transaction(models.Model):
     STATUS = (
