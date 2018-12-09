@@ -145,6 +145,9 @@ class Product(models.Model):
         print(str(self.slug))
         super(Product, self).save(**kwargs)
 
+    def __str__(self):
+        return str(self.name)
+
 
 class Banner(models.Model):
     title = models.CharField(max_length=150, null=False, blank=False, verbose_name=u"عنوان")

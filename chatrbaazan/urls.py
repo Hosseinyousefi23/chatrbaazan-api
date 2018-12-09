@@ -29,6 +29,8 @@ from chatrbaazan import settings
 from shop import serializers
 
 urlpatterns = [
+    url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
+    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     path('admin/', admin.site.urls),
     url(r'^', include('shop.urls')),
     path('auth/login/', ObtainJSONWebToken.as_view()),
