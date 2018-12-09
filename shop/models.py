@@ -65,6 +65,22 @@ class Category(models.Model):
     name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام")
     english_name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام (انگلیسی)")
     available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
+    slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
+
+    def __str__(self):
+        return 
+
+    def save(self, **kwargs):
+        self.slug = orig = str((self.name)).replace(' ', '-')
+        for x in itertools.count(1):
+            if not Company.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                break
+            self.slug = '%s-%d' % (orig, x)
+        # self.save()
+        print(str(self.slug))
+        super(Product, self).save(**kwargs)
+
+
 
 
 class Company(models.Model):
@@ -72,6 +88,18 @@ class Company(models.Model):
     category = models.ForeignKey(Category, related_name="category_company", null=True, default=None, blank=True,
                                  verbose_name=u"دسته بندی", on_delete=models.CASCADE)
     available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
+    slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
+
+    def save(self, **kwargs):
+        self.slug = orig = str((self.name)).replace(' ', '-')
+        for x in itertools.count(1):
+            if not Company.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                break
+            self.slug = '%s-%d' % (orig, x)
+        # self.save()
+        print(str(self.slug))
+        super(Product, self).save(**kwargs)
+
 
 
 class ProductLabel(models.Model):

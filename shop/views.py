@@ -98,7 +98,9 @@ class GetOffers(APIView, PageNumberPagination):
 
         cityId = request.GET.get('city', None)
         categoryId = request.GET.get('category', None)
+        categorySlug = request.GET.get('category_slug', None)
         companyId = request.GET.get('company', None)
+        companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
 
         if ordering == 'created_at':
@@ -118,14 +120,21 @@ class GetOffers(APIView, PageNumberPagination):
                 products = products.filter(city__id__in=city.values('id'))
             else:
                 return None
-        if categoryId is not None:
-            category = Category.objects.filter(id=convert_to_int(categoryId))
+        if categoryId is not None or categorySlug:
+            if categoryId is not None:
+                category = Category.objects.filter(id=convert_to_int(categoryId))
+            elif categorySlug is not None:
+                category = Category.objects.filter(slug=categorySlug)
             if category.count() > 0:
                 products = products.filter(category__id__in=category.values('id'))
             else:
                 return None
-        if companyId is not None:
-            company = Company.objects.filter(id=convert_to_int(companyId))
+        if companyId is not None or companySlug is not None:
+            if companyId is not None:
+                company = Company.objects.filter(id=convert_to_int(companyId))
+            elif companySlug is not None:
+                company = Company.objects.filter(slug=companySlug)
+
             if company.count() > 0:
                 products = products.filter(company__id__in=company.values('id'))
             else:
