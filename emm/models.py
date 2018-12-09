@@ -31,8 +31,10 @@ class EmailLog(models.Model):
         (2, u"مشکل در ارسال"),
         (3, u"در حال ارسال")
     )
+    email = models.ForeignKey(EmailEMM, default=None, blank=True, null=True, verbose_name=u"ایمیل",
+                              on_delete=models.SET_NULL)
     user = models.ForeignKey(User, related_name="emailLog_user", verbose_name=u"کاربر", on_delete=models.CASCADE)
-    email = models.TextField(blank=False, null=False, verbose_name=u"ایمیل")
+    body = models.TextField(blank=False, null=False, verbose_name=u"ایمیل")
     status = models.PositiveSmallIntegerField(choices=STATUS, default=3, blank=False, null=False, verbose_name=u"وضعیت")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
