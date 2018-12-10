@@ -76,12 +76,12 @@ class Category(models.Model):
     def save(self, **kwargs):
         self.slug = orig = str((self.name)).replace(' ', '-')
         for x in itertools.count(1):
-            if not Company.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+            if not Category.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
                 break
             self.slug = '%s-%d' % (orig, x)
         # self.save()
         print(str(self.slug))
-        super(Product, self).save(**kwargs)
+        super(Category, self).save(**kwargs)
 
 
 class Company(models.Model):
@@ -102,7 +102,7 @@ class Company(models.Model):
             self.slug = '%s-%d' % (orig, x)
         # self.save()
         print(str(self.slug))
-        super(Product, self).save(**kwargs)
+        super(Company, self).save(**kwargs)
 
 
 class ProductLabel(models.Model):
