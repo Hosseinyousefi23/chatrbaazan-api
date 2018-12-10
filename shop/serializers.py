@@ -62,7 +62,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi')
+        fields = ('id', 'name', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi','slug')
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -80,7 +80,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ('name', 'available')
+        fields = ('name', 'available','slug')
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
