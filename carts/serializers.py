@@ -13,8 +13,8 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'product', 'price', 'total_price', 'count')
 
     def get_product(self, obj):
-        pass
-        # return ProductSerializer(Product.objects.get(id=obj.product.id), many=False,).data
+        return ProductSerializer(Product.objects.get(id=obj.product.id), many=False,
+                                 context={'request': self.context['request']}).data
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -25,4 +25,5 @@ class CartSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_item(self, obj):
-        return CartItemSerializer(CartItem.objects.filter(cart__id=obj.pk), many=True).data
+        return CartItemSerializer(CartItem.objects.filter(cart__id=obj.pk), many=True,
+                                  context={'request': self.context['request']}).data
