@@ -103,17 +103,6 @@ class GetOffers(APIView, PageNumberPagination):
         companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
 
-        if ordering == 'created_at':
-            products = Product.objects.all().order_by(ordering, '-expiration_date')
-        else:
-            if ordering == 'favorites':
-                like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')).order_by(
-                    '-count')
-                products = Product.objects.filter(id__in=like.values('product__id'))
-            elif ordering == 'topchatrbazi':
-                products = Product.objects.all().order_by('-chatrbazi')
-            else:
-                return None
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
             if city.count() > 0:
@@ -142,6 +131,18 @@ class GetOffers(APIView, PageNumberPagination):
         if search is not None:
             products = products.filter(Q(name__contains=search) | Q(explanation__contains=search) |
                                        Q(company__name=search) | Q(category__name=search))
+        if products is not None or products.count() > 0:  # fix ordering products
+            if ordering == 'created_at':
+                products = products.order_by(ordering, '-expiration_date')
+            else:
+                if ordering == 'favorites':
+                    like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')).order_by(
+                        '-count')
+                    products = products.filter(id__in=like.values('product__id'))
+                elif ordering == 'topchatrbazi':
+                    products = products.all().order_by('-chatrbazi')
+                else:
+                    return None
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
