@@ -60,16 +60,30 @@ class CartItem(models.Model):
         oldData = self
         print('cart', str(self.cart))
         super(CartItem, self).delete(*args, **kwargs)
-        cart = Cart.objects.filter(id=self.cart.id)
-        if cart.exists():
-            item = CartItem.objects.filter(cart__id=oldData.id)
+        cart = Cart.objects.filter(id=oldData.cart.id)
+        if cart.count() > 0:
+            item = CartItem.objects.filter(cart__id=cart.first().id)
             if item.count() == 0:
+                print('count item', str(item.count()))
                 cart.first().delete()
             else:
                 cart = cart.first()
                 cart.price = cart.price - oldData.total_price
-                cart.total_price = cart.price - oldData.total_price
+                cart.total_price = cart.total_price - oldData.total_price
                 if cart.price < 0 or cart.total_price < 0:
                     cart.delete()
+                    print('bug')
                 else:
                     cart.save()
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, *args, **kwargs):
+        super(CartItem, self).save(*args, **kwargs)
+        cartItem = CartItem.objects.filter(cart__id=self.cart.id)
+        tt_price = 0
+        if cartItem.count() > 0:
+            for citem in cartItem:
+                tt_price += citem.total_price
+
+        if tt_price >= 0:
+            Cart.objects.filter(id=self.cart.id).update(price=tt_price, total_price=tt_price)

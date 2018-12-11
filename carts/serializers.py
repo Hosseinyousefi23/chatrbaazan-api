@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from carts.models import Cart, CartItem
+from shop.models import Product
+from shop.serializers import ProductSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -11,7 +13,8 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ('id', 'product', 'price', 'total_price', 'count')
 
     def get_product(self, obj):
-        return obj.product.name
+        pass
+        # return ProductSerializer(Product.objects.get(id=obj.product.id), many=False,).data
 
 
 class CartSerializer(serializers.ModelSerializer):
