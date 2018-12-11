@@ -75,7 +75,7 @@ class AddCart(mixins.CreateModelMixin,
         cart = Cart.objects.get(pk=cart.data['id'])
         return CustomJSONRenderer().render(
             {
-                'count': cart.count(),
+                'count': Cart.objects.filter(user=request.user).count(),
                 'result': CartSerializer(cart, many=True).data
             }, status=201
         )
