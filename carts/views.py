@@ -60,7 +60,7 @@ class AddCart(mixins.CreateModelMixin,
         if cart.count() == 0:
             cart = self.create(request, *args, **kwargs)
         else:
-            cart = CartSerializer(cart.first(), many=False)
+            cart = CartSerializer(cart.first(), many=False, context={'request': request***REMOVED***)
 
         print(str(cart.data['id']))
         try:
@@ -90,7 +90,7 @@ class AddCart(mixins.CreateModelMixin,
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
-                'result': CartSerializer(cart, many=True).data
+                'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
             ***REMOVED***, status=201
         )
 
@@ -99,7 +99,7 @@ class AddCart(mixins.CreateModelMixin,
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
-                'result': CartSerializer(cart, many=True).data
+                'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
             ***REMOVED***
         )
 
@@ -124,6 +124,6 @@ class AddCart(mixins.CreateModelMixin,
             return CustomJSONRenderer().render(
                 {
                     'count': cart.count(),
-                    'result': CartSerializer(cart, many=True).data
+                    'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
                 ***REMOVED***, status=201
             )
