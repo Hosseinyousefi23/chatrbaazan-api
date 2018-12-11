@@ -35,16 +35,13 @@ class AddCart(mixins.CreateModelMixin,
     queryset = Cart.objects.all()
 
     def post(self, request, format=None, *args, **kwargs):
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
-        if 'product' not in body_data:
-            pId = 0
-        else:
-            pId = body_data['product']
+        # body_unicode = request.body.decode('utf-8')
+        # body_data = json.loads(body_unicode)
+        pId = request.POST.get('product', 0)
         # check exists Product
         product = Product.objects.filter(id=pId)
         if not product.exists():
-            return CustomJSONRenderer().render400()
+            return CustomJSONRenderer().render404('product', '')
         product = product.first()
         if product.is_free or product.price == 0:
             return Response({'message': 'Product Is Free, can not add to cart'***REMOVED***, status=400)
@@ -59,17 +56,32 @@ class AddCart(mixins.CreateModelMixin,
         request.data.update(price=product.price)
         request.data.update(total_price=product.price)
         request.POST._mutable = mutable
-        cart = self.create(request, *args, **kwargs)
+        cart = Cart.objects.filter(user=request.user).filter(status=1)
+        if cart.count() == 0:
+            cart = self.create(request, *args, **kwargs)
+        else:
+            cart = CartSerializer(cart.first(), many=False)
+
+        print(str(cart.data['id']))
         try:
-            CartItem.objects.create(
-                product=product,
-                price=product.price,
-                total_price=product.price,
-                cart=Cart.objects.get(pk=cart.data['id']),
-                count=1
-            )
+            cItem = CartItem.objects.filter(cart__id=cart.data['id'])
+
+            if cItem.filter(product__id=product.id).count() > 0:
+                cItem = cItem.first()
+                cItem.count = cItem.count + 1
+                cItem.total_price = cItem.total_price + cItem.product.price
+                cItem.save()
+            else:
+                cartCreate = CartItem.objects.create(
+                    product=product,
+                    price=product.price,
+                    total_price=product.price,
+                    cart=Cart.objects.get(pk=int(cart.data['id'])),
+                    count=1
+                )
         except Exception as e:
-            Cart.objects.filter(id=cart.data['id']).delete()
+            raise e
+            # Cart.objects.filter(id=cart.data['id']).delete()
             print('error when create item', str(e))
             return Response({'message': 'Problem When Add product To Cart Try Again.'***REMOVED***)
         # Create Item Product
@@ -99,8 +111,7 @@ class AddCart(mixins.CreateModelMixin,
         #     if 'product' in body_data:
         #         pId = body_data['product']
         # else:
-        body = QueryDict(request.body)
-        cId = body.get('cart')
+        cId = request.POST.get('cart', 0)
         cartItem = CartItem.objects.filter(id=cId)
         if not cartItem.exists():
             return CustomJSONRenderer().render404('cart', '')
@@ -116,6 +127,3 @@ class AddCart(mixins.CreateModelMixin,
                     'result': CartSerializer(cart, many=True).data
                 ***REMOVED***, status=201
             )
-
-
-
