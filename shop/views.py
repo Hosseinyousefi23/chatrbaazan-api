@@ -111,7 +111,7 @@ class GetOffers(APIView, PageNumberPagination):
                     '-count')
                 products = Product.objects.filter(id__in=like.values('product__id'))
             elif ordering == 'topchatrbazi':
-                products = Product.objects.all().order('-chatrbazi')
+                products = Product.objects.all().order_by('-chatrbazi')
             else:
                 return None
         if cityId is not None:
