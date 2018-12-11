@@ -1,3 +1,4 @@
+from django.http.request import QueryDict
 from django.shortcuts import render
 
 # Create your views here.
@@ -89,3 +90,32 @@ class AddCart(mixins.CreateModelMixin,
                 'result': CartSerializer(cart, many=True).data
             }
         )
+
+    def delete(self, request, format=None, *args, **kwargs):
+        # pId = 0
+        # if 'product' not in request.POST:
+        #     body_unicode = request.body.decode('utf-8')
+        #     body_data = json.loads(body_unicode)
+        #     if 'product' in body_data:
+        #         pId = body_data['product']
+        # else:
+        body = QueryDict(request.body)
+        cId = body.get('cart')
+        cartItem = CartItem.objects.filter(id=cId)
+        if not cartItem.exists():
+            return CustomJSONRenderer().render404('cart', '')
+        else:
+            try:
+                cartItem.first().delete()
+            except Exception as e:
+                return CustomJSONRenderer().render500(str(e), '')
+            cart = Cart.objects.filter(user=request.user)
+            return CustomJSONRenderer().render(
+                {
+                    'count': cart.count(),
+                    'result': CartSerializer(cart, many=True).data
+                }, status=201
+            )
+
+
+

@@ -39,7 +39,8 @@ class Cart(models.Model):
 class CartItem(models.Model):
     product = models.ForeignKey(Product, models.CASCADE, related_name="cartItem_product", verbose_name=u"محصول")
     price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
-    total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ نهایی")
+    total_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True,
+                                      verbose_name=u"مبلغ نهایی")
     cart = models.ForeignKey(Cart, models.CASCADE, related_name="cartItem_cart", verbose_name=u"سبد خرید")
     count = models.IntegerField(default=1, verbose_name=u"تعداد")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -51,3 +52,24 @@ class CartItem(models.Model):
 
     def __str__(self):
         return str(self.product)
+
+    def delete(self, using=None, keep_parents=False, *args, **kwargs):
+        # print('action', self.__class__.__str__())
+        print('object', str(self))
+
+        oldData = self
+        print('cart', str(self.cart))
+        super(CartItem, self).delete(*args, **kwargs)
+        cart = Cart.objects.filter(id=self.cart.id)
+        if cart.exists():
+            item = CartItem.objects.filter(cart__id=oldData.id)
+            if item.count() == 0:
+                cart.first().delete()
+            else:
+                cart = cart.first()
+                cart.price = cart.price - oldData.total_price
+                cart.total_price = cart.price - oldData.total_price
+                if cart.price < 0 or cart.total_price < 0:
+                    cart.delete()
+                else:
+                    cart.save()
