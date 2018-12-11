@@ -4,6 +4,7 @@ from django.shortcuts import render
 from rest_framework import mixins, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.utils import json
 from rest_framework.views import APIView
 import uuid
 
@@ -33,8 +34,14 @@ class AddCart(mixins.CreateModelMixin,
     queryset = Cart.objects.all()
 
     def post(self, request, format=None, *args, **kwargs):
+        body_unicode = request.body.decode('utf-8')
+        body_data = json.loads(body_unicode)
+        if 'product' not in body_data:
+            pId = 0
+        else:
+            pId = body_data['product']
         # check exists Product
-        product = Product.objects.filter(id=request.POST.get('product'))
+        product = Product.objects.filter(id=pId)
         if not product.exists():
             return CustomJSONRenderer().render400()
         product = product.first()
