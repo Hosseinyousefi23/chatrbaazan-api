@@ -1,3 +1,4 @@
+import operator
 import os
 from allauth.account.utils import setup_user_email
 from allauth.utils import email_address_exists
@@ -14,6 +15,7 @@ from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
 
+from like.models import Like
 from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel, ProductGallery
 from accounts.models import User
 import re
@@ -62,7 +64,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi','slug')
+        fields = ('id', 'name', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi', 'slug')
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -80,7 +82,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ('name', 'available','slug')
+        fields = ('name', 'available', 'slug')
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -140,12 +142,14 @@ class ProductSerializer(serializers.ModelSerializer):
     city = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
     gallery = serializers.SerializerMethodField()
+    like = serializers.SerializerMethodField()
+    dislike = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ('id',
-            'name', 'priority', 'explanation', 'expiration_date', 'price', 'chatrbazi', 'is_free', 'english_name',
-            'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug')
+                  'name', 'priority', 'explanation', 'expiration_date', 'price', 'chatrbazi', 'is_free', 'english_name',
+                  'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug', 'like', 'dislike')
 
     def get_image(self, obj, **kwargs):
         if obj.image:
@@ -178,6 +182,20 @@ class ProductSerializer(serializers.ModelSerializer):
             return ProductGallerySerializer(obj.gallery.all(), context=self.context, many=True).data
         else:
             pass
+
+    def get_like(self, obj):
+        like = Like.objects.filter(like=1).filter(product__id=obj.id)
+        if like.count() > 0:
+            return int(like.count())
+        else:
+            return 0
+
+    def get_dislike(self, obj):
+        dislike = Like.objects.filter(like=2).filter(product__id=obj.id)
+        if dislike.count() > 0:
+            return int(dislike.count())
+        else:
+            return 0
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)

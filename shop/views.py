@@ -1,4 +1,8 @@
 from collections import OrderedDict
+import operator
+import itertools
+from itertools import chain
+
 from django.db.models import Count, Max
 
 from django.contrib.auth.models import User
@@ -91,10 +95,12 @@ class GetOffers(APIView, PageNumberPagination):
             limits = 5
         if limits >= 30:
             limits = 30
+
+        self.page_size = limits  # fix limit query
         ordering = request.GET.get('ordering', 'created_at')
         order = ['favorites', 'topchatrbazi', 'created_at']
         if ordering not in order:
-            ordering = '-created_at'
+            ordering = 'created_at'
 
         cityId = request.GET.get('city', None)
         categoryId = request.GET.get('category', None)
@@ -131,14 +137,22 @@ class GetOffers(APIView, PageNumberPagination):
         if search is not None:
             products = products.filter(Q(name__contains=search) | Q(explanation__contains=search) |
                                        Q(company__name=search) | Q(category__name=search))
-        if products and products is not None or products.count() > 0:  # fix ordering products
+        if products.count() > 0:  # fix ordering products
             if ordering == 'created_at':
                 products = products.order_by(ordering, '-expiration_date')
             else:
                 if ordering == 'favorites':
-                    like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')).order_by(
+                    like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')) \
+                        .filter(product__id__in=products.values('id')).order_by(
                         '-count')
-                    products = products.filter(id__in=like.values('product__id'))
+                    if like.count() > 0:
+                        margesort = marge_sort(
+                            [id[0] for id in like.values_list('product__id')],
+                            [id[0] for id in products.values_list('id')])
+                        products = products.filter(id__in=margesort)
+                    else:
+                        products = products.order_by('-id')
+
                 elif ordering == 'topchatrbazi':
                     products = products.order_by('-chatrbazi')
                 else:
@@ -148,13 +162,14 @@ class GetOffers(APIView, PageNumberPagination):
     def get(self, request, format=None, ):
         products = self.get_queryset(request)
         if products is None:
-            return CustomJSONRenderer().render400()
+            return CustomJSONRenderer().render404('product', '')
+        data = ProductSerializer(products, many=True, context={'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
                 ('next', self.get_next_link()),
                 ('previous', self.get_previous_link()),
-                ('results', ProductSerializer(products, many=True, context={'request': request}).data)
+                ('results', data)
             ])
         )
 
@@ -179,3 +194,11 @@ def convert_to_int(number):
         return 0
     except Exception as ex:
         return 0
+
+
+def marge_sort(first_list, second_list):
+    # if type(first_list) is dict:
+    #     first_list = first_list.items()
+    # if type(second_list) is dict:
+    #     second_list = second_list.items()
+    return first_list + list(set(second_list) - set(first_list))
