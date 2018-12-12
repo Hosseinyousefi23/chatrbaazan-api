@@ -16,7 +16,7 @@ from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
 from like.models import Like
-from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel, ProductGallery
+from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel, ProductGallery, UserProduct
 from accounts.models import User
 import re
 
@@ -201,3 +201,18 @@ class ProductSerializer(serializers.ModelSerializer):
         super().__init__(instance, **kwargs)
         for fd in pop:
             self.fields.pop(fd)
+
+
+class UserProductSerializer(serializers.ModelSerializer):
+    product = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProduct
+        fields = ('user', 'product', 'created_at', 'updated_at')
+
+    def get_product(self, obj):
+        if obj.product:
+            return ProductSerializer(Product.objects.get(pk=obj.product.pk), many=False,
+                                     context={'request': self.context['request']***REMOVED***).data
+        else:
+            return None

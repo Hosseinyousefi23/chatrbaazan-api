@@ -237,3 +237,10 @@ class UserProduct(models.Model):
                              verbose_name=u"کاربر")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.product) + ' User: ' + str(self.user)
+
+    class Meta:
+        verbose_name = u"محصولات خریداری شده"
+        verbose_name_plural = u"محصولات خریداری شده"
