@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'emm',
     'about',
     'accounts',
+    'sms',
     'rest_framework',
     'rest_auth',
     'rest_auth.registration',
@@ -55,7 +56,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_framework.authtoken',
-
 
 ]
 # CKEDITOR_BASEPATH = "/public/assets/ckeditor/ckeditor"
@@ -261,4 +261,3 @@ REST_USE_JWT = True
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer'
 }
-
