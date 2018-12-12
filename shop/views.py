@@ -19,9 +19,10 @@ from django.db.models import Q
 
 from like.models import Like
 from like.serializers import LikeSerializer
-from shop.models import City, Banner, Category, Product, Company
+from shop.models import City, Banner, Category, Product, Company, UserProduct
 from shop.renderers import CustomJSONRenderer
-from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer
+from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
+    UserProductSerializer
 from rest_auth.registration.views import RegisterView
 
 
@@ -77,6 +78,18 @@ class GetBanner(APIView):
     def get(self, request, format=None, ):
         bannerData = Banner.objects.filter(available=True).order_by('-id')[:6]
         data = BannerSerializer(bannerData, many=True, context={'request': request}).data
+        return CustomJSONRenderer().renderData(data)
+
+
+class GetUserProduct(APIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_methods = ('GET',)
+
+    # renderer_classes = (JSONRenderer,)
+
+    def get(self, request, format=None, ):
+        userData = UserProduct.objects.filter(user=request.user).order_by('-id')
+        data = UserProductSerializer(userData, many=True, context={'request': request}).data
         return CustomJSONRenderer().renderData(data)
 
 
