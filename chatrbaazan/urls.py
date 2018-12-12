@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^api/v1/cart/', include('carts.routers')),
     url(r'^api/v1/about/', include('about.routers')),
     url(r'^api/v1/user/', include('accounts.routers')),
+    url(r'^api/v1/sms/', include('sms.routers')),
     url(r'^api/v1/', include('shop.routers')),
 
 ]
