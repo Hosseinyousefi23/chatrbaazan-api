@@ -5,6 +5,8 @@ from allauth.utils import email_address_exists
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import truncatechars
+from django.utils.text import Truncator
 from rest_framework import serializers
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from rest_auth.registration.serializers import RegisterSerializer
@@ -144,12 +146,17 @@ class ProductSerializer(serializers.ModelSerializer):
     gallery = serializers.SerializerMethodField()
     like = serializers.SerializerMethodField()
     dislike = serializers.SerializerMethodField()
+    explanation_short = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ('id',
-                  'name', 'priority', 'explanation', 'expiration_date', 'price', 'chatrbazi', 'is_free', 'english_name',
+                  'name', 'priority', 'explanation', 'explanation_short', 'expiration_date', 'price', 'chatrbazi',
+                  'is_free', 'english_name',
                   'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug', 'like', 'dislike')
+
+    def get_explanation_short(self, obj):
+        return Truncator(obj.explanation).chars(300)
 
     def get_image(self, obj, **kwargs):
         if obj.image:
