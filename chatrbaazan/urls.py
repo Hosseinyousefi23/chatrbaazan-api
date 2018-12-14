@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
-from rest_auth.views import LogoutView
+from rest_auth.views import LogoutView, PasswordResetView, PasswordResetConfirmView
 from django.conf.urls.static import static
 
 from rest_framework import routers
@@ -25,6 +25,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
 
+from accounts.views import UserDetailsView
 from chatrbaazan import settings
 from shop import serializers
 
@@ -38,6 +39,11 @@ urlpatterns = [
     path('auth/registration/', include('rest_auth.registration.urls')),
     path('auth/refresh/', refresh_jwt_token),
     path('auth/verify/', verify_jwt_token),
+    url(r'^auth/password/reset/$', PasswordResetView.as_view(),
+        name='rest_password_reset'),
+    url(r'^auth/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'),
+    url(r'^auth/user/$', UserDetailsView.as_view(), name='rest_user_details'),
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
     url(r'^api/v1/contact/', include('contact.routers')),
     url(r'^api/v1/like/', include('like.routers')),
