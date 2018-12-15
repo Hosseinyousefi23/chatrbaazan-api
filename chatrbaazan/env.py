@@ -3,5 +3,6 @@ ENV = {
     'USERDB': 'postgres',
     'PASSWORDDB':'123456',
     'HOST': 'localhost',
-    'PORT': ''
+    'PORT': '',
+    'DEBUG':True,
 }
