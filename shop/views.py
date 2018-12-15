@@ -149,7 +149,7 @@ class GetOffers(APIView, PageNumberPagination):
                 return None
         if search is not None:
             products = products.filter(Q(name__contains=search) | Q(explanation__contains=search) |
-                                       Q(company__name=search) | Q(category__name=search))
+                                       Q(company__name=search) | Q(category__name=search)).distinct()
         if products.count() > 0:  # fix ordering products
             if ordering == 'created_at':
                 products = products.order_by(ordering, '-expiration_date')

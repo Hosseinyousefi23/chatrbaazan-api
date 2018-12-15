@@ -20,3 +20,5 @@ python manage.py migrate dashboard
 python manage.py collectstatic
 
 ```
+
+apt install libpq-dev
