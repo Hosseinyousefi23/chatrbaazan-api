@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 import datetime
 import os
-
+from chatrbaazan.env import ENV
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -176,11 +176,11 @@ SITE_ID = 1
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'chatr',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-    ***REMOVED***
-    ***REMOVED***
+        'NAME': ENV['DBNAME'],
+        'USER': ENV['USERDB'],
+        'PASSWORD': ENV['PASSWORDDB'],
+        'HOST': ENV['HOST'],
+        'PORT': ENV['PORT'],
     ***REMOVED***
 ***REMOVED***
 # Configure the JWTs to expire after 1 hour, and allow users to refresh near-expiration tokens
