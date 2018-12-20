@@ -149,7 +149,8 @@ class Product(models.Model):
     category = models.ManyToManyField(Category, related_name="product_category", verbose_name=u"دسته بندی")
     company = models.ManyToManyField(Company, related_name="product_company", verbose_name=u"کمپانی", null=True,
                                      blank=True)
-    discount = models.ForeignKey(Discount, null=True, blank=True, verbose_name=u"کد تخفیف", on_delete=models.CASCADE)
+    # discount = models.ForeignKey(Discount, null=True, blank=True, verbose_name=u"کد تخفیف", on_delete=models.CASCADE)
+    discount_code = models.CharField(max_length=300, null=True, blank=True, verbose_name=u"کد تخفیف")
     label = models.ManyToManyField(ProductLabel, related_name="product_label", verbose_name=u"تگ", null=True,
                                    blank=True)
     priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=1, verbose_name=u"اولویت")

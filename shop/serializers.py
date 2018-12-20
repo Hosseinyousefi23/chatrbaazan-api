@@ -151,9 +151,10 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id',
-                  'name', 'priority', 'explanation', 'explanation_short', 'expiration_date', 'price', 'chatrbazi',
-                  'is_free', 'english_name',
-                  'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug', 'like', 'dislike')
+                  'name', 'priority', 'explanation', 'explanation_short', 'expiration_date', 'price',
+                  'chatrbazi', 'is_free', 'english_name',
+                  'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug',
+                  'like', 'dislike')
 
     def get_explanation_short(self, obj):
         return Truncator(obj.explanation).chars(300)
@@ -179,10 +180,8 @@ class ProductSerializer(serializers.ModelSerializer):
             return ProductLabelSerializer(obj.label.all(), many=True, pop=['available']).data
 
     def get_discount(self, obj):
-        if obj.discount and obj.is_free:
-            return obj.discount.discount
-        else:
-            pass
+        if obj.discount_code:
+            return obj.discount_code
 
     def get_gallery(self, obj):
         if obj.gallery:
