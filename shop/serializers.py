@@ -5,6 +5,7 @@ from allauth.utils import email_address_exists
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db.models.aggregates import Sum
 from django.template.defaultfilters import truncatechars
 from django.utils.text import Truncator
 from rest_framework import serializers
@@ -70,15 +71,24 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
-
         for fd in pop:
             self.fields.pop(fd)
 
     def get_all_chatrbazi(self, obj):
-        pass
+        sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
+            category__id=obj.pk)
+        if sum.count() > 0:
+            return sum[0]['sum']
+        else:
+            return 0
 
     def get_open_chatrbazi(self, obj):
-        pass
+        sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
+            category__id=obj.pk).filter(priority=1)
+        if sum.count() > 0:
+            return sum[0]['sum']
+        else:
+            return 0
 
 
 class CompanySerializer(serializers.ModelSerializer):

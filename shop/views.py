@@ -6,6 +6,7 @@ from itertools import chain
 from django.db.models import Count, Max
 
 from django.contrib.auth.models import User
+from django.db.models.aggregates import Sum
 from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
@@ -37,7 +38,7 @@ class TestAPi(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
-        return Response("test")
+        return HttpResponse('')
 
 
 def testr(request):
@@ -54,7 +55,16 @@ class GetCategory(APIView):
         categoryData = Category.objects.filter(available=True)
         categoryDataSerializer = CategorySerializer(categoryData, many=True).data
         # TODO Cache Data Category
-        return CustomJSONRenderer().renderData(categoryDataSerializer)
+        # return CustomJSONRenderer().renderData(categoryDataSerializer)
+        sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum')
+        if sumChatrbazi.count() > 0:
+            sumChatrbazi = sumChatrbazi[0]['sum']
+        else:
+            sumChatrbazi = 0
+        return CustomJSONRenderer().render({
+            'data': categoryDataSerializer,
+            'all_chatrbazi': sumChatrbazi
+        })
 
 
 class GetCity(APIView):
