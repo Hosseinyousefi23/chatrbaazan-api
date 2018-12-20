@@ -158,7 +158,7 @@ class Product(models.Model):
     expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
     city = models.ManyToManyField(City, related_name="product_city", verbose_name=u"شهر", null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name=u"مبلغ")
-    chatrbazi = models.CharField(max_length=150, default=None, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
+    chatrbazi = models.IntegerField(default=0, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
     is_free = models.BooleanField(default=False, verbose_name=u"رایگان")
     english_name = models.CharField(max_length=500, blank=True, null=True, verbose_name=u"نام کالا به انگلیسی‌")
     image = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, verbose_name=u"تصویر",
