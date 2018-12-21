@@ -207,6 +207,15 @@ class Product(models.Model):
         return str(self.name)
 
 
+class Failure(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='failure_product')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='failure_user', null=True, blank=True)
+    description = models.TextField(null=True, blank=True, verbose_name=u"Description")
+    uuid = models.CharField(max_length=350, verbose_name=u"uuid")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Banner(models.Model):
     title = models.CharField(max_length=150, null=False, blank=False, verbose_name=u"عنوان")
     image = models.ImageField(storage=fs, upload_to=generate_filename_bannerPic, verbose_name=u"تصویر",
