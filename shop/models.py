@@ -37,6 +37,12 @@ def generate_filename_ProductPic(instance, filename):
     return os.path.join(u"UpLoadedFiles", "Product", str(instance.id), (filename))
 
 
+def generate_filename_company(instance, filename):
+    if not instance.id:
+        instance.id = date.today().year
+    return os.path.join(u"UpLoadedFiles", "Company", str(instance.id), (filename))
+
+
 def generate_filename_ProductPic(instance, filename):
     if not instance.id:
         instance.id = date.today().year
@@ -85,11 +91,23 @@ class Category(models.Model):
 
 
 class Company(models.Model):
+    PRIORITY = (
+        (1, u"فعال"),
+        (3, u"غیرفعال"),
+        (4, u"سطح پایین"),
+        (5, u"سطح معمولی"),
+        (6, u"سطح بالا"),
+        (7, u"سطح فوق بالا"),
+    )
     name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام")
     category = models.ForeignKey(Category, related_name="category_company", null=True, default=None, blank=True,
                                  verbose_name=u"دسته بندی", on_delete=models.CASCADE)
     available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
+    image = models.ImageField(storage=fs, upload_to=generate_filename_company, verbose_name=u"تصویر",
+                              blank=True, null=True, max_length=500)
+    priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=4, verbose_name=u"اولویت")
+    description = models.TextField(verbose_name=u"توضیحات", blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name or ''
@@ -166,6 +184,8 @@ class Product(models.Model):
     gallery = models.ManyToManyField(ProductGallery, related_name="product_gallery", null=True, blank=True,
                                      verbose_name=u"گالری")
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
+    failure = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد گزارش خرابی")
+    click = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد لایک")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

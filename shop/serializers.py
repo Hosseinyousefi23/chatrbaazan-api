@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models.aggregates import Sum
 from django.template.defaultfilters import truncatechars
+from django.urls.base import reverse
 from django.utils.text import Truncator
 from rest_framework import serializers
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
@@ -44,15 +45,32 @@ class CitySerializer(serializers.ModelSerializer):
 
 class BannerSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    link = serializers.SerializerMethodField()
 
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'image', 'is_slider')
+        fields = ('id', 'title', 'image', 'is_slider', 'link')
 
     def get_image(self, obj):
         if obj.image:
             return self.context['request'].build_absolute_uri(obj.image.url)
             # return obj.image.url
+
+    def get_link(self, obj):
+        if obj.link:
+            return obj.link
+        elif obj.category:
+            if obj.category.slug:
+                return self.context['request'].build_absolute_uri(
+                    reverse('getOffers') + '?category_slug={***REMOVED***'.format(obj.category.slug))
+                return self.context['request'].build_absolute_uri(reverse('getOffer', args=[obj.category.slug]))
+            pass
+        elif obj.product:
+            if obj.product.slug:
+                return self.context['request'].build_absolute_uri(reverse('getOffer', args=[obj.product.slug]))
+            pass
+        else:
+            pass
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -92,9 +110,17 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Company
-        fields = ('name', 'available', 'slug')
+        fields = ('name', 'available', 'slug', 'description', 'image')
+
+    def get_image(self, obj):
+        if obj.image:
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        else:
+            pass
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -179,7 +205,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_company(self, obj):
         if obj.company:
-            return CompanySerializer(obj.company.all(), many=True, pop=['available']).data
+            return CompanySerializer(obj.company.all().order_by('-priority'), many=True,
+                                     context={'request': self.context['request']***REMOVED***,
+                                     pop=['available']).data
 
     def get_category(self, obj):
         if obj.category:
