@@ -275,3 +275,10 @@ REST_USE_JWT = True
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer'
 }
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_HOST_USER = 'noreply@digicharkh.com'
+EMAIL_HOST_PASSWORD = 'mohammad@gmail.com'
+EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL = 'noreply@digicharkh.com'
+
