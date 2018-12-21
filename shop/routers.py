@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^user/product/$', views.GetUserProduct.as_view()),
     url(r'^offer/$', views.GetOffers.as_view(), name="getOffers"),
     url(r'^offer/(?P<slug>.*)/$', views.GetOffer.as_view(), name="getOffer"),
+    url(r'^failure/(?P<slug>.*)/$', views.FailureOffer.as_view(), name="reportFailure"),
     url(r'^route/', include(router.urls)),
 ]

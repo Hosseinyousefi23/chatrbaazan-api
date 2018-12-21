@@ -7,3 +7,4 @@ db.sqlite3
 .venv/
 public/*
 UpLoadedFiles/*
+chatrbaazan/env.py

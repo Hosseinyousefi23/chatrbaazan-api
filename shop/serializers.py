@@ -181,7 +181,6 @@ class ProductSerializer(serializers.ModelSerializer):
     discount = serializers.SerializerMethodField()
     gallery = serializers.SerializerMethodField()
     like = serializers.SerializerMethodField()
-    dislike = serializers.SerializerMethodField()
     explanation_short = serializers.SerializerMethodField()
 
     class Meta:
@@ -190,7 +189,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'name', 'priority', 'explanation', 'explanation_short', 'expiration_date', 'price',
                   'chatrbazi', 'is_free', 'english_name',
                   'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug',
-                  'like', 'dislike')
+                  'like',)
 
     def get_explanation_short(self, obj):
         return Truncator(obj.explanation).chars(300)
@@ -228,18 +227,19 @@ class ProductSerializer(serializers.ModelSerializer):
             pass
 
     def get_like(self, obj):
-        like = Like.objects.filter(like=1).filter(product__id=obj.id)
-        if like.count() > 0:
-            return int(like.count())
-        else:
-            return 0
+        return obj.click
+        # like = Like.objects.filter(like=1).filter(product__id=obj.id)
+        # if like.count() > 0:
+        #     return int(like.count())
+        # else:
+        #     return 0
 
-    def get_dislike(self, obj):
-        dislike = Like.objects.filter(like=2).filter(product__id=obj.id)
-        if dislike.count() > 0:
-            return int(dislike.count())
-        else:
-            return 0
+    # def get_dislike(self, obj):
+    #     dislike = Like.objects.filter(like=2).filter(product__id=obj.id)
+    #     if dislike.count() > 0:
+    #         return int(dislike.count())
+    #     else:
+    #         return 0
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)

@@ -1,12 +1,15 @@
+import random
 from collections import OrderedDict
 import operator
 import itertools
 from itertools import chain
+import uuid
 
 from django.db.models import Count, Max
 
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Sum
+from django.db.models.expressions import F
 from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
@@ -20,7 +23,7 @@ from django.db.models import Q
 
 from like.models import Like
 from like.serializers import LikeSerializer
-from shop.models import City, Banner, Category, Product, Company, UserProduct
+from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
     UserProductSerializer
@@ -38,7 +41,7 @@ class TestAPi(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
-        return HttpResponse('')
+        return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
 
 
 def testr(request):
@@ -165,16 +168,17 @@ class GetOffers(APIView, PageNumberPagination):
                 products = products.order_by(ordering, '-expiration_date')
             else:
                 if ordering == 'favorites':
-                    like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')) \
-                        .filter(product__id__in=products.values('id')).order_by(
-                        '-count')
-                    if like.count() > 0:
-                        margesort = marge_sort(
-                            [id[0] for id in like.values_list('product__id')],
-                            [id[0] for id in products.values_list('id')])
-                        products = products.filter(id__in=margesort)
-                    else:
-                        products = products.order_by('-id')
+                    # like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')) \
+                    #     .filter(product__id__in=products.values('id')).order_by(
+                    #     '-count')
+                    # if like.count() > 0:
+                    #     margesort = marge_sort(
+                    #         [id[0] for id in like.values_list('product__id')],
+                    #         [id[0] for id in products.values_list('id')])
+                    #     products = products.filter(id__in=margesort)
+                    # else:
+                    print('clickkkkk')
+                    products = products.order_by('-click')
 
                 elif ordering == 'topchatrbazi':
                     products = products.order_by('-chatrbazi')
@@ -207,6 +211,31 @@ class GetOffer(APIView, PageNumberPagination):
             return CustomJSONRenderer().render400()
         return CustomJSONRenderer().renderData(
             ProductSerializer(product.first(), context={'request': request***REMOVED***, many=False).data)
+
+
+class FailureOffer(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, slug, format=None, ):
+        product = Product.objects.filter(slug=slug)
+        if not product.exists():
+            return CustomJSONRenderer().render404('product', '')
+
+        print(str(request.session))
+        if 'uuid_failure' in request.session:
+            return CustomJSONRenderer().render({'message': 'گزارش توسط شما قبلا ارسال شده است'***REMOVED***, status=400)
+        if request.user:
+            user = request.user
+        else:
+            user = None
+        request.session['uuid_failure'] = str(uuid.uuid1(random.randint(0, 281474976710655)))
+        uuid_failure = request.session['uuid_failure']
+        Failure.objects.create(product=product.first(),
+                               user=user,
+                               uuid=uuid_failure)
+        product.update(failure=F('failure') + 1)
+        return CustomJSONRenderer().render({'success': True***REMOVED***, 200)
 
 
 def convert_to_int(number):
