@@ -181,7 +181,7 @@ class GetOffers(APIView, PageNumberPagination):
                     products = products.order_by('-click')
 
                 elif ordering == 'topchatrbazi':
-                    products = products.order_by('-chatrbazi')
+                    products = products.order_by('-chatrbazi', '-click')
                 else:
                     return None
         return self.paginate_queryset(products, self.request)
