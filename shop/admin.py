@@ -8,9 +8,13 @@ class UserProductAdmin(admin.ModelAdmin):
     list_display = ('product', 'user', 'created_at', 'updated_at')
 
 
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'failure', 'chatrbazi', 'is_free')
+
+
 admin.site.register(City)
 admin.site.register(Banner)
-admin.site.register(Product)
+admin.site.register(Product, ProductAdmin)
 admin.site.register(UserProduct, UserProductAdmin)
 admin.site.register(Category)
 admin.site.register(Company)

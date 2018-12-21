@@ -7,7 +7,7 @@ import uuid
 
 from django.db.models import Count, Max
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
 from django.shortcuts import render
@@ -225,7 +225,7 @@ class FailureOffer(APIView):
         print(str(request.session))
         if 'uuid_failure' in request.session:
             return CustomJSONRenderer().render({'message': 'گزارش توسط شما قبلا ارسال شده است'***REMOVED***, status=400)
-        if request.user:
+        if not request.user.is_anonymous:
             user = request.user
         else:
             user = None

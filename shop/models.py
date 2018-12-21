@@ -6,9 +6,11 @@ from datetime import date
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.core.files.storage import FileSystemStorage
+from django.core.mail.message import EmailMessage
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.template.loader import get_template
 from django.utils.translation import gettext as _
 
 # Create your models here.
@@ -200,7 +202,6 @@ class Product(models.Model):
                 break
             self.slug = '%s-%d' % (orig, x)
         # self.save()
-        print(str(self.slug))
         super(Product, self).save(**kwargs)
 
     def __str__(self):
@@ -214,6 +215,22 @@ class Failure(models.Model):
     uuid = models.CharField(max_length=350, verbose_name=u"uuid")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, *args, **kwargs):
+        if int(self.product.failure) >= 10:
+            message = EmailMessage(subject='چتربازان گزارش خرابی محصول',
+                                   body=get_template('email/failure.html').render(
+                                       {
+                                           'product': self.product,
+                                       ***REMOVED***),
+                                   to=[user.email for user in User.objects.filter(is_admin=True)])
+            # message.content_subtype = 'html'
+            try:
+                message.send()
+            except Exception as e:
+                raise str(e)
+        super(Failure, self).save(**kwargs)
 
 
 class Banner(models.Model):
