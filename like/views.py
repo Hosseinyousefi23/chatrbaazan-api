@@ -1,3 +1,6 @@
+import random
+import uuid
+
 from django.db.models.expressions import F
 from django.shortcuts import render
 
@@ -21,11 +24,20 @@ class LikeView(mixins.CreateModelMixin,
         productId = request.POST.get('product', 0)
         if not Product.objects.filter(pk=productId).exists():
             return CustomJSONRenderer().render400()
+        if 'like_session' in request.session:
+            return CustomJSONRenderer().render({
+                'message': 'You Have Already Like This Post.'
+            ***REMOVED***, status=400)
+        session = uuid.uuid1(random.randint(0, 281474976710655))
         mutable = request.POST._mutable
         request.POST._mutable = True
-        request.data.update(user=request.user.pk)
+        user = None
+        if request.user.is_authenticated:
+            user = request.user.pk
+        request.data.update(user=user)
         request.data.update(product=productId)
         request.data.update(like=1)
+        request.data.update(session=session)
         request.POST._mutable = mutable
         if Like.objects.filter(user__id=request.POST.get('user')).filter(
                 product__id=request.POST.get('product')).exists():
@@ -33,5 +45,6 @@ class LikeView(mixins.CreateModelMixin,
         like = {1***REMOVED***
         if int(request.POST.get('like')) not in like:
             return CustomJSONRenderer().render400()
+        request.session['like_session'] = session
         Product.objects.filter(id=productId).update(F('click') + 1)
         return self.create(request, *args, **kwargs)
