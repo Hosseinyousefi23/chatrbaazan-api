@@ -17,7 +17,7 @@ from shop.renderers import CustomJSONRenderer
 
 class LikeView(mixins.CreateModelMixin,
                generics.GenericAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     serializer_class = LikeSerializer
 
     def post(self, request, format=None, *args, **kwargs):
