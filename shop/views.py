@@ -26,7 +26,7 @@ from like.serializers import LikeSerializer
 from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
-    UserProductSerializer
+    UserProductSerializer, CompanySerializer
 from rest_auth.registration.views import RegisterView
 
 
@@ -190,13 +190,22 @@ class GetOffers(APIView, PageNumberPagination):
         products = self.get_queryset(request)
         if products is None:
             return CustomJSONRenderer().render404('product', '')
+        companySlug = request.GET.get('company_slug', None)
+        dataCompany = None
+        if companySlug:
+            company = Company.objects.filter(slug=companySlug)
+            if company.count() > 0:
+                dataCompany = company.first();
         data = ProductSerializer(products, many=True, context={'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
                 ('next', self.get_next_link()),
                 ('previous', self.get_previous_link()),
-                ('results', data)
+                ('results', data),
+                ('dataCompany',
+                 CompanySerializer(dataCompany, many=False, context={'request': request},
+                                   pop=['available']).data if dataCompany else None)
             ])
         )
 
