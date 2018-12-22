@@ -234,6 +234,12 @@ class Failure(models.Model):
 
 
 class Banner(models.Model):
+    LOCATION = (
+        (3, u'Top'),
+        (2, u'Middle'),
+        (1, u'Down'),
+        (0, u'None'),
+    )
     title = models.CharField(max_length=150, null=False, blank=False, verbose_name=u"عنوان")
     image = models.ImageField(storage=fs, upload_to=generate_filename_bannerPic, verbose_name=u"تصویر",
                               blank=True, null=True, max_length=500)
@@ -244,6 +250,7 @@ class Banner(models.Model):
     is_slider = models.BooleanField(default=False, verbose_name=u"قرار دادن در اسلایدر")
     link = models.CharField(max_length=500, default=None, null=True, blank=True, verbose_name=u"لینک")
     available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
+    location = models.PositiveSmallIntegerField(choices=LOCATION, default=3, blank=True, null=True)
 
     class Meta:
         verbose_name = u"بنر"
