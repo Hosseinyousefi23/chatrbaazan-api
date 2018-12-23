@@ -79,11 +79,24 @@ class CartItem(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, *args, **kwargs):
         super(CartItem, self).save(*args, **kwargs)
-        cartItem = CartItem.objects.filter(cart__id=self.cart.id)
+        self.update_price(self.cart.id)
+    
+    
+    def update_price(cartId):
+        cartItem = CartItem.objects.filter(cart__id=cartId)
         tt_price = 0
         if cartItem.count() > 0:
             for citem in cartItem:
+                if citem.count == 0:
+                    citem.delete()
+                    continue
+                tt_price_item = citem.price * citem.count
+                citem.total_price = tt_price_item
+                citem.save()
                 tt_price += citem.total_price
-
+        else:
+            Cart.objects.filter(id=cartId).delete()
         if tt_price >= 0:
-            Cart.objects.filter(id=self.cart.id).update(price=tt_price, total_price=tt_price)
+            Cart.objects.filter(id=cartId).update(price=tt_price, total_price=tt_price)
+        else:
+            Cart.objects.filter(id=cartId).delete()

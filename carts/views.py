@@ -127,3 +127,26 @@ class AddCart(mixins.CreateModelMixin,
                     'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
                 ***REMOVED***, status=201
             )
+
+    def put(self, request, format=None, *args, **kwags):
+        itemId = request.POST.get('itemId', 0)
+        itemCount = request.POST.get('itemCount',1)
+        
+        itemFound = CartItem.objects.filter(id=itemId)
+        if not itemFound:
+            return CustomJSONRenderer().render404('Cart Item',None)
+
+        itemFoundFirst = itemFound.first()
+        itemFoundFirst.count = itemCount
+        if itemFoundFirst.save():
+            cart = Cart.objects.filter(user=request.user)
+            return CustomJSONRenderer().render(
+                {
+                    'count': cart.count(),
+                    'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
+                ***REMOVED***
+            )
+        else:
+            return CustomJSONRenderer().render({'success':False***REMOVED***,status=500)
+        
+
