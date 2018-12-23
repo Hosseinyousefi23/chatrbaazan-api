@@ -76,27 +76,37 @@ class CartItem(models.Model):
                 else:
                     cart.save()
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None, *args, **kwargs):
-        super(CartItem, self).save(*args, **kwargs)
-        self.update_price(self.cart.id)
-    
-    
-    def update_price(cartId):
+    def update_price(self, cartId):
+        print('action update price evented ')
         cartItem = CartItem.objects.filter(cart__id=cartId)
+        print(str(cartItem))
         tt_price = 0
         if cartItem.count() > 0:
             for citem in cartItem:
                 if citem.count == 0:
                     citem.delete()
                     continue
-                tt_price_item = citem.price * citem.count
+                if not citem.price:
+                    price = citem.product.price
+                else:
+                    price = citem.price
+                print('price', str(citem.price))
+                print('count',str(citem.count))
+                tt_price_item = int(price) * int(citem.count)
+                citem.price = price
                 citem.total_price = tt_price_item
                 citem.save()
                 tt_price += citem.total_price
         else:
             Cart.objects.filter(id=cartId).delete()
         if tt_price >= 0:
-            Cart.objects.filter(id=cartId).update(price=tt_price, total_price=tt_price)
+            Cart.objects.filter(id=cartId).update(
+                price=tt_price, total_price=tt_price)
         else:
             Cart.objects.filter(id=cartId).delete()
+
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, *args, **kwargs):
+        super(CartItem, self).save(*args, **kwargs)
+    

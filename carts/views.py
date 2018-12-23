@@ -86,7 +86,10 @@ class AddCart(mixins.CreateModelMixin,
             return Response({'message': 'Problem When Add product To Cart Try Again.'})
         # Create Item Product
         # cart = Cart.objects.get(pk=cart.data['id'])
+        CartItem().update_price(Cart.objects.get(pk=int(cart.data['id'])).id)
+
         cart = Cart.objects.filter(user=request.user)
+        
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
@@ -117,7 +120,10 @@ class AddCart(mixins.CreateModelMixin,
             return CustomJSONRenderer().render404('cart', '')
         else:
             try:
+                idCart = cartItem.first().cart.id
                 cartItem.first().delete()
+                CartItem().update_price(idCart)
+
             except Exception as e:
                 return CustomJSONRenderer().render500(str(e), '')
             cart = Cart.objects.filter(user=request.user)
@@ -125,7 +131,7 @@ class AddCart(mixins.CreateModelMixin,
                 {
                     'count': cart.count(),
                     'result': CartSerializer(cart, many=True, context={'request': request}).data
-                }, status=201
+                }, status=200
             )
 
     def put(self, request, format=None, *args, **kwags):
@@ -139,6 +145,7 @@ class AddCart(mixins.CreateModelMixin,
         itemFoundFirst = itemFound.first()
         itemFoundFirst.count = itemCount
         if itemFoundFirst.save():
+            CartItem().update_price(itemFoundFirst.cart.id)
             cart = Cart.objects.filter(user=request.user)
             return CustomJSONRenderer().render(
                 {
