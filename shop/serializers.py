@@ -189,7 +189,7 @@ class ProductSerializer(serializers.ModelSerializer):
                   'name', 'priority','discount_code', 'explanation', 'explanation_short', 'expiration_date', 'price',
                   'chatrbazi', 'is_free', 'english_name',
                   'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug',
-                  'like',)
+                  'like','link')
 
     def get_explanation_short(self, obj):
         return Truncator(obj.explanation).chars(300)

@@ -188,6 +188,7 @@ class Product(models.Model):
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
     failure = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد گزارش خرابی")
     click = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد لایک")
+    link = models.CharField(max_length=350, blank=True, null=True,default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
