@@ -178,7 +178,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
     label = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
-    discount = serializers.SerializerMethodField()
+    discount_code = serializers.SerializerMethodField()
     gallery = serializers.SerializerMethodField()
     like = serializers.SerializerMethodField()
     explanation_short = serializers.SerializerMethodField()
@@ -188,7 +188,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'name', 'priority','discount_code', 'explanation', 'explanation_short', 'expiration_date', 'price',
                   'chatrbazi', 'is_free', 'english_name',
-                  'image', 'category', 'label', 'city', 'company', 'discount', 'gallery', 'slug',
+                  'image', 'category', 'label', 'city', 'company', 'gallery', 'slug',
                   'like','link')
 
     def get_explanation_short(self, obj):
@@ -216,9 +216,14 @@ class ProductSerializer(serializers.ModelSerializer):
         if obj.label:
             return ProductLabelSerializer(obj.label.all(), many=True, pop=['available']).data
 
-    def get_discount(self, obj):
+    def get_discount_code(self, obj):
         if obj.discount_code:
-            return obj.discount_code
+            if obj.is_free:
+                return obj.discount_code
+            else:
+                pass
+        else:
+            pass
 
     def get_gallery(self, obj):
         if obj.gallery:

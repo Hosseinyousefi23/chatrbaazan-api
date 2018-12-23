@@ -71,6 +71,10 @@ class City(models.Model):
     def __str__(self):
         return self.name or ''
 
+    class Meta:
+        verbose_name = u'شهر'
+        verbose_name_plural = u'شهر'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام")
@@ -90,6 +94,10 @@ class Category(models.Model):
         # self.save()
         print(str(self.slug))
         super(Category, self).save(**kwargs)
+
+    class Meta:
+        verbose_name = u'دسته بندی'
+        verbose_name_plural=u'دسته بندی'
 
 
 class Company(models.Model):
@@ -124,6 +132,10 @@ class Company(models.Model):
         print(str(self.slug))
         super(Company, self).save(**kwargs)
 
+    class Meta:
+        verbose_name = u'شرکت'
+        verbose_name_plural = u'شرکت'
+
 
 class ProductLabel(models.Model):
     name = models.CharField(max_length=200, blank=False, null=False, verbose_name=u"نام")
@@ -131,6 +143,10 @@ class ProductLabel(models.Model):
 
     def __str__(self):
         return self.name or ''
+
+    class Meta:
+        verbose_name = u'تگ ها'
+        verbose_name_plural = u'تگ ها'
 
 
 class Discount(models.Model):
@@ -154,6 +170,13 @@ class ProductGallery(models.Model):
     #     super(ProductGallery, self).save(*args, **kwargs)
     # self.title = 's'
     # self.save()
+
+    def __str__(self):
+        return self.title if self.title else 'Image {}'.format(self.pk)
+
+    class Meta:
+        verbose_name = u'گالری'
+        verbose_name_plural = u'گالری'
 
 
 class Product(models.Model):
@@ -188,13 +211,13 @@ class Product(models.Model):
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
     failure = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد گزارش خرابی")
     click = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد لایک")
-    link = models.CharField(max_length=350, blank=True, null=True,default=None)
+    link = models.CharField(max_length=350, blank=True, null=True,default=None,verbose_name=u'لینک')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = u"محصولات"
-        verbose_name_plural = u"محصولات"
+        verbose_name = u"کد تخفیف"
+        verbose_name_plural = u"کد تخفیف"
 
     def save(self, **kwargs):
         self.slug = orig = str((self.name)).replace(' ', '-')
