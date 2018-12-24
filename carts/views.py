@@ -144,7 +144,8 @@ class AddCart(mixins.CreateModelMixin,
 
         itemFoundFirst = itemFound.first()
         itemFoundFirst.count = itemCount
-        if itemFoundFirst.save():
+        try:
+            itemFoundFirst.save()
             CartItem().update_price(itemFoundFirst.cart.id)
             cart = Cart.objects.filter(user=request.user)
             return CustomJSONRenderer().render(
@@ -153,7 +154,7 @@ class AddCart(mixins.CreateModelMixin,
                     'result': CartSerializer(cart, many=True, context={'request': request}).data
                 }
             )
-        else:
-            return CustomJSONRenderer().render({'success':False},status=500)
+        except Exception as e:
+            return CustomJSONRenderer().render({'success':False,'e':str(e)},status=500)
         
 
