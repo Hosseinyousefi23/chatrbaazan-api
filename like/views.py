@@ -42,9 +42,9 @@ class LikeView(mixins.CreateModelMixin,
         if Like.objects.filter(user__id=request.POST.get('user')).filter(
                 product__id=request.POST.get('product')).exists():
             return CustomJSONRenderer().render400()
-        like = {1}
-        if int(request.POST.get('like')) not in like:
-            return CustomJSONRenderer().render400()
+        # like = 1
+        # if int(request.POST.get('like')) not in like:
+            # return CustomJSONRenderer().render400()
         request.session['like_session'] = session
-        Product.objects.filter(id=productId).update(F('click') + 1)
+        Product.objects.filter(id=productId).update(click=F('click') + 1)
         return self.create(request, *args, **kwargs)
