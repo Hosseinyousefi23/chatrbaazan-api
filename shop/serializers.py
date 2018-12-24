@@ -183,7 +183,7 @@ class ProductSerializer(serializers.ModelSerializer):
     like = serializers.SerializerMethodField()
     explanation_short = serializers.SerializerMethodField()
     file = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
+    # type = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
