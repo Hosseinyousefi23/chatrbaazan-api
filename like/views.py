@@ -28,7 +28,7 @@ class LikeView(mixins.CreateModelMixin,
             return CustomJSONRenderer().render({
                 'message': 'You Have Already Like This Post.'
             ***REMOVED***, status=400)
-        session = uuid.uuid1(random.randint(0, 281474976710655))
+        session = str(uuid.uuid1(random.randint(0, 281474976710655)))
         mutable = request.POST._mutable
         request.POST._mutable = True
         user = None
