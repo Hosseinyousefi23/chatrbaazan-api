@@ -182,6 +182,8 @@ class ProductSerializer(serializers.ModelSerializer):
     gallery = serializers.SerializerMethodField()
     like = serializers.SerializerMethodField()
     explanation_short = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -189,10 +191,18 @@ class ProductSerializer(serializers.ModelSerializer):
                   'name', 'priority','discount_code', 'explanation', 'explanation_short', 'expiration_date', 'price',
                   'chatrbazi', 'is_free', 'english_name',
                   'image', 'category', 'label', 'city', 'company', 'gallery', 'slug',
-                  'like','link')
+                  'like','link','file','type')
 
     def get_explanation_short(self, obj):
         return Truncator(obj.explanation).chars(300)
+
+    # def get_type(self,obj):
+        # return obj.get_type_display()
+
+    def get_file(self, obj, *args, **kwargs):
+        if obj.file:
+            return self.context['request'].build_absolute_uri(obj.file.url)
+
 
     def get_image(self, obj, **kwargs):
         if obj.image:
