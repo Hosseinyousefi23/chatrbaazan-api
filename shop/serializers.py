@@ -114,7 +114,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ('name', 'available', 'slug', 'description', 'image')
+        fields = ('name', 'available', 'slug', 'description', 'image','link')
 
     def get_image(self, obj):
         if obj.image:

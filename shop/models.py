@@ -120,6 +120,7 @@ class Company(models.Model):
                               blank=True, null=True, max_length=500)
     priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=4, verbose_name=u"اولویت")
     description = models.TextField(verbose_name=u"توضیحات", blank=True, null=True, default=None)
+    link = models.CharField(max_length=500, null=True,blank=True,default=None,verbose_name=u'لینک')
 
     def __str__(self):
         return self.name or ''
