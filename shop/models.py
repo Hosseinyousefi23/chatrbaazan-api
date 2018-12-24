@@ -328,3 +328,21 @@ class UserProduct(models.Model):
     class Meta:
         verbose_name = u"محصولات خریداری شده"
         verbose_name_plural = u"محصولات خریداری شده"
+
+class ShopSetting(models.Model):
+    instagram = models.CharField(max_length=350, blank=True, default="#", verbose_name=u"اینستاگرام")
+    telegram = models.CharField(max_length=350, blank=True, default="#", verbose_name=u"تلگرام")
+    phone = models.CharField(max_length=100, blank=True, null=True, verbose_name=u"تلفن")
+    email = models.CharField(max_length=350, blank=True, null=True, verbose_name=u"ایمیل")
+    map_x = models.CharField(max_length=100, null=True, blank=True, verbose_name=u"نقطه ی x در نقشه")
+    map_y = models.CharField(max_length=100, null=True, blank=True, verbose_name=u"نقطه ی y در نقشه")
+    enable = models.BooleanField(default=False, verbose_name=u'فعال')
+    address = models.TextField(blank=True, null=True, verbose_name=u"آدرس فروشگاه")
+    
+
+    class Meta:
+        verbose_name = u'تنظمیات فروشگاه'
+        verbose_name_plural = u'تنظیمات فروشگاه'
+
+    def __str__(self):
+        return self

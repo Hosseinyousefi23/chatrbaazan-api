@@ -23,10 +23,10 @@ from django.db.models import Q
 
 from like.models import Like
 from like.serializers import LikeSerializer
-from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure
+from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure,ShopSetting
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
-    UserProductSerializer, CompanySerializer
+    UserProductSerializer, CompanySerializer, ShopSettingSerializer
 from rest_auth.registration.views import RegisterView
 
 
@@ -246,7 +246,12 @@ class FailureOffer(APIView):
         product.update(failure=F('failure') + 1)
         return CustomJSONRenderer().render({'success': True}, 200)
 
-
+class SettingView(APIView):
+    permission_class = (AllowAny,)
+    
+    def get(self, request, format=None):
+        setting = ShopSetting.objects.filter(enable=True)
+        return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(),many=False).data)
 def convert_to_int(number):
     try:
         cnumber = int(number)
