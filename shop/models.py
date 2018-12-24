@@ -86,14 +86,16 @@ class Category(models.Model):
         return self.name or ''
 
     def save(self, **kwargs):
-        self.slug = orig = str((self.name)).replace(' ', '-')
-        for x in itertools.count(1):
-            if not Category.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-                break
-            self.slug = '%s-%d' % (orig, x)
-        # self.save()
-        print(str(self.slug))
         super(Category, self).save(**kwargs)
+        if not self.slug:
+            self.slug = orig = str((self.name)).replace(' ', '-')
+            for x in itertools.count(1):
+                if not Category.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                    break
+                self.slug = '%s-%d' % (orig, x)
+            self.save()
+            print(str(self.slug))
+        
 
     class Meta:
         verbose_name = u'دسته بندی'
@@ -123,14 +125,15 @@ class Company(models.Model):
         return self.name or ''
 
     def save(self, **kwargs):
-        self.slug = orig = str((self.name)).replace(' ', '-')
-        for x in itertools.count(1):
-            if not Company.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-                break
-            self.slug = '%s-%d' % (orig, x)
-        # self.save()
-        print(str(self.slug))
         super(Company, self).save(**kwargs)
+        if not self.slug:
+            self.slug = orig = str((self.name)).replace(' ', '-')
+            for x in itertools.count(1):
+                if not Company.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                    break
+                self.slug = '%s-%d' % (orig, x)
+            self.save()
+            print(str(self.slug))
 
     class Meta:
         verbose_name = u'شرکت'
@@ -220,13 +223,15 @@ class Product(models.Model):
         verbose_name_plural = u"کد تخفیف"
 
     def save(self, **kwargs):
-        self.slug = orig = str((self.name)).replace(' ', '-')
-        for x in itertools.count(1):
-            if not Product.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
-                break
-            self.slug = '%s-%d' % (orig, x)
-        # self.save()
         super(Product, self).save(**kwargs)
+        if not self.slug:
+            self.slug = orig = str((self.name)).replace(' ', '-')
+            for x in itertools.count(1):
+                if not Product.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                    break
+                self.slug = '%s-%d' % (orig, x)
+            self.save()
+            print('slug product write',str(self.slug))
 
     def __str__(self):
         return str(self.name)
