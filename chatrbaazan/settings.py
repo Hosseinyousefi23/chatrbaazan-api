@@ -14,6 +14,9 @@ import os
 from chatrbaazan.env import ENV
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
+
+def _(s): return s
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -70,9 +73,12 @@ CKEDITOR_CONFIGS = {
             ['Source', '-', 'Bold', 'Italic']
         ],
         'toolbar_YourCustomToolbarConfig': [
-            {'name': 'document', 'items': ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']***REMOVED***,
-            {'name': 'clipboard', 'items': ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']***REMOVED***,
-            {'name': 'editing', 'items': ['Find', 'Replace', '-', 'SelectAll']***REMOVED***,
+            {'name': 'document', 'items': [
+                'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']***REMOVED***,
+            {'name': 'clipboard', 'items': [
+                'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']***REMOVED***,
+            {'name': 'editing', 'items': [
+                'Find', 'Replace', '-', 'SelectAll']***REMOVED***,
             {'name': 'forms',
              'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
                        'HiddenField']***REMOVED***,
@@ -87,7 +93,8 @@ CKEDITOR_CONFIGS = {
             {'name': 'insert',
              'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']***REMOVED***,
             '/',
-            {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']***REMOVED***,
+            {'name': 'styles', 'items': [
+                'Styles', 'Format', 'Font', 'FontSize']***REMOVED***,
             {'name': 'colors', 'items': ['TextColor', 'BGColor']***REMOVED***,
             {'name': 'tools', 'items': ['Maximize', 'ShowBlocks']***REMOVED***,
             {'name': 'about', 'items': ['About']***REMOVED***,
@@ -281,4 +288,42 @@ EMAIL_HOST_USER = 'noreply@digicharkh.com'
 EMAIL_HOST_PASSWORD = 'mohammad@gmail.com'
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = 'noreply@digicharkh.com'
-
+# Config django-jet
+JET_THEMES = [
+    {
+        'theme': 'default',  # theme folder name
+        'color': '#47bac1',  # color of the theme's button in user menu
+        'title': 'Default'  # theme title
+    ***REMOVED***,
+    {
+        'theme': 'green',
+        'color': '#44b78b',
+        'title': 'Green'
+    ***REMOVED***,
+    {
+        'theme': 'light-green',
+        'color': '#2faa60',
+        'title': 'Light Green'
+    ***REMOVED***,
+    {
+        'theme': 'light-violet',
+        'color': '#a464c4',
+        'title': 'Light Violet'
+    ***REMOVED***,
+    {
+        'theme': 'light-blue',
+        'color': '#5EADDE',
+        'title': 'Light Blue'
+    ***REMOVED***,
+    {
+        'theme': 'light-gray',
+        'color': '#222',
+        'title': 'Light Gray'
+    ***REMOVED***
+]
+'''
+Adds buttons to change forms that allows you to navigate to previous/next 
+object without returning back to change list. Can be disabled if hit performance.
+'''
+JET_APP_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultAppIndexDashboard'
+JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
