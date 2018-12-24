@@ -51,6 +51,11 @@ def generate_filename_ProductPic(instance, filename):
     return os.path.join(u"UpLoadedFiles", "Product", str(instance.id), (filename))
 
 
+def generate_filename_fieldFileProduct(instance, filename):
+    if not instance.id:
+        instance.id = date.today().year
+    return os.path.join(u"UpLoadedFiles","Product","File", str(instance.id), (filename))
+
 def validate_mobile(mobile):
     if mobile:
         if not re.match('^09[\d]{9}$', str(mobile)):
@@ -192,6 +197,12 @@ class Product(models.Model):
         (6, u"سطح بالا"),
         (7, u"سطح فوق بالا"),
     )
+    TYPE = (
+        (1, u"محصول"),
+        (2, u"اپ"),
+        (3,u"همایش"),
+        (4,u"کد تخفیف"),
+    )
     name = models.CharField(max_length=300, blank=False, null=False, verbose_name=u"نام")
     category = models.ManyToManyField(Category, related_name="product_category", verbose_name=u"دسته بندی")
     company = models.ManyToManyField(Company, related_name="product_company", verbose_name=u"کمپانی", null=True,
@@ -216,6 +227,9 @@ class Product(models.Model):
     failure = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد گزارش خرابی")
     click = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد لایک")
     link = models.CharField(max_length=350, blank=True, null=True,default=None,verbose_name=u'لینک')
+    file = models.FileField(storage=fs, upload_to=generate_filename_fieldFileProduct,
+                     verbose_name=u"فایل", blank=True, null=True, max_length=500)
+    type = models.PositiveSmallIntegerField(choices=TYPE, default=1, verbose_name=u"نوع")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -307,11 +321,11 @@ class Transaction(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = u"بنر"
-        verbose_name_plural = u"بنر"
+        verbose_name = u"پرداخت"
+        verbose_name_plural = u"پرداخت"
 
     def __unicode__(self):
-        return 'بنر {}'.format(self.title)
+        return 'پرداخت {}'.format(self.title)
 
 
 class UserProduct(models.Model):
