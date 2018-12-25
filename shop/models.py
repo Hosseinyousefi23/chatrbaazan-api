@@ -359,4 +359,4 @@ class ShopSetting(models.Model):
         verbose_name_plural = u'تنظیمات فروشگاه'
 
     def __str__(self):
-        return self
+        return str(self.telegram)
