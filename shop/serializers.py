@@ -143,7 +143,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         compnaies = Company.objects.filter(category__id=obj.id)
         if compnaies:
-            return CompanySerializer(compnaies,many=True).data
+            return CompanySerializer(compnaies,many=True,context={'request':self.context['request']***REMOVED***).data
         
 class CompanySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
