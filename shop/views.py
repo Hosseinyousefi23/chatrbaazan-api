@@ -256,7 +256,18 @@ class SettingView(APIView):
     def get(self, request, format=None):
         setting = ShopSetting.objects.filter(enable=True)
         return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(), many=False).data)
-        
+
+
+class GetCompanies(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+    def get(self, request, format=None):
+        search = request.GET.get('search',None)
+        if search is not None:
+            Companies = Company.objects.filter(Q(name__contains=search)).distinct()
+        else:
+            Companies = None
+        return CustomJSONRenderer().renderData(CompanySerializer(Companies,many=True,context={'request':request***REMOVED***).data)
 
 def convert_to_int(number):
     try:
