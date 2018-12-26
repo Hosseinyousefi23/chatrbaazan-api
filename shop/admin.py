@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from shop.models import City, Banner,ShopSetting, Product, Category, Company, ProductLabel, Discount, ProductGallery, UserProduct
+from shop.models import City, Banner, ShopSetting, Product, Category, Company, ProductLabel, Discount, ProductGallery, UserProduct
 
 
 class UserProductAdmin(admin.ModelAdmin):
@@ -10,6 +10,7 @@ class UserProductAdmin(admin.ModelAdmin):
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'failure', 'chatrbazi', 'is_free')
+    list_filter = ('type',)
 
 
 admin.site.register(City)

@@ -13,6 +13,15 @@ $(document).ready(function () {
             console.log(this)
             CKEDITOR.replace( this );
         });
+var vars = [];
+var hash;
+var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+for (var i = 0; i < hashes.length; i++) { hash=hashes[i].split('=');
+            vars[hash[0]] = hash[1];
+        }
+        if(vars['type'] != 'undefined'){
+            $("#id_type").find('option[value="'+vars['type']+'"]').prop('selected', 'selected');
+        }
 })
 </script>
 {{ block.super }}
