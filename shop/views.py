@@ -56,7 +56,7 @@ class GetCategory(APIView):
 
     def get(self, request, format=None, ):
         categoryData = Category.objects.filter(available=True)
-        categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True).data
+        categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True,context={'request':request}).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
         sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum')
