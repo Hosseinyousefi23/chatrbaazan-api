@@ -109,6 +109,42 @@ class CategorySerializer(serializers.ModelSerializer):
             return 0
 
 
+class CategoryMenuSerializer(serializers.ModelSerializer):
+    open_chatrbazi = serializers.SerializerMethodField()
+    all_chatrbazi = serializers.SerializerMethodField()
+    company = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'english_name', 'available',
+                  'all_chatrbazi', 'open_chatrbazi', 'slug', 'company')
+
+    def __init__(self, instance, pop=[], *args, **kwargs):
+        super().__init__(instance, **kwargs)
+        for fd in pop:
+            self.fields.pop(fd)
+
+    def get_all_chatrbazi(self, obj):
+        sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
+            category__id=obj.pk)
+        if sum.count() > 0:
+            return sum[0]['sum']
+        else:
+            return 0
+
+    def get_open_chatrbazi(self, obj):
+        sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
+            category__id=obj.pk).filter(priority=1)
+        if sum.count() > 0:
+            return sum[0]['sum']
+        else:
+            return 0
+
+    def get_company(self, obj):
+        compnaies = Company.objects.filter(category__id=obj.id)
+        if compnaies:
+            return CompanySerializer(compnaies,many=True).data
+        
 class CompanySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 

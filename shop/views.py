@@ -26,7 +26,7 @@ from like.serializers import LikeSerializer
 from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure,ShopSetting
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
-    UserProductSerializer, CompanySerializer, ShopSettingSerializer
+    UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer
 from rest_auth.registration.views import RegisterView
 
 
@@ -56,7 +56,7 @@ class GetCategory(APIView):
 
     def get(self, request, format=None, ):
         categoryData = Category.objects.filter(available=True)
-        categoryDataSerializer = CategorySerializer(categoryData, many=True).data
+        categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
         sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum')
@@ -162,8 +162,8 @@ class GetOffers(APIView, PageNumberPagination):
             else:
                 return None
         if search is not None:
-            products = products.filter(Q(name__contains=search) | Q(explanation__contains=search) |
-                                       Q(company__name=search) | Q(category__name=search)).distinct()
+            products = products.filter(Q(label__name__contains=search) |
+                                       Q(company__name__contains=search)).distinct()
         if products.count() > 0:  # fix ordering products
             if ordering == 'created_at':
                 products = products.order_by(ordering, '-expiration_date')
