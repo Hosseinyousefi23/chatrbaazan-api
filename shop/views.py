@@ -134,7 +134,7 @@ class GetOffers(APIView, PageNumberPagination):
         companyId = request.GET.get('company', None)
         companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
-        type = request.GET.get('type',None)
+        type_product = request.GET.get('type',None)
         products = Product.objects.all()
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
@@ -166,7 +166,7 @@ class GetOffers(APIView, PageNumberPagination):
                                        Q(company__name__contains=search)).distinct()
         if products.count() > 0:  # fix ordering products
             if ordering == 'created_at':
-                products = products.order_by(ordering, '-expiration_date')
+                products = products.order_by('-created_at', '-expiration_date')
             else:
                 if ordering == 'favorites':
                     # like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')) \
@@ -178,15 +178,14 @@ class GetOffers(APIView, PageNumberPagination):
                     #         [id[0] for id in products.values_list('id')])
                     #     products = products.filter(id__in=margesort)
                     # else:
-                    print('clickkkkk')
                     products = products.order_by('-click')
 
                 elif ordering == 'topchatrbazi':
                     products = products.order_by('-chatrbazi', '-click')
                 else:
                     return None
-            if type is not None:
-                products = products.filter(type=type)
+            if type_product is not None:
+                products = products.filter(type=type_product)
         if companySlug is None or companyId is None:
             products = products.filter(Q(expiration_date__lt=datetime.now()) | Q(expiration_date__isnull=True) )
         return self.paginate_queryset(products, self.request)
@@ -258,7 +257,7 @@ class SettingView(APIView):
         setting = ShopSetting.objects.filter(enable=True)
         return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(), many=False).data)
         
-        
+
 def convert_to_int(number):
     try:
         cnumber = int(number)
