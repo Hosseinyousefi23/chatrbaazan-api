@@ -187,7 +187,7 @@ class GetOffers(APIView, PageNumberPagination):
             if type_product is not None:
                 products = products.filter(type=type_product)
         if companySlug is None or companyId is None:
-            products = products.filter(Q(expiration_date__lt=datetime.now()) | Q(expiration_date__isnull=True) )
+            products = products.filter(Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True) )
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
