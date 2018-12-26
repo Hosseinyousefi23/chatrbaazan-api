@@ -134,7 +134,7 @@ class GetOffers(APIView, PageNumberPagination):
         companyId = request.GET.get('company', None)
         companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
-        type = request.GET.get('type',4)
+        type = request.GET.get('type',None)
         products = Product.objects.all()
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
@@ -185,7 +185,8 @@ class GetOffers(APIView, PageNumberPagination):
                     products = products.order_by('-chatrbazi', '-click')
                 else:
                     return None
-            products = products.filter(type=type)
+            if type is not None:
+                products = products.filter(type=type)
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
