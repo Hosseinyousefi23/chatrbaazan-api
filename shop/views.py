@@ -28,7 +28,7 @@ from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
     UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer
 from rest_auth.registration.views import RegisterView
-
+from datetime import datetime
 
 def test(request):
     return render(request, 'index.html')
@@ -187,6 +187,8 @@ class GetOffers(APIView, PageNumberPagination):
                     return None
             if type is not None:
                 products = products.filter(type=type)
+        if companySlug is None or companyId is None:
+            products = products.filter(Q(expiration_date__lt=datetime.now()) | Q(expiration_date__isnull=True) )
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
@@ -198,7 +200,7 @@ class GetOffers(APIView, PageNumberPagination):
         if companySlug:
             company = Company.objects.filter(slug=companySlug)
             if company.count() > 0:
-                dataCompany = company.first();
+                dataCompany = company.first()
         data = ProductSerializer(products, many=True, context={'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
@@ -250,11 +252,13 @@ class FailureOffer(APIView):
         return CustomJSONRenderer().render({'success': True}, 200)
 
 class SettingView(APIView):
-    permission_class = (AllowAny,)
-    
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
     def get(self, request, format=None):
         setting = ShopSetting.objects.filter(enable=True)
-        return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(),many=False).data)
+        return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(), many=False).data)
+        
+        
 def convert_to_int(number):
     try:
         cnumber = int(number)
