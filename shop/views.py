@@ -114,11 +114,11 @@ class GetOffers(APIView, PageNumberPagination):
 
     # renderer_classes = (JSONRenderer,)
     def get_queryset(self, request):
-        limits = request.GET.get('limits', 10)
+        limits = request.GET.get('limits', 100)
         try:
             limits = int(limits)
         except ValueError as e:
-            limits = 5
+            limits = 100
         if limits >= 30:
             limits = 30
 
