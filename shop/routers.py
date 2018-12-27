@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^city/$', views.GetCity.as_view()),
     url(r'^banner/$', views.GetBanner.as_view()),
     url(r'^company/$', views.GetCompanies.as_view()),
-    url(r'^label/(?P<slug>.*)$', views.LabelViews.as_view()),
+    url(r'^label/(?P<slug>.*)/$', views.LabelViews.as_view()),
     url(r'^user/product/$', views.GetUserProduct.as_view()),
     url(r'^offer/$', views.GetOffers.as_view(), name="getOffers"),
     url(r'^offer/(?P<slug>.*)/$', views.GetOffer.as_view(), name="getOffer"),
