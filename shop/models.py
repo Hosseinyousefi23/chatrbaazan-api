@@ -234,8 +234,8 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = u"محصولات"
-        verbose_name_plural = u"محصول"
+        verbose_name = u"محصول"
+        verbose_name_plural = u"محصولات"
 
     def save(self, **kwargs):
         super(Product, self).save(**kwargs)
