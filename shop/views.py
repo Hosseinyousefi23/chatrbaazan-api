@@ -288,7 +288,7 @@ def marge_sort(first_list, second_list):
 
 
 class LabelViews(APIView):
-    permission_class = (AllowAny,)
+    permission_classes = (AllowAny,)
     allowed_methods = ('GET',)
 
     def get(self, request, slug=None, format=None):
