@@ -23,10 +23,10 @@ from django.db.models import Q
 
 from like.models import Like
 from like.serializers import LikeSerializer
-from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure,ShopSetting
+from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure, ShopSetting, ProductLabel
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
-    UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer
+    UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer
 from rest_auth.registration.views import RegisterView
 from datetime import datetime
 
@@ -285,3 +285,21 @@ def marge_sort(first_list, second_list):
     # if type(second_list) is dict:
     #     second_list = second_list.items()
     return first_list + list(set(second_list) - set(first_list))
+
+
+class LabelViews(APIView):
+    permission_class = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, slug=None, format=None):
+        if slug:
+            print('Slug',str(slug))
+            products = Product.objects.filter(Q(label__name__contains=slug))
+            return CustomJSONRenderer().renderData(ProductSerializer(products, context={'request': request***REMOVED***, many=True).data)
+        else:
+            print('None slug LabelViews ')
+            search = request.GET.get('search', None)
+            PLable = None
+            if search is not None:
+                PLable = ProductLabel.objects.filter(Q(name__contains=search))
+            return CustomJSONRenderer().renderData(ProductLabelSerializer(PLable, many=True, pop=['available']).data)
