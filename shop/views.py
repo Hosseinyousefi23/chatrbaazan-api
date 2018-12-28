@@ -1,11 +1,15 @@
+import random
 from collections import OrderedDict
 import operator
 import itertools
 from itertools import chain
+import uuid
 
 from django.db.models import Count, Max
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
+from django.db.models.aggregates import Sum
+from django.db.models.expressions import F
 from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
@@ -19,10 +23,12 @@ from django.db.models import Q
 
 from like.models import Like
 from like.serializers import LikeSerializer
-from shop.models import City, Banner, Category, Product, Company
+from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure, ShopSetting, ProductLabel
 from shop.renderers import CustomJSONRenderer
-from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer
+from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
+    UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer
 from rest_auth.registration.views import RegisterView
+from datetime import datetime
 
 
 def test(request):
@@ -36,7 +42,7 @@ class TestAPi(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
-        return Response("test")
+        return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
 
 
 def testr(request):
@@ -51,9 +57,18 @@ class GetCategory(APIView):
 
     def get(self, request, format=None, ):
         categoryData = Category.objects.filter(available=True)
-        categoryDataSerializer = CategorySerializer(categoryData, many=True).data
+        categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True, context={'request': request***REMOVED***).data
         # TODO Cache Data Category
-        return CustomJSONRenderer().renderData(categoryDataSerializer)
+        # return CustomJSONRenderer().renderData(categoryDataSerializer)
+        sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum')
+        if sumChatrbazi.count() > 0:
+            sumChatrbazi = sumChatrbazi[0]['sum']
+        else:
+            sumChatrbazi = 0
+        return CustomJSONRenderer().render({
+            'data': categoryDataSerializer,
+            'all_chatrbazi': sumChatrbazi
+        ***REMOVED***)
 
 
 class GetCity(APIView):
@@ -75,8 +90,20 @@ class GetBanner(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
-        bannerData = Banner.objects.filter(available=True).order_by('-id')[:6]
+        bannerData = Banner.objects.filter(available=True).order_by('-location')[:10]
         data = BannerSerializer(bannerData, many=True, context={'request': request***REMOVED***).data
+        return CustomJSONRenderer().renderData(data)
+
+
+class GetUserProduct(APIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_methods = ('GET',)
+
+    # renderer_classes = (JSONRenderer,)
+
+    def get(self, request, format=None, ):
+        userData = UserProduct.objects.filter(user=request.user).order_by('-id')
+        data = UserProductSerializer(userData, many=True, context={'request': request***REMOVED***).data
         return CustomJSONRenderer().renderData(data)
 
 
@@ -88,11 +115,11 @@ class GetOffers(APIView, PageNumberPagination):
 
     # renderer_classes = (JSONRenderer,)
     def get_queryset(self, request):
-        limits = request.GET.get('limits', 10)
+        limits = request.GET.get('limits', 100)
         try:
             limits = int(limits)
         except ValueError as e:
-            limits = 5
+            limits = 100
         if limits >= 30:
             limits = 30
 
@@ -108,6 +135,7 @@ class GetOffers(APIView, PageNumberPagination):
         companyId = request.GET.get('company', None)
         companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
+        type_product = request.GET.get('type', None)
         products = Product.objects.all()
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
@@ -135,41 +163,54 @@ class GetOffers(APIView, PageNumberPagination):
             else:
                 return None
         if search is not None:
-            products = products.filter(Q(name__contains=search) | Q(explanation__contains=search) |
-                                       Q(company__name=search) | Q(category__name=search))
+            products = products.filter(Q(label__name__contains=search) |
+                                       Q(company__name__contains=search)).distinct()
         if products.count() > 0:  # fix ordering products
             if ordering == 'created_at':
-                products = products.order_by(ordering, '-expiration_date')
+                products = products.order_by('-created_at', '-expiration_date')
             else:
                 if ordering == 'favorites':
-                    like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')) \
-                        .filter(product__id__in=products.values('id')).order_by(
-                        '-count')
-                    if like.count() > 0:
-                        margesort = marge_sort(
-                            [id[0] for id in like.values_list('product__id')],
-                            [id[0] for id in products.values_list('id')])
-                        products = products.filter(id__in=margesort)
-                    else:
-                        products = products.order_by('-id')
+                    # like = Like.objects.values('product__id').filter(like=1).annotate(count=Count('like')) \
+                    #     .filter(product__id__in=products.values('id')).order_by(
+                    #     '-count')
+                    # if like.count() > 0:
+                    #     margesort = marge_sort(
+                    #         [id[0] for id in like.values_list('product__id')],
+                    #         [id[0] for id in products.values_list('id')])
+                    #     products = products.filter(id__in=margesort)
+                    # else:
+                    products = products.order_by('-click')
 
                 elif ordering == 'topchatrbazi':
-                    products = products.order_by('-chatrbazi')
+                    products = products.order_by('-chatrbazi', '-click')
                 else:
                     return None
+            if type_product is not None:
+                products = products.filter(type=type_product)
+        if companySlug is None or companyId is None:
+            products = products.filter(Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
         products = self.get_queryset(request)
         if products is None:
             return CustomJSONRenderer().render404('product', '')
+        companySlug = request.GET.get('company_slug', None)
+        dataCompany = None
+        if companySlug:
+            company = Company.objects.filter(slug=companySlug)
+            if company.count() > 0:
+                dataCompany = company.first()
         data = ProductSerializer(products, many=True, context={'request': request***REMOVED***).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
                 ('next', self.get_next_link()),
                 ('previous', self.get_previous_link()),
-                ('results', data)
+                ('results', data),
+                ('dataCompany',
+                 CompanySerializer(dataCompany, many=False, context={'request': request***REMOVED***,
+                                   pop=['available']).data if dataCompany else None)
             ])
         )
 
@@ -184,6 +225,54 @@ class GetOffer(APIView, PageNumberPagination):
             return CustomJSONRenderer().render400()
         return CustomJSONRenderer().renderData(
             ProductSerializer(product.first(), context={'request': request***REMOVED***, many=False).data)
+
+
+class FailureOffer(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, slug, format=None, ):
+        product = Product.objects.filter(slug=slug)
+        if not product.exists():
+            return CustomJSONRenderer().render404('product', '')
+
+        print(str(request.session))
+        if 'uuid_failure' in request.session:
+            return CustomJSONRenderer().render({'message': 'گزارش توسط شما قبلا ارسال شده است'***REMOVED***, status=400)
+        if not request.user.is_anonymous:
+            user = request.user
+        else:
+            user = None
+        request.session['uuid_failure'] = str(uuid.uuid1(random.randint(0, 281474976710655)))
+        uuid_failure = request.session['uuid_failure']
+        Failure.objects.create(product=product.first(),
+                               user=user,
+                               uuid=uuid_failure)
+        product.update(failure=F('failure') + 1)
+        return CustomJSONRenderer().render({'success': True***REMOVED***, 200)
+
+
+class SettingView(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, format=None):
+        setting = ShopSetting.objects.filter(enable=True)
+        return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(), many=False).data)
+
+
+class GetCompanies(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, format=None):
+        search = request.GET.get('search', None)
+        if search is not None:
+            Companies = Company.objects.filter(Q(name__contains=search)).distinct()
+        else:
+            Companies = None
+        return CustomJSONRenderer().renderData(
+            CompanySerializer(Companies, many=True, context={'request': request***REMOVED***).data)
 
 
 def convert_to_int(number):
@@ -202,3 +291,24 @@ def marge_sort(first_list, second_list):
     # if type(second_list) is dict:
     #     second_list = second_list.items()
     return first_list + list(set(second_list) - set(first_list))
+
+
+class LabelViews(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request, slug=None, format=None):
+        search = request.GET.get('search', None)
+        if slug:
+            print('Slug', str(slug))
+            products = Product.objects.filter(Q(label__name__contains=slug))
+            if search is not None:
+                products = products.filter(Q(category__name__contains=search) | Q(company__name__contains=search))
+            return CustomJSONRenderer().renderData(
+                ProductSerializer(products, context={'request': request***REMOVED***, many=True).data)
+        else:
+            print('None slug LabelViews ')
+            PLable = None
+            if search is not None:
+                PLable = ProductLabel.objects.filter(Q(name__contains=search))
+            return CustomJSONRenderer().renderData(ProductLabelSerializer(PLable, many=True, pop=['available']).data)

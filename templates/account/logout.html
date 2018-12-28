@@ -1,0 +1,21 @@
+{% extends "account/base.html" %***REMOVED***
+
+{% load i18n %***REMOVED***
+
+{% block head_title %***REMOVED***{% trans "Sign Out" %***REMOVED***{% endblock %***REMOVED***
+
+{% block content %***REMOVED***
+<h1>{% trans "Sign Out" %***REMOVED***</h1>
+
+<p>{% trans 'Are you sure you want to sign out?' %***REMOVED***</p>
+
+<form method="post" action="{% url 'account_logout' %***REMOVED***">
+  {% csrf_token %***REMOVED***
+  {% if redirect_field_value %***REMOVED***
+  <input type="hidden" name="{{ redirect_field_name ***REMOVED******REMOVED***" value="{{ redirect_field_value ***REMOVED******REMOVED***"/>
+  {% endif %***REMOVED***
+  <button type="submit">{% trans 'Sign Out' %***REMOVED***</button>
+</form>
+
+
+{% endblock %***REMOVED***

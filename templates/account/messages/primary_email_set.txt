@@ -1,0 +1,2 @@
+{% load i18n %***REMOVED***
+{% blocktrans %***REMOVED***Primary e-mail address set.{% endblocktrans %***REMOVED***

@@ -14,10 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import url, include
-from rest_auth.views import LogoutView
+from rest_auth.registration.views import VerifyEmailView
+from rest_auth.views import LogoutView, PasswordResetView, PasswordResetConfirmView
 from django.conf.urls.static import static
+from allauth.account.views import confirm_email as allauthemailconfirmation
 
 from rest_framework import routers
 from rest_framework_jwt.views import refresh_jwt_token, ObtainJSONWebToken
@@ -25,6 +27,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
 
+from accounts.views import UserDetailsView
 from chatrbaazan import settings
 from shop import serializers
 
@@ -36,14 +39,24 @@ urlpatterns = [
     url(r'^', include('shop.urls')),
     path('auth/login/', ObtainJSONWebToken.as_view()),
     path('auth/registration/', include('rest_auth.registration.urls')),
+    re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
+            name='account_email_verification_sent'),
+    url(r'^rest-auth/registration/account-confirm-email/(?P<key>\w+)/$', allauthemailconfirmation,
+        name="account_confirm_email"),
     path('auth/refresh/', refresh_jwt_token),
     path('auth/verify/', verify_jwt_token),
+    url(r'^auth/password/reset/$', PasswordResetView.as_view(),
+        name='rest_password_reset'),
+    url(r'^auth/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm'),
+    url(r'^auth/user/$', UserDetailsView.as_view(), name='rest_user_details'),
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
     url(r'^api/v1/contact/', include('contact.routers')),
     url(r'^api/v1/like/', include('like.routers')),
     url(r'^api/v1/cart/', include('carts.routers')),
     url(r'^api/v1/about/', include('about.routers')),
     url(r'^api/v1/user/', include('accounts.routers')),
+    url(r'^api/v1/email/', include('emm.routers')),
     url(r'^api/v1/sms/', include('sms.routers')),
     url(r'^api/v1/', include('shop.routers')),
 

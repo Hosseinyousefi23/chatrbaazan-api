@@ -5,4 +5,6 @@ db.sqlite3
 .pyc
 .env/
 .venv/
-
+public/*
+UpLoadedFiles/*
+chatrbaazan/env.py
