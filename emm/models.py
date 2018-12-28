@@ -1,18 +1,39 @@
+import re
+
 from django.core.mail import EmailMessage
 
 from django.db import models
 from django.template import Context
 from django.template.loader import get_template
+from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 
-# Create your models here.
+def validate_email(email):
+    if email:
+        if not re.match('^[^@]+@[^@]+\.[^@]+', str(email)):
+            raise ValidationError(u'is not valid email')
+
+
+class EmailRegister(models.Model):
+    email = models.CharField(max_length=250, verbose_name=u"ایمیل")
+    is_active = models.BooleanField(default=True, verbose_name=u"فعال")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.email)
+
+
 class EmailEMM(models.Model):
     title = models.CharField(max_length=250, blank=True, null=True, default=None, verbose_name=u"عنوان ایمیل")
     user = models.ManyToManyField(User, related_name="emailEmm_user", verbose_name=u"کاربر")
+    email_register = models.ManyToManyField(EmailRegister, null=True, blank=True,
+                                            related_name="emailEmm_email_register",
+                                            verbose_name=u"انتخاب ایمیل از لیست خبرنامه")
     text = models.TextField(verbose_name=u"متن ایمیل", blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
