@@ -46,6 +46,12 @@ class EmailLog(models.Model):
     def __str__(self):
         return str(self.user)
 
+
+class EmailRegister(models.Model):
+    email = models.CharField(max_length=250, verbose_name=u"ایمیل")
+    is_active = models.BooleanField(default=True, verbose_name=u"فعال")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 # @receiver(post_save, sender=EmailEMM)
 # def send_user_data_when_created_by_admin(sender, instance, created=True, raw=True, *args, **kwargs):
 #     print(str(sender))
