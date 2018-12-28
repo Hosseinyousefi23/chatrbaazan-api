@@ -59,13 +59,13 @@ def generate_filename_fieldFileProduct(instance, filename):
 
 def validate_mobile(mobile):
     if mobile:
-        if not re.match('^09[\d]{9}$', str(mobile)):
+        if not re.match('^[0][9][1][0-9]{8,8}$', str(mobile)):
             raise ValidationError(u'not Invalid Mobile')
 
 
 def validate_phone(phone):
     if phone:
-        if not re.match('^0[\d]{10}$', str(phone)):
+        if not re.match('^[0][9][1][0-9]{8,8}$', str(phone)):
             raise ValidationError(u'not Invalid Phone')
 
 
@@ -230,7 +230,7 @@ class Product(models.Model):
     file = models.FileField(storage=fs, upload_to=generate_filename_fieldFileProduct,
                             verbose_name=u"فایل", blank=True, null=True, max_length=500)
     type = models.PositiveSmallIntegerField(choices=TYPE, default=1, verbose_name=u"نوع")
-    count = models.IntegerField(default=0,verbose_name=u"تعداد")
+    count = models.IntegerField(default=0, verbose_name=u"تعداد")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

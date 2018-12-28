@@ -1,23 +1,23 @@
 import requests
 
 
-def send_verification_sms(user, request=None, text=None, mobile=None):
+def send_verification_sms(user, request=None, text=None, mobile=None, verify_code=1):
     """
     sending verification sms via post method
     :param appointment:
     :param request:
-    :return:
+    :return:        validate_phone(request.POST.get('phone', ''))
+
     """
     url_post = 'http://smspanel.Trez.ir/SendMessageWithPost.ashx'
     if text is None:
-        text = text.replace("{VERIFIYCODE}", str(user.verify_code))
-    mobile_number = user.phone if user.user is None else user.user
+        text = "کد تاییدیه:{} با تشکر چتربازان".format(verify_code)
     params = {
-        'UserName': 'Sepandteb',
-        'Password': 'sepandteb1132',
-        'PhoneNumber': '50005858997',
+        'UserName': 'Vahidsaadat1',
+        'Password': 'vma#123',
+        'PhoneNumber': '50002237242500',
         'MessageBody': text,
-        'RecNumber': mobile_number,
+        'RecNumber': mobile,
         'Smsclass': '1',
     }
 
