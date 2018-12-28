@@ -17,10 +17,23 @@ def validate_email(email):
         if not re.match('^[^@]+@[^@]+\.[^@]+', str(email)):
             raise ValidationError(u'is not valid email')
 
-# Create your models here.
+
+class EmailRegister(models.Model):
+    email = models.CharField(max_length=250, verbose_name=u"ایمیل")
+    is_active = models.BooleanField(default=True, verbose_name=u"فعال")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.email)
+
+
 class EmailEMM(models.Model):
     title = models.CharField(max_length=250, blank=True, null=True, default=None, verbose_name=u"عنوان ایمیل")
     user = models.ManyToManyField(User, related_name="emailEmm_user", verbose_name=u"کاربر")
+    email_register = models.ManyToManyField(EmailRegister, null=True, blank=True,
+                                            related_name="emailEmm_email_register",
+                                            verbose_name=u"انتخاب ایمیل از لیست خبرنامه")
     text = models.TextField(verbose_name=u"متن ایمیل", blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -54,12 +67,6 @@ class EmailLog(models.Model):
     def __str__(self):
         return str(self.user)
 
-
-class EmailRegister(models.Model):
-    email = models.CharField(max_length=250, verbose_name=u"ایمیل")
-    is_active = models.BooleanField(default=True, verbose_name=u"فعال")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 # @receiver(post_save, sender=EmailEMM)
 # def send_user_data_when_created_by_admin(sender, instance, created=True, raw=True, *args, **kwargs):
 #     print(str(sender))
