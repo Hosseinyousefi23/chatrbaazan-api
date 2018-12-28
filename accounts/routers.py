@@ -25,4 +25,5 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     url(r'^code/$', views.UserSendCodeView.as_view()),
+    url(r'^$', views.UserViews.as_view()),
 ]

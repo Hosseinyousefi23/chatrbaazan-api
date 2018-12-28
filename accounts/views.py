@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
 from accounts.models import UserSendCode, User
-from accounts.serializers import UserSendCodeSerializer, CustomUserDetailsSerializer
+from accounts.serializers import UserSendCodeSerializer, CustomUserDetailsSerializer, UserUpdateSerializer
 from contact.models import Contact
 from contact.serializers import ContactSerializer
 from shop.renderers import CustomJSONRenderer
@@ -62,3 +62,15 @@ class UserDetailsView(RetrieveUpdateAPIView):
         https://github.com/Tivix/django-rest-auth/issues/275
         """
         return User().objects.none()
+
+
+class UserViews(mixins.ListModelMixin, mixins.UpdateModelMixin,
+                mixins.CreateModelMixin, generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_method = ('PUT',)
+    serializer_class = UserUpdateSerializer
+    queryset = User.objects.all()
+
+    def put(self, request, format=None, *args, **kwargs):
+        mutable = request.POST._mutable
+        request.POST._mutable = True
