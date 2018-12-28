@@ -20,7 +20,8 @@ from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
 from like.models import Like
-from shop.models import City, Banner, Category, Product, Discount, Company,ShopSetting, ProductLabel, ProductGallery, UserProduct
+from shop.models import City, Banner, Category, Product, Discount, Company, ShopSetting, ProductLabel, ProductGallery, \
+    UserProduct
 from accounts.models import User
 import re
 
@@ -49,7 +50,7 @@ class BannerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'image', 'is_slider', 'link','location')
+        fields = ('id', 'title', 'image', 'is_slider', 'link', 'location')
 
     def get_image(self, obj):
         if obj.image:
@@ -143,14 +144,15 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         compnaies = Company.objects.filter(category__id=obj.id)
         if compnaies:
-            return CompanySerializer(compnaies,many=True,context={'request':self.context['request']}).data
+            return CompanySerializer(compnaies, many=True, context={'request': self.context['request']}).data
+
 
 class CompanySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
-        fields = ('name', 'available', 'slug', 'description', 'image','link')
+        fields = ('name', 'available', 'slug', 'description', 'image', 'link')
 
     def get_image(self, obj):
         if obj.image:
@@ -219,29 +221,29 @@ class ProductSerializer(serializers.ModelSerializer):
     like = serializers.SerializerMethodField()
     explanation_short = serializers.SerializerMethodField()
     file = serializers.SerializerMethodField()
+
     # type = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ('id',
-                  'name', 'priority','discount_code', 'explanation', 'explanation_short', 'expiration_date', 'price',
+                  'name', 'priority', 'discount_code', 'explanation', 'explanation_short', 'expiration_date', 'price',
                   'chatrbazi', 'is_free', 'english_name',
                   'image', 'category', 'label', 'city', 'company', 'gallery', 'slug',
-                  'like','link','file','type')
+                  'like', 'link', 'file', 'type')
 
     def get_explanation_short(self, obj):
         return Truncator(obj.explanation).chars(300)
 
-    # def get_type(self,obj):
+        # def get_type(self,obj):
         # return obj.get_type_display()
 
     def get_file(self, obj, *args, **kwargs):
         if obj.is_free:
-            return None
-        else:
             if obj.file:
                 return self.context['request'].build_absolute_uri(obj.file.url)
-
+        else:
+            return None
 
     def get_image(self, obj, **kwargs):
         if obj.image:
