@@ -30,6 +30,7 @@ from shop.serializers import CitySerializer, BannerSerializer, CategorySerialize
 from rest_auth.registration.views import RegisterView
 from datetime import datetime
 
+
 def test(request):
     return render(request, 'index.html')
 
@@ -56,7 +57,7 @@ class GetCategory(APIView):
 
     def get(self, request, format=None, ):
         categoryData = Category.objects.filter(available=True)
-        categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True,context={'request':request}).data
+        categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True, context={'request': request}).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
         sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum')
@@ -134,7 +135,7 @@ class GetOffers(APIView, PageNumberPagination):
         companyId = request.GET.get('company', None)
         companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
-        type_product = request.GET.get('type',None)
+        type_product = request.GET.get('type', None)
         products = Product.objects.all()
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
@@ -187,7 +188,7 @@ class GetOffers(APIView, PageNumberPagination):
             if type_product is not None:
                 products = products.filter(type=type_product)
         if companySlug is None or companyId is None:
-            products = products.filter(Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True) )
+            products = products.filter(Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
@@ -250,9 +251,11 @@ class FailureOffer(APIView):
         product.update(failure=F('failure') + 1)
         return CustomJSONRenderer().render({'success': True}, 200)
 
+
 class SettingView(APIView):
     permission_classes = (AllowAny,)
     allowed_methods = ('GET',)
+
     def get(self, request, format=None):
         setting = ShopSetting.objects.filter(enable=True)
         return CustomJSONRenderer().renderData(ShopSettingSerializer(setting.first(), many=False).data)
@@ -261,13 +264,16 @@ class SettingView(APIView):
 class GetCompanies(APIView):
     permission_classes = (AllowAny,)
     allowed_methods = ('GET',)
+
     def get(self, request, format=None):
-        search = request.GET.get('search',None)
+        search = request.GET.get('search', None)
         if search is not None:
             Companies = Company.objects.filter(Q(name__contains=search)).distinct()
         else:
             Companies = None
-        return CustomJSONRenderer().renderData(CompanySerializer(Companies,many=True,context={'request':request}).data)
+        return CustomJSONRenderer().renderData(
+            CompanySerializer(Companies, many=True, context={'request': request}).data)
+
 
 def convert_to_int(number):
     try:
@@ -292,13 +298,16 @@ class LabelViews(APIView):
     allowed_methods = ('GET',)
 
     def get(self, request, slug=None, format=None):
+        search = request.GET.get('search', None)
         if slug:
-            print('Slug',str(slug))
+            print('Slug', str(slug))
             products = Product.objects.filter(Q(label__name__contains=slug))
-            return CustomJSONRenderer().renderData(ProductSerializer(products, context={'request': request}, many=True).data)
+            if search is not None:
+                products = products.filter(Q(category__name__contains=search) | Q(company__name__contains=search))
+            return CustomJSONRenderer().renderData(
+                ProductSerializer(products, context={'request': request}, many=True).data)
         else:
             print('None slug LabelViews ')
-            search = request.GET.get('search', None)
             PLable = None
             if search is not None:
                 PLable = ProductLabel.objects.filter(Q(name__contains=search))
