@@ -12,10 +12,11 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
+from yaml.__init__ import serialize
 
 from accounts.adapters import CustomUserAccountAdapter
 from accounts.models import UserSendCode
-from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel
+from shop.models import City, Banner, Category, Product, Discount, Company, ProductLabel, validate_phone
 from .models import User
 import re
 
@@ -69,7 +70,19 @@ class RegisterSerializerCustom(serializers.Serializer):
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'mobile')
+        fields = ('first_name', 'last_name', 'email', 'mobile', 'address')
+        read_only_fields = ('email',)
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    mobile = serializers.CharField(validators=[validate_phone])
+    address = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'mobile', 'address')
         read_only_fields = ('email',)
 
 
