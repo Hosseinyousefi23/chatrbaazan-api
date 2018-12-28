@@ -1,0 +1,31 @@
+{% extends "account/base.html" %***REMOVED***
+
+{% load i18n %***REMOVED***
+{% load account %***REMOVED***
+
+{% block head_title %***REMOVED***{% trans "Confirm E-mail Address" %***REMOVED***{% endblock %***REMOVED***
+
+
+{% block content %***REMOVED***
+<h1>{% trans "Confirm E-mail Address" %***REMOVED***</h1>
+
+{% if confirmation %***REMOVED***
+
+{% user_display confirmation.email_address.user as user_display %***REMOVED***
+
+<p>{% blocktrans with confirmation.email_address.email as email %***REMOVED***Please confirm that <a href="mailto:{{ email ***REMOVED******REMOVED***">{{ email ***REMOVED******REMOVED***</a> is an e-mail address for user {{ user_display ***REMOVED******REMOVED***.{% endblocktrans %***REMOVED***</p>
+
+<form method="post" action="{% url 'account_confirm_email' confirmation.key %***REMOVED***">
+{% csrf_token %***REMOVED***
+    <button type="submit">{% trans 'Confirm' %***REMOVED***</button>
+</form>
+
+{% else %***REMOVED***
+
+{% url 'account_email' as email_url %***REMOVED***
+
+<p>{% blocktrans %***REMOVED***This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url ***REMOVED******REMOVED***">issue a new e-mail confirmation request</a>.{% endblocktrans %***REMOVED***</p>
+
+{% endif %***REMOVED***
+
+{% endblock %***REMOVED***

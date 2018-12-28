@@ -1,0 +1,4 @@
+{% load account %***REMOVED***
+{% load i18n %***REMOVED***
+{% user_display user as name %***REMOVED***
+{% blocktrans %***REMOVED***Successfully signed in as {{name***REMOVED******REMOVED***.{% endblocktrans %***REMOVED***

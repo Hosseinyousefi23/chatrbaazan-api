@@ -1,0 +1,73 @@
+{% extends "account/base.html" %***REMOVED***
+
+{% load i18n %***REMOVED***
+
+{% block head_title %***REMOVED***{% trans "Account" %***REMOVED***{% endblock %***REMOVED***
+
+{% block content %***REMOVED***
+    <h1>{% trans "E-mail Addresses" %***REMOVED***</h1>
+{% if user.emailaddress_set.all %***REMOVED***
+<p>{% trans 'The following e-mail addresses are associated with your account:' %***REMOVED***</p>
+
+<form action="{% url 'account_email' %***REMOVED***" class="email_list" method="post">
+{% csrf_token %***REMOVED***
+<fieldset class="blockLabels">
+
+  {% for emailaddress in user.emailaddress_set.all %***REMOVED***
+<div class="ctrlHolder">
+      <label for="email_radio_{{forloop.counter***REMOVED******REMOVED***" class="{% if emailaddress.primary %***REMOVED***primary_email{%endif%***REMOVED***">
+
+      <input id="email_radio_{{forloop.counter***REMOVED******REMOVED***" type="radio" name="email" {% if emailaddress.primary or user.emailaddress_set.count == 1 %***REMOVED***checked="checked"{%endif %***REMOVED*** value="{{emailaddress.email***REMOVED******REMOVED***"/>
+
+{{ emailaddress.email ***REMOVED******REMOVED***
+    {% if emailaddress.verified %***REMOVED***
+    <span class="verified">{% trans "Verified" %***REMOVED***</span>
+    {% else %***REMOVED***
+    <span class="unverified">{% trans "Unverified" %***REMOVED***</span>
+    {% endif %***REMOVED***
+      {% if emailaddress.primary %***REMOVED***<span class="primary">{% trans "Primary" %***REMOVED***</span>{% endif %***REMOVED***
+</label>
+</div>
+  {% endfor %***REMOVED***
+
+<div class="buttonHolder">
+      <button class="secondaryAction" type="submit" name="action_primary" >{% trans 'Make Primary' %***REMOVED***</button>
+      <button class="secondaryAction" type="submit" name="action_send" >{% trans 'Re-send Verification' %***REMOVED***</button>
+      <button class="primaryAction" type="submit" name="action_remove" >{% trans 'Remove' %***REMOVED***</button>
+</div>
+
+</fieldset>
+</form>
+
+{% else %***REMOVED***
+<p><strong>{% trans 'Warning:'%***REMOVED***</strong> {% trans "You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc." %***REMOVED***</p>
+
+{% endif %***REMOVED***
+
+
+    <h2>{% trans "Add E-mail Address" %***REMOVED***</h2>
+
+    <form method="post" action="{% url 'account_email' %***REMOVED***" class="add_email">
+        {% csrf_token %***REMOVED***
+        {{ form.as_p ***REMOVED******REMOVED***
+        <button name="action_add" type="submit">{% trans "Add E-mail" %***REMOVED***</button>
+    </form>
+
+{% endblock %***REMOVED***
+
+
+{% block extra_body %***REMOVED***
+<script type="text/javascript">
+(function() {
+  var message = "{% trans 'Do you really want to remove the selected e-mail address?' %***REMOVED***";
+  var actions = document.getElementsByName('action_remove');
+  if (actions.length) {
+    actions[0].addEventListener("click", function(e) {
+      if (! confirm(message)) {
+        e.preventDefault();
+      ***REMOVED***
+    ***REMOVED***);
+  ***REMOVED***
+***REMOVED***)();
+</script>
+{% endblock %***REMOVED***

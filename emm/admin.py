@@ -27,10 +27,24 @@ class EmailAdmin(admin.ModelAdmin):
                             ***REMOVED***
                         )
                     )
+                for email in form.cleaned_data.get('email_register'):
+                    print('user', str(email))
+                    # first_name = instance.user.first_name
+                    # print('first name is', first_name)
+                    print(str(user))
+                    EmailLog.objects.create(
+                        user=user,
+                        body=get_template('email/emm.html').render(
+                            {
+                                'email': email,
+                                'text': obj.text
+                            ***REMOVED***
+                        )
+                    )
             except Exception as e:
                 print('error when insert data To Email Log', str(e))
         else:
-            super(EmailLogAdmin, self).save_model(request, obj, form, change)
+            super(EmailAdmin, self).save_model(request, obj, form, change)
 
 
 class EmailLogAdmin(admin.ModelAdmin):

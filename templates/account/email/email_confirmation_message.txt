@@ -1,0 +1,8 @@
+{% load account %***REMOVED***{% user_display user as user_display %***REMOVED***{% load i18n %***REMOVED***{% autoescape off %***REMOVED***{% blocktrans with site_name=current_site.name site_domain=current_site.domain %***REMOVED***
+با سلام !
+
+شما این ایمیل را دریافت می کنید زیرا کاربر {{user_display***REMOVED******REMOVED*** ایمیل شما را به عنوان یک ایمیل برای اتصال حساب کاربری خود به شما داده است.
+برای تایید این درست است، به {{activate_url***REMOVED******REMOVED*** بروید
+{% endblocktrans %***REMOVED***{% endautoescape %***REMOVED***
+{% blocktrans with site_name=current_site.name site_domain=current_site.domain %***REMOVED***،با تشکر {{ site_name ***REMOVED******REMOVED***!
+{{ site_domain ***REMOVED******REMOVED***{% endblocktrans %***REMOVED***

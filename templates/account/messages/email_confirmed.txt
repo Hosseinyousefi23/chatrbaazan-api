@@ -1,0 +1,2 @@
+{% load i18n %***REMOVED***
+{% blocktrans %***REMOVED***You have confirmed {{email***REMOVED******REMOVED***.{% endblocktrans %***REMOVED***
