@@ -45,7 +45,7 @@ class SmsUser(models.Model):
     send_at = models.DateTimeField(auto_now_add=True, verbose_name=u"زمان ارسال کد")
 
     def __str__(self):
-        return self.user.mobile if self.user else self.phone
+        return self.phone
 
     class Meta:
         verbose_name = u"اشتراک پیامک کاربر"
