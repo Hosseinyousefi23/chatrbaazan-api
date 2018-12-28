@@ -1,13 +1,21 @@
+import re
+
 from django.core.mail import EmailMessage
 
 from django.db import models
 from django.template import Context
 from django.template.loader import get_template
+from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
+
+def validate_email(email):
+    if email:
+        if not re.match('^[^@]+@[^@]+\.[^@]+', str(email)):
+            raise ValidationError(u'is not valid email')
 
 # Create your models here.
 class EmailEMM(models.Model):
