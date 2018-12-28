@@ -1,7 +1,10 @@
 from django.shortcuts import render
 
 # Create your views here.
+from rest_auth.registration.serializers import RegisterSerializer
+from rest_auth.registration.views import RegisterView
 from rest_framework import mixins, generics
+from rest_framework.decorators import permission_classes
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView

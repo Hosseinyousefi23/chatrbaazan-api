@@ -70,14 +70,16 @@ class User(AbstractBaseUser):
                               verbose_name="mobile", db_index=True, validators=[validate_mobile], unique=True)
     first_name = models.CharField(max_length=150, verbose_name="first name")
     last_name = models.CharField(max_length=150, verbose_name="last name")
-
+    address = models.TextField(null=True, blank=True, default=None, verbose_name=u"آدرس")
     objects = UserManager()
 
-    # REQUIRED_FIELDS = ['email', 'mobile']
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
     class Meta:
         unique_together = ('email',)
+        verbose_name = u"کاربران"
+        verbose_name_plural = u"کاربران"
 
     def __str__(self):
         return self.email
@@ -98,9 +100,6 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
-    class Meta:
-        verbose_name = u"کاربران"
-        verbose_name_plural = u"کاربران"
 
 
 class UserSendCode(models.Model):
