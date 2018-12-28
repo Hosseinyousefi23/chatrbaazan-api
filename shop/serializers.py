@@ -144,7 +144,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
         compnaies = Company.objects.filter(category__id=obj.id)
         if compnaies:
             return CompanySerializer(compnaies,many=True,context={'request':self.context['request']***REMOVED***).data
-        
+
 class CompanySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
@@ -236,8 +236,11 @@ class ProductSerializer(serializers.ModelSerializer):
         # return obj.get_type_display()
 
     def get_file(self, obj, *args, **kwargs):
-        if obj.file:
-            return self.context['request'].build_absolute_uri(obj.file.url)
+        if obj.is_free:
+            return None
+        else:
+            if obj.file:
+                return self.context['request'].build_absolute_uri(obj.file.url)
 
 
     def get_image(self, obj, **kwargs):

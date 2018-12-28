@@ -54,7 +54,8 @@ def generate_filename_ProductPic(instance, filename):
 def generate_filename_fieldFileProduct(instance, filename):
     if not instance.id:
         instance.id = date.today().year
-    return os.path.join(u"UpLoadedFiles","Product","File", str(instance.id), (filename))
+    return os.path.join(u"UpLoadedFiles", "Product", "File", str(instance.id), (filename))
+
 
 def validate_mobile(mobile):
     if mobile:
@@ -100,11 +101,10 @@ class Category(models.Model):
                 self.slug = '%s-%d' % (orig, x)
             self.save()
             print(str(self.slug))
-        
 
     class Meta:
         verbose_name = u'دسته بندی'
-        verbose_name_plural=u'دسته بندی'
+        verbose_name_plural = u'دسته بندی'
 
 
 class Company(models.Model):
@@ -125,7 +125,7 @@ class Company(models.Model):
                               blank=True, null=True, max_length=500)
     priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=4, verbose_name=u"اولویت")
     description = models.TextField(verbose_name=u"توضیحات", blank=True, null=True, default=None)
-    link = models.CharField(max_length=500, null=True,blank=True,default=None,verbose_name=u'لینک')
+    link = models.CharField(max_length=500, null=True, blank=True, default=None, verbose_name=u'لینک')
 
     def __str__(self):
         return self.name or ''
@@ -200,8 +200,8 @@ class Product(models.Model):
     TYPE = (
         (1, u"محصول"),
         (2, u"اپ"),
-        (3,u"همایش"),
-        (4,u"کد تخفیف"),
+        (3, u"همایش"),
+        (4, u"کد تخفیف"),
     )
     name = models.CharField(max_length=300, blank=False, null=False, verbose_name=u"نام")
     category = models.ManyToManyField(Category, related_name="product_category", verbose_name=u"دسته بندی")
@@ -226,10 +226,11 @@ class Product(models.Model):
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
     failure = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد گزارش خرابی")
     click = models.IntegerField(null=True, blank=True, default=0, verbose_name=u"تعداد لایک")
-    link = models.CharField(max_length=350, blank=True, null=True,default=None,verbose_name=u'لینک')
+    link = models.CharField(max_length=350, blank=True, null=True, default=None, verbose_name=u'لینک')
     file = models.FileField(storage=fs, upload_to=generate_filename_fieldFileProduct,
-                     verbose_name=u"فایل", blank=True, null=True, max_length=500)
+                            verbose_name=u"فایل", blank=True, null=True, max_length=500)
     type = models.PositiveSmallIntegerField(choices=TYPE, default=1, verbose_name=u"نوع")
+    count = models.IntegerField(default=0,verbose_name=u"تعداد")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -246,7 +247,7 @@ class Product(models.Model):
                     break
                 self.slug = '%s-%d' % (orig, x)
             self.save()
-            print('slug product write',str(self.slug))
+            print('slug product write', str(self.slug))
 
     def __str__(self):
         return str(self.name)
@@ -343,6 +344,7 @@ class UserProduct(models.Model):
         verbose_name = u"محصولات خریداری شده"
         verbose_name_plural = u"محصولات خریداری شده"
 
+
 class ShopSetting(models.Model):
     instagram = models.CharField(max_length=350, blank=True, default="#", verbose_name=u"اینستاگرام")
     telegram = models.CharField(max_length=350, blank=True, default="#", verbose_name=u"تلگرام")
@@ -352,7 +354,6 @@ class ShopSetting(models.Model):
     map_y = models.CharField(max_length=100, null=True, blank=True, verbose_name=u"نقطه ی y در نقشه")
     enable = models.BooleanField(default=False, verbose_name=u'فعال')
     address = models.TextField(blank=True, null=True, verbose_name=u"آدرس فروشگاه")
-    
 
     class Meta:
         verbose_name = u'تنظمیات فروشگاه'
