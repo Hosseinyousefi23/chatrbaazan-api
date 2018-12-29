@@ -32,7 +32,7 @@ class UserSendCodeView(mixins.ListModelMixin,
     def post(self, request, format=None, *args, **kwargs):
         mutable = request.POST._mutable
         request.POST._mutable = True
-        request.data.update(user=request.user.pk)
+        request.data.update(user=request.user.pk if request.user.is_authenticated else None)
         request.data.update(status=2)
         request.POST._mutable = mutable
         return self.create(request, *args, **kwargs)

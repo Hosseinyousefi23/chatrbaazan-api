@@ -101,15 +101,14 @@ class User(AbstractBaseUser):
         return self.is_admin
 
 
-
 class UserSendCode(models.Model):
     STATUS = (
         (1, u"تایید شده"),
         (2, u"در انتظار تایید"),
         (3, u"لغو شده")
     )
-    user = models.ForeignKey(User, related_name="user_send_code_user", blank=False, null=False,
-                             on_delete=models.CASCADE, verbose_name=u"کاربر")
+    user = models.ForeignKey(User, related_name="user_send_code_user", blank=True, null=True,
+                             on_delete=models.CASCADE, default=None, verbose_name=u"کاربر")
     code = models.CharField(max_length=300, blank=False, null=False, verbose_name=u"کد تخفیف")
     explanation = models.TextField(blank=True, null=True, verbose_name=u"توضیح")
     expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
