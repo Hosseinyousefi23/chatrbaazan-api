@@ -14,32 +14,19 @@ class EmailAdmin(admin.ModelAdmin):
             obj.save()
             try:
                 for user in form.cleaned_data.get('user'):
-                    print('user', str(user))
-                    # first_name = instance.user.first_name
-                    # print('first name is', first_name)
-                    print(str(user))
                     EmailLog.objects.create(
                         user=user,
-                        email=get_template('email/emm.html').render(
-                            {
-                                'user': user,
-                                'text': obj.text
-                            }
-                        )
+                        body=get_template('email/emm.html').render(),
+                        email_address=user.email,
+                        title_email=form.cleaned_data.get('title')
                     )
+                print('clean data', str(form.cleaned_data.get('email_register')))
                 for email in form.cleaned_data.get('email_register'):
-                    print('user', str(email))
-                    # first_name = instance.user.first_name
-                    # print('first name is', first_name)
-                    print(str(user))
+                    print('email', str(email))
                     EmailLog.objects.create(
-                        user=user,
-                        body=get_template('email/emm.html').render(
-                            {
-                                'email': email,
-                                'text': obj.text
-                            }
-                        )
+                        body=get_template('email/emm.html').render(),
+                        email_address=email,
+                        title_email=form.cleaned_data.get('title')
                     )
             except Exception as e:
                 print('error when insert data To Email Log', str(e))
@@ -48,8 +35,10 @@ class EmailAdmin(admin.ModelAdmin):
 
 
 class EmailLogAdmin(admin.ModelAdmin):
-    list_display = ['user', 'email']
-    list_display_links = ['user']
+    list_display = ('get_email', 'status',)
+
+    def get_email(self, obj):
+        return obj.user if obj.user else obj.email_address
 
 
 admin.site.register(EmailEMM, EmailAdmin)

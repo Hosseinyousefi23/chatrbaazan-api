@@ -52,9 +52,12 @@ class EmailLog(models.Model):
         (2, u"مشکل در ارسال"),
         (3, u"در حال ارسال")
     )
+    title_email = models.CharField(max_length=300, blank=True, null=True, default=None, verbose_name=u"عنوان ایمیل")
     email = models.ForeignKey(EmailEMM, default=None, blank=True, null=True, verbose_name=u"ایمیل",
                               on_delete=models.SET_NULL)
-    user = models.ForeignKey(User, related_name="emailLog_user", verbose_name=u"کاربر", on_delete=models.CASCADE)
+    email_address = models.CharField(max_length=300, default=None, blank=True, null=True, verbose_name=u"آدرس ایمیل")
+    user = models.ForeignKey(User, blank=True, null=True, default=None, related_name="emailLog_user",
+                             verbose_name=u"کاربر", on_delete=models.CASCADE)
     body = models.TextField(blank=False, null=False, verbose_name=u"ایمیل")
     status = models.PositiveSmallIntegerField(choices=STATUS, default=3, blank=False, null=False, verbose_name=u"وضعیت")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -65,7 +68,7 @@ class EmailLog(models.Model):
         verbose_name_plural = u"ایمیل های داخل صف"
 
     def __str__(self):
-        return str(self.user)
+        return str(self.user) if self.user else str(self.email_address)
 
 # @receiver(post_save, sender=EmailEMM)
 # def send_user_data_when_created_by_admin(sender, instance, created=True, raw=True, *args, **kwargs):
