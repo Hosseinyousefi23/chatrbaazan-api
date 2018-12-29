@@ -28,7 +28,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
 
-from accounts.views import UserDetailsView
+from accounts.views import UserDetailsView, account_login
 from chatrbaazan import settings
 from shop import serializers
 
@@ -37,13 +37,14 @@ urlpatterns = [
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/login/', account_login, name="account_login"),
     url(r'^', include('shop.urls')),
     path('auth/login/', ObtainJSONWebToken.as_view()),
     path('auth/registration/', include('rest_auth.registration.urls')),
     re_path(r'^auth/account-confirm-email/', VerifyEmailView.as_view(),
             name='account_email_verification_sent'),
-    re_path(r'^auth/account-confirm-email/(?P<key>[-:\w]+)/$', VerifyEmailView.as_view(),
-            name='account_confirm_email'),
+    url(r'^rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/$', allauthemailconfirmation,
+        name="account_confirm_email"),
     path('auth/refresh/', refresh_jwt_token),
     path('auth/verify/', verify_jwt_token),
     url(r'^auth/password/reset/$', PasswordResetView.as_view(),
