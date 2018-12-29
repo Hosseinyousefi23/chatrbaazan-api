@@ -60,7 +60,7 @@ def generate_filename_fieldFileProduct(instance, filename):
 def validate_mobile(mobile):
     if mobile:
         if not re.match('^[0][9][1][0-9]{8,8}$', str(mobile)):
-            raise ValidationError(u'not Invalid Mobile')
+            raise ValidationError({'message': u'not Invalid Mobile'})
 
 
 def validate_phone(phone):

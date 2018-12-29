@@ -12,7 +12,6 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
-from yaml.__init__ import serialize
 
 from accounts.adapters import CustomUserAccountAdapter
 from accounts.models import UserSendCode
@@ -75,10 +74,10 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    mobile = serializers.CharField(validators=[validate_phone])
-    address = serializers.CharField()
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    mobile = serializers.CharField(required=True, validators=[validate_phone])
+    address = serializers.CharField(required=True)
 
     class Meta:
         model = User
