@@ -26,4 +26,5 @@ router = routers.DefaultRouter()
 urlpatterns = [
     url(r'^$', views.AddCart.as_view()),
     path('complete/<id>/', views.CompleteView.as_view()),
+    path('factor/<id>/', views.FactorView.as_view()),
 ]
