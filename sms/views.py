@@ -1,4 +1,5 @@
-from datetime import datetime
+from _ast import Is
+from datetime import datetime, timedelta
 from django.shortcuts import render
 
 # Create your views here.
@@ -6,6 +7,8 @@ from rest_framework import mixins, generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 import random
+
+from rest_framework.views import APIView
 
 from shop.renderers import CustomJSONRenderer
 from sms.models import SmsUser
@@ -61,3 +64,29 @@ class SmsView(mixins.CreateModelMixin,
                 return CustomJSONRenderer().render({'message': 'code not math'}, status=400)
         else:
             return CustomJSONRenderer().render404()
+
+
+class ReSendSmsView(APIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_method = ('GET',)
+
+    def get(self, request, phone='', format=None, *args, **kwargs):
+        validate_phone(phone)
+        smsUser = SmsUser.objects.filter(phone=phone)
+        if not smsUser:
+            return CustomJSONRenderer().render404('Sms User', '')
+
+        smsUser = smsUser.first()
+        now = datetime.now()
+        if smsUser.active_at and smsUser.status == 1:
+            return CustomJSONRenderer().render({'message': 'user is old active'}, status=400)
+        time_app = smsUser.send_at + timedelta(minutes=5)
+
+        if now.replace(tzinfo=None) > time_app.replace(tzinfo=None):
+            code_verify = random.randint(1, 3000) * 10
+            send_verification_sms(request.user, request, mobile=phone, verify_code=code_verify)
+            SmsUser.objects.filter(pk=smsUser.pk).update(code_verify=code_verify, send_at=datetime.now(),
+                                                         active_at=None)
+            return CustomJSONRenderer().render({'success': True})
+        else:
+            return CustomJSONRenderer().render({'message': 'last time send code tl minutes 5 '}, status=400)

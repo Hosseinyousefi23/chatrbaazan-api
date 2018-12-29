@@ -24,5 +24,6 @@ from . import views
 router = routers.DefaultRouter()
 
 urlpatterns = [
+    url(r'^resend/(?P<phone>.*)$', views.ReSendSmsView.as_view()),
     url(r'^(?P<phone>.*)$', views.SmsView.as_view()),
 ]
