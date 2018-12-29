@@ -5,13 +5,15 @@ from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.registration.views import RegisterView
 from rest_framework import mixins, generics
 from rest_framework.decorators import permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import UserSendCode, User
-from accounts.serializers import UserSendCodeSerializer, CustomUserDetailsSerializer, UserUpdateSerializer
+from accounts.serializers import UserSendCodeSerializer, CustomUserDetailsSerializer, UserUpdateSerializer, \
+    ChangePasswordSerializer
 from contact.models import Contact
 from contact.serializers import ContactSerializer
 from shop.models import validate_phone, validate_mobile
@@ -80,7 +82,7 @@ class UserViews(mixins.ListModelMixin, mixins.UpdateModelMixin,
         mobile = request.POST.get('mobile', '')
         validate_mobile(mobile)
         if User.objects.filter(mobile=mobile):
-            return CustomJSONRenderer().render({'message':'mobile is already!'}, status=400)
+            return CustomJSONRenderer().render({'message': 'mobile is already!'}, status=400)
         partial = kwargs.pop('partial', False)
         instance = self.get_object(request)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -90,3 +92,28 @@ class UserViews(mixins.ListModelMixin, mixins.UpdateModelMixin,
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+
+class ChangePassword(mixins.UpdateModelMixin, generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_method = ('PUT',)
+    serializer_class = ChangePasswordSerializer
+
+    def put(self, request, format=None, *args, **kwargs):
+        password_old = request.POST.get('password_old', None)
+        password_1 = request.POST.get('password_1', None)
+        password_2 = request.POST.get('password_2', None)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if password_1 != password_2:
+            raise ValidationError({'message': 'password not contains '})
+
+        user = User.objects.get(pk=request.user.pk)
+
+        if user.check_password(password_old):
+            user.set_password(password_1)
+            user.save()
+            return CustomJSONRenderer().renderData(CustomUserDetailsSerializer(user, many=False).data)
+        else:
+            raise ValidationError({'password_old': 'password old not match'})
