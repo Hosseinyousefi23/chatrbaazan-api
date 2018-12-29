@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import datetime
 import os
 from chatrbaazan.env import ENV
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
 def _(s): return s
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,6 +61,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
     'rest_framework.authtoken',
 
 ]
@@ -273,6 +277,9 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
 ***REMOVED***
+REST_AUTH_REGISTER_PERMISSION_CLASSES = (
+    ('accounts.permissions.AllowAnyAnonymous'),
+)
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 AUTH_USER_MODEL = 'accounts.User'
@@ -280,6 +287,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 REST_USE_JWT = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Config django-jet
 JET_THEMES = [
@@ -320,8 +328,6 @@ object without returning back to change list. Can be disabled if hit performance
 '''
 JET_APP_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultAppIndexDashboard'
 JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
-
-
 
 # SMTP Config
 EMAIL_HOST = 'smtp.gmail.com'

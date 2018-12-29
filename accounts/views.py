@@ -7,6 +7,7 @@ from rest_framework import mixins, generics
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import UserSendCode, User
@@ -62,3 +63,8 @@ class UserDetailsView(RetrieveUpdateAPIView):
         https://github.com/Tivix/django-rest-auth/issues/275
         """
         return User().objects.none()
+
+
+def confirm_emil(request, key):
+    print(str(vars(request)))
+    return Response(key)
