@@ -1,0 +1,11 @@
+{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}
+<p>با سلام !</p>
+
+<p>
+    شما این ایمیل را دریافت می کنید زیرا کاربر {{user_display}} ایمیل شما را به عنوان یک ایمیل برای اتصال حساب کاربری خود به شما داده است.
+    برای تایید این درست است، به <a href="{{activate_url}}">فعال سازی</a> بروید
+</p>
+<p>{{activate_url}}</p>
+{% endblocktrans %}{% endautoescape %}
+{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}با تشکر {{ site_name }}!
+{{ site_domain }}{% endblocktrans %}
