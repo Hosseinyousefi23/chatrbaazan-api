@@ -239,7 +239,10 @@ class ProductSerializer(serializers.ModelSerializer):
         # return obj.get_type_display()
 
     def get_file(self, obj, *args, **kwargs):
-        if obj.is_free:
+        if obj.is_free or \
+                UserProduct.objects.filter(
+                    user=self.context['request'].user if self.context[
+                        'request'].user.is_authenticated else None).filter(product__id=obj.id):
             if obj.file:
                 return self.context['request'].build_absolute_uri(obj.file.url)
         else:
@@ -269,7 +272,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_discount_code(self, obj):
         if obj.discount_code:
-            if obj.is_free:
+            if obj.is_free or \
+                    UserProduct.objects.filter(
+                    user=self.context['request'].user if self.context[
+                    'request'].user.is_authenticated else None).filter(product__id=obj.id):
                 return obj.discount_code
             else:
                 pass
