@@ -1,3 +1,4 @@
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 
 # Create your views here.
@@ -12,6 +13,7 @@ from rest_framework.views import APIView
 
 from accounts.models import UserSendCode, User
 from accounts.serializers import UserSendCodeSerializer, CustomUserDetailsSerializer
+from chatrbaazan import settings
 from contact.models import Contact
 from contact.serializers import ContactSerializer
 from shop.renderers import CustomJSONRenderer
@@ -68,3 +70,7 @@ class UserDetailsView(RetrieveUpdateAPIView):
 def confirm_emil(request, key):
     print(str(vars(request)))
     return Response(key)
+
+
+def account_login(request):
+    return HttpResponseRedirect("http://0.0.0.0:4200/")
