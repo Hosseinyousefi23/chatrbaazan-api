@@ -7,12 +7,14 @@ from rest_framework import mixins, generics
 from rest_framework.decorators import permission_classes
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import UserSendCode, User
 from accounts.serializers import UserSendCodeSerializer, CustomUserDetailsSerializer, UserUpdateSerializer
 from contact.models import Contact
 from contact.serializers import ContactSerializer
+from shop.models import validate_phone, validate_mobile
 from shop.renderers import CustomJSONRenderer
 
 
@@ -71,6 +73,20 @@ class UserViews(mixins.ListModelMixin, mixins.UpdateModelMixin,
     serializer_class = UserUpdateSerializer
     queryset = User.objects.all()
 
+    def get_object(self, request):
+        return User.objects.get(pk=request.user.pk)
+
     def put(self, request, format=None, *args, **kwargs):
-        mutable = request.POST._mutable
-        request.POST._mutable = True
+        mobile = request.POST.get('mobile', '')
+        validate_mobile(mobile)
+        if User.objects.filter(mobile=mobile):
+            return CustomJSONRenderer().render({'message':'mobile is already!'***REMOVED***, status=400)
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object(request)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {***REMOVED***
+
+        return Response(serializer.data)
