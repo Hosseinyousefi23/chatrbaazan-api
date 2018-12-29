@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
     'rest_framework.authtoken',
 
 ]
@@ -277,6 +278,9 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
 }
+REST_AUTH_REGISTER_PERMISSION_CLASSES = (
+    ('accounts.permissions.AllowAnyAnonymous'),
+)
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
 AUTH_USER_MODEL = 'accounts.User'
@@ -284,6 +288,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 REST_USE_JWT = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 # Config django-jet
 JET_THEMES = [
