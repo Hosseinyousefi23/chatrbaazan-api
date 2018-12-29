@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta, time
+
+from django.db.models.expressions import F
 from django.http.request import QueryDict
 from django.shortcuts import render
 
@@ -11,7 +14,8 @@ import uuid
 
 from carts.models import CartItem, Cart
 from carts.serializers import CartSerializer
-from shop.models import Product
+from chatrbaazan import settings
+from shop.models import Product, UserProduct
 from shop.renderers import CustomJSONRenderer
 
 
@@ -89,7 +93,7 @@ class AddCart(mixins.CreateModelMixin,
         CartItem().update_price(Cart.objects.get(pk=int(cart.data['id'])).id)
 
         cart = Cart.objects.filter(user=request.user)
-        
+
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
@@ -98,7 +102,9 @@ class AddCart(mixins.CreateModelMixin,
         )
 
     def get(self, request, format=None, *args, **kwargs):
-        cart = Cart.objects.filter(user=request.user)
+        cart = Cart.objects.filter(user=request.user).filter(status=1).filter(
+            updated_at__gte=datetime.now() - timedelta(hours=24))
+        print(str(cart.query))
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
@@ -136,11 +142,11 @@ class AddCart(mixins.CreateModelMixin,
 
     def put(self, request, format=None, *args, **kwags):
         itemId = request.POST.get('itemId', 0)
-        itemCount = request.POST.get('itemCount',1)
-        
+        itemCount = request.POST.get('itemCount', 1)
+
         itemFound = CartItem.objects.filter(id=itemId)
         if not itemFound:
-            return CustomJSONRenderer().render404('Cart Item',None)
+            return CustomJSONRenderer().render404('Cart Item', None)
 
         itemFoundFirst = itemFound.first()
         itemFoundFirst.count = itemCount
@@ -155,6 +161,62 @@ class AddCart(mixins.CreateModelMixin,
                 ***REMOVED***
             )
         except Exception as e:
-            return CustomJSONRenderer().render({'success':False,'e':str(e)***REMOVED***,status=500)
-        
+            return CustomJSONRenderer().render({'success': False, 'e': str(e)***REMOVED***, status=500)
 
+
+class CompleteView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        if id is None:
+            cart = Cart.objects.filter(user=request.user).filter(status=1).filter(
+                updated_at__gte=datetime.now() - timedelta(hours=24))
+
+        else:
+            cart = Cart.objects.filter(pk=id).filter(user=request.user).filter(
+                updated_at__gte=datetime.now() - timedelta(hours=24)).filter(
+                status=1)
+        # check not empty cart
+        if cart.count() == 0:
+            return CustomJSONRenderer().render({
+                'message': 'cart is empty',
+                'success': False
+            ***REMOVED***, status=400)
+
+        cart = cart.first()
+        if cart.total_price == 0:
+            # Product is free ~ BUG :)
+            return CustomJSONRenderer().render({'message': 'Problem The System Cart', 'success': False***REMOVED***, status=400)
+
+        if settings.CART_DEBUG:
+            # Debug enable for cart
+            """""
+            :: save product into user product
+            :: change status cart in 3
+            :: mince count product
+            :: check count product
+            """""
+            cartItems_date = CartItem.objects.filter(cart__id=cart.pk)
+            for cartItem in cartItems_date:
+                product = Product.objects.filter(id=cartItem.product.id)
+                if product.first().count == 0:
+                    # deleted item product from cart item
+                    CartItem.objects.filter(id=cartItem.id).delete()
+                    return CustomJSONRenderer().render({
+                        'message': 'Product {***REMOVED*** Not Exists'.format(cartItem.product),
+                        'success': False,
+                        'reload': True
+                    ***REMOVED***, status=400)
+            for cartItem in cartItems_date:
+                UserProduct.objects.create(
+                    user=request.user,
+                    product=cartItem.product
+                )
+                product = Product.objects.filter(id=cartItem.product.id).update(count=F('count') - 1)
+            Cart.objects.filter(pk=cart.pk).update(status=3)
+            return CustomJSONRenderer().render({
+                'redirect_uri': settings.URI_FRONT + 'cart/factor/{***REMOVED***/'.format(cart.pk),
+                'success': True,
+            ***REMOVED***)
+        else:
+            pass
