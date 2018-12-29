@@ -93,3 +93,16 @@ class UserSendCodeSerializer(serializers.ModelSerializer):
             'user': {'write_only': True***REMOVED***,
             'status': {'write_only': True***REMOVED***
         ***REMOVED***
+
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    password_old = serializers.CharField(required=True)
+    password_1 = serializers.CharField(required=True)
+    password_2 = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('password_old', 'password_1', 'password_2')
+        extra_kwargs = {
+            'password': {'write_only': True***REMOVED***
+        ***REMOVED***
