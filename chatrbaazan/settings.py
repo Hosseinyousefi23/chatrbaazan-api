@@ -12,10 +12,13 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import datetime
 import os
 from chatrbaazan.env import ENV
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 
 
 def _(s): return s
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -60,7 +63,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'rest_framework.authtoken',
-
 
 ]
 # CKEDITOR_BASEPATH = "/public/assets/ckeditor/ckeditor"
@@ -323,11 +325,13 @@ object without returning back to change list. Can be disabled if hit performance
 JET_APP_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultAppIndexDashboard'
 JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
 
-
-
 # SMTP Config
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mohammad.chavoshipor@gmail.com'
 EMAIL_HOST_PASSWORD = 'soxftfkswnndhnkf'
+
+# Cart Debug
+CART_DEBUG = ENV['CART_DEBUG'] if ENV['CART_DEBUG'] else False
+URI_FRONT = ENV['URI_FRONT'] if ENV['URI_FRONT'] else 'http://0.0.0.0:4200/'
