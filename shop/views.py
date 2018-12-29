@@ -60,7 +60,8 @@ class GetCategory(APIView):
         categoryDataSerializer = CategoryMenuSerializer(categoryData, many=True, context={'request': request***REMOVED***).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
-        sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum')
+        sumChatrbazi = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
+            Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
         if sumChatrbazi.count() > 0:
             sumChatrbazi = sumChatrbazi[0]['sum']
         else:
