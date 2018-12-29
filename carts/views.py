@@ -220,3 +220,25 @@ class CompleteView(APIView):
             ***REMOVED***)
         else:
             pass
+
+
+class FactorView(APIView):
+    permission_classes = (IsAuthenticated,)
+    allowed_method = ('GET',)
+
+    def get(self, request, id=None, format=None, *args, **kwargs):
+        print('str id cart in uri factor', str(id))
+        if id is None:
+            return CustomJSONRenderer().render404('cart', '')
+        try:
+            cart = Cart.objects.filter(user=request.user).filter(status=3).get(id=id)
+        except Exception as e:
+            print('str e in factor ', str(e))
+            return CustomJSONRenderer().render404('cart', '')
+
+        if cart.status == 3:
+            return CustomJSONRenderer().renderData(CartSerializer(cart, many=False, context={'request': request***REMOVED***).data)
+        else:
+            return CustomJSONRenderer().render({
+                'message': u'محصول هم چنان در وضعیت معلق قرار دارد.',
+            ***REMOVED***, status=403)
