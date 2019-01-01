@@ -27,7 +27,7 @@ from shop.renderers import CustomJSONRenderer
 class UserSendCodeView(mixins.ListModelMixin ,
                        mixins.CreateModelMixin ,
                        generics.GenericAPIView):
-    permission_classes = (IsAuthenticated ,)
+    permission_classes = (AllowAny ,)
     allowed_methods = ('POST' , 'GET' ,)
     serializer_class = UserSendCodeSerializer
 
