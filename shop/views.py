@@ -304,10 +304,20 @@ class LabelViews(APIView):
     def get(self , request , slug=None , format=None):
         search = request.GET.get('search' , None)
         if slug:
+            slug = str(slug).replace('/' , '')
             print('Slug' , str(slug))
+            company = request.GET.get('company' , None)
+            category = request.GET.get('category' , None)
             products = Product.objects.filter(Q(label__name__contains=slug))
             if search is not None:
                 products = products.filter(Q(category__name__contains=search) | Q(company__name__contains=search))
+            if company is not None:
+                products = products.filter(
+                    Q(company__name__contains=company) | Q(company__slug__contains=company))
+            if category is not None:
+                products = products.filter(
+                    Q(category__name__contains=category) | Q(category__slug__contains=category)
+                | Q(category__english_name__contains=category))
             return CustomJSONRenderer().renderData(
                 ProductSerializer(products , context={'request': request} , many=True).data)
         else:

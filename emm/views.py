@@ -5,7 +5,9 @@ from rest_framework import mixins, generics
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
+from emm.models import EmailRegister
 from emm.serializers import EmailRegisterSerializer
+from shop.renderers import CustomJSONRenderer
 
 
 class EmailRegisterView(mixins.ListModelMixin,
@@ -16,5 +18,9 @@ class EmailRegisterView(mixins.ListModelMixin,
     serializer_class = EmailRegisterSerializer
 
     def post(self, request, format=None, *args, **kwargs):
+        email = request.POST.get('email',None)
+        if email:
+            if EmailRegister.objects.filter(email=email):
+                return CustomJSONRenderer().render('')
         return self.create(request, *args, **kwargs)
 
