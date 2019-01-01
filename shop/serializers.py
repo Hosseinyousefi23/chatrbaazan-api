@@ -13,14 +13,15 @@ from rest_framework import serializers
 from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from rest_auth.registration.serializers import RegisterSerializer
 
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate , get_user_model
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
 
 from like.models import Like
-from shop.models import City, Banner, Category, Product, Discount, Company, ShopSetting, ProductLabel, ProductGallery, \
+from shop.models import City , Banner , Category , Product , Discount , Company , ShopSetting , ProductLabel , \
+    ProductGallery , \
     UserProduct
 from accounts.models import User
 import re
@@ -28,7 +29,7 @@ import re
 
 def validate_mobile(mobile):
     if mobile:
-        if not re.match('^09[\d]{9***REMOVED***$', mobile):
+        if not re.match('^09[\d]{9***REMOVED***$' , mobile):
             raise ValidationError(u'شماره موبایل صحیح نمی باشد.')
         return mobile
 
@@ -36,10 +37,10 @@ def validate_mobile(mobile):
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
-        fields = ('id', 'name', 'english_name', 'available')
+        fields = ('id' , 'name' , 'english_name' , 'available')
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
         for fd in pop:
             self.fields.pop(fd)
 
@@ -50,31 +51,31 @@ class BannerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Banner
-        fields = ('id', 'title', 'image', 'is_slider', 'link', 'location')
+        fields = ('id' , 'title' , 'image' , 'is_slider' , 'link' , 'location')
 
-    def get_image(self, obj):
+    def get_image(self , obj):
         if obj.image:
             return self.context['request'].build_absolute_uri(obj.image.url)
             # return obj.image.url
 
-    def get_link(self, obj):
+    def get_link(self , obj):
         if obj.link:
             return obj.link
         elif obj.category:
             if obj.category.slug:
                 return self.context['request'].build_absolute_uri(
                     reverse('getOffers') + '?category_slug={***REMOVED***'.format(obj.category.slug))
-                return self.context['request'].build_absolute_uri(reverse('getOffer', args=[obj.category.slug]))
+                return self.context['request'].build_absolute_uri(reverse('getOffer' , args=[obj.category.slug]))
             pass
         elif obj.product:
             if obj.product.slug:
-                return self.context['request'].build_absolute_uri(reverse('getOffer', args=[obj.product.slug]))
+                return self.context['request'].build_absolute_uri(reverse('getOffer' , args=[obj.product.slug]))
             pass
         else:
             pass
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
 
         for fd in pop:
             self.fields.pop(fd)
@@ -86,14 +87,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'english_name', 'available', 'all_chatrbazi', 'open_chatrbazi', 'slug')
+        fields = ('id' , 'name' , 'english_name' , 'available' , 'all_chatrbazi' , 'open_chatrbazi' , 'slug')
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
         for fd in pop:
             self.fields.pop(fd)
 
-    def get_all_chatrbazi(self, obj):
+    def get_all_chatrbazi(self , obj):
         sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
             category__id=obj.pk)
         if sum.count() > 0:
@@ -101,7 +102,7 @@ class CategorySerializer(serializers.ModelSerializer):
         else:
             return 0
 
-    def get_open_chatrbazi(self, obj):
+    def get_open_chatrbazi(self , obj):
         sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
             category__id=obj.pk).filter(priority=1)
         if sum.count() > 0:
@@ -117,15 +118,15 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'english_name', 'available',
-                  'all_chatrbazi', 'open_chatrbazi', 'slug', 'company')
+        fields = ('id' , 'name' , 'english_name' , 'available' ,
+                  'all_chatrbazi' , 'open_chatrbazi' , 'slug' , 'company')
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
         for fd in pop:
             self.fields.pop(fd)
 
-    def get_all_chatrbazi(self, obj):
+    def get_all_chatrbazi(self , obj):
         sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
             category__id=obj.pk)
         if sum.count() > 0:
@@ -133,7 +134,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
         else:
             return 0
 
-    def get_open_chatrbazi(self, obj):
+    def get_open_chatrbazi(self , obj):
         sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
             category__id=obj.pk).filter(priority=1)
         if sum.count() > 0:
@@ -141,10 +142,10 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
         else:
             return 0
 
-    def get_company(self, obj):
+    def get_company(self , obj):
         compnaies = Company.objects.filter(category__id=obj.id)
         if compnaies:
-            return CompanySerializer(compnaies, many=True, context={'request': self.context['request']***REMOVED***).data
+            return CompanySerializer(compnaies , many=True , context={'request': self.context['request']***REMOVED***).data
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -152,16 +153,16 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ('name', 'available', 'slug', 'description', 'image', 'link')
+        fields = ('name' , 'available' , 'slug' , 'description' , 'image' , 'link')
 
-    def get_image(self, obj):
+    def get_image(self , obj):
         if obj.image:
             return self.context['request'].build_absolute_uri(obj.image.url)
         else:
             pass
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
 
         for fd in pop:
             self.fields.pop(fd)
@@ -170,10 +171,10 @@ class CompanySerializer(serializers.ModelSerializer):
 class ProductLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductLabel
-        fields = ('name', 'available')
+        fields = ('name' , 'available')
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
 
         for fd in pop:
             self.fields.pop(fd)
@@ -187,13 +188,13 @@ class ProductGallerySerializer(serializers.ModelSerializer):
         model = ProductGallery
         fields = '__all__'
 
-    def get_image(self, obj):
+    def get_image(self , obj):
         if obj.image:
             return self.context['request'].build_absolute_uri(obj.image.url)
         else:
             pass
 
-    def get_title(self, obj):
+    def get_title(self , obj):
         pass
         # return os.path.split(obj.image.url)[0]
 
@@ -201,10 +202,10 @@ class ProductGallerySerializer(serializers.ModelSerializer):
 class DiscountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discount
-        fields = ('id', 'discount', 'available')
+        fields = ('id' , 'discount' , 'available')
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
 
         for fd in pop:
             self.fields.pop(fd)
@@ -226,19 +227,20 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id',
-                  'name', 'priority', 'discount_code', 'explanation', 'explanation_short', 'expiration_date', 'price',
-                  'chatrbazi', 'is_free', 'english_name',
-                  'image', 'category', 'label', 'city', 'company', 'gallery', 'slug',
-                  'like', 'link', 'file', 'type','count')
+        fields = ('id' ,
+                  'name' , 'priority' , 'discount_code' , 'explanation' , 'explanation_short' , 'expiration_date' ,
+                  'price' ,
+                  'chatrbazi' , 'is_free' , 'english_name' ,
+                  'image' , 'category' , 'label' , 'city' , 'company' , 'gallery' , 'slug' ,
+                  'like' , 'link' , 'file' , 'type' , 'count')
 
-    def get_explanation_short(self, obj):
+    def get_explanation_short(self , obj):
         return Truncator(obj.explanation).chars(300)
 
         # def get_type(self,obj):
         # return obj.get_type_display()
 
-    def get_file(self, obj, *args, **kwargs):
+    def get_file(self , obj , *args , **kwargs):
         if obj.is_free or \
                 UserProduct.objects.filter(
                     user=self.context['request'].user if self.context[
@@ -248,47 +250,52 @@ class ProductSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def get_image(self, obj, **kwargs):
+    def get_image(self , obj , **kwargs):
         if obj.image:
             return self.context['request'].build_absolute_uri(obj.image.url)
+        elif obj.company.count() > 0:
+            if obj.company.first().image:
+                return self.context['request'].build_absolute_uri(obj.company.first().image.url)
+        else:
+            return None
 
-    def get_city(self, obj):
+    def get_city(self , obj):
         if obj.city:
-            return CitySerializer(obj.city.all(), many=True, pop=['available']).data
+            return CitySerializer(obj.city.all() , many=True , pop=['available']).data
 
-    def get_company(self, obj):
+    def get_company(self , obj):
         if obj.company:
-            return CompanySerializer(obj.company.all().order_by('-priority'), many=True,
-                                     context={'request': self.context['request']***REMOVED***,
+            return CompanySerializer(obj.company.all().order_by('-priority') , many=True ,
+                                     context={'request': self.context['request']***REMOVED*** ,
                                      pop=['available']).data
 
-    def get_category(self, obj):
+    def get_category(self , obj):
         if obj.category:
-            return CategorySerializer(obj.category.all(), many=True, pop=['available']).data
+            return CategorySerializer(obj.category.all() , many=True , pop=['available']).data
 
-    def get_label(self, obj):
+    def get_label(self , obj):
         if obj.label:
-            return ProductLabelSerializer(obj.label.all(), many=True, pop=['available']).data
+            return ProductLabelSerializer(obj.label.all() , many=True , pop=['available']).data
 
-    def get_discount_code(self, obj):
+    def get_discount_code(self , obj):
         if obj.discount_code:
             if obj.is_free or \
                     UserProduct.objects.filter(
-                    user=self.context['request'].user if self.context[
-                    'request'].user.is_authenticated else None).filter(product__id=obj.id):
+                        user=self.context['request'].user if self.context[
+                            'request'].user.is_authenticated else None).filter(product__id=obj.id):
                 return obj.discount_code
             else:
                 pass
         else:
             pass
 
-    def get_gallery(self, obj):
+    def get_gallery(self , obj):
         if obj.gallery:
-            return ProductGallerySerializer(obj.gallery.all(), context=self.context, many=True).data
+            return ProductGallerySerializer(obj.gallery.all() , context=self.context , many=True).data
         else:
             pass
 
-    def get_like(self, obj):
+    def get_like(self , obj):
         return obj.click
         # like = Like.objects.filter(like=1).filter(product__id=obj.id)
         # if like.count() > 0:
@@ -303,8 +310,8 @@ class ProductSerializer(serializers.ModelSerializer):
     #     else:
     #         return 0
 
-    def __init__(self, instance, pop=[], *args, **kwargs):
-        super().__init__(instance, **kwargs)
+    def __init__(self , instance , pop=[] , *args , **kwargs):
+        super().__init__(instance , **kwargs)
         for fd in pop:
             self.fields.pop(fd)
 
@@ -314,11 +321,11 @@ class UserProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProduct
-        fields = ('user', 'product', 'created_at', 'updated_at')
+        fields = ('user' , 'product' , 'created_at' , 'updated_at')
 
-    def get_product(self, obj):
+    def get_product(self , obj):
         if obj.product:
-            return ProductSerializer(Product.objects.get(pk=obj.product.pk), many=False,
+            return ProductSerializer(Product.objects.get(pk=obj.product.pk) , many=False ,
                                      context={'request': self.context['request']***REMOVED***).data
         else:
             return None
