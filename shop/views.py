@@ -143,8 +143,10 @@ class GetOffers(APIView , PageNumberPagination):
         products = Product.objects.all()
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
+            print('count city in filter' , str(city.count()))
             if city.count() > 0:
-                products = products.filter(city__id__in=city.values('id'))
+                products = products.filter(Q(city__id__in=city.values('id')) | Q(city__id__isnull=True))
+                print('sql filter product by city' , str(products.query))
             else:
                 return None
         if categoryId is not None or categorySlug:
@@ -317,7 +319,7 @@ class LabelViews(APIView):
             if category is not None:
                 products = products.filter(
                     Q(category__name__contains=category) | Q(category__slug__contains=category)
-                | Q(category__english_name__contains=category))
+                    | Q(category__english_name__contains=category))
             return CustomJSONRenderer().renderData(
                 ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data)
         else:
