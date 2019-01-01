@@ -102,8 +102,7 @@ class AddCart(mixins.CreateModelMixin,
         )
 
     def get(self, request, format=None, *args, **kwargs):
-        cart = Cart.objects.filter(user=request.user).filter(status=1).filter(
-            updated_at__gte=datetime.now() - timedelta(hours=24))
+        cart = Cart.objects.filter(user=request.user).filter(status=1)
         print(str(cart.query))
         return CustomJSONRenderer().render(
             {
@@ -174,7 +173,6 @@ class CompleteView(APIView):
 
         else:
             cart = Cart.objects.filter(pk=id).filter(user=request.user).filter(
-                updated_at__gte=datetime.now() - timedelta(hours=24)).filter(
                 status=1)
         # check not empty cart
         if cart.count() == 0:
