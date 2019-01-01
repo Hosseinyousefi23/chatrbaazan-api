@@ -64,7 +64,7 @@ class SmsView(mixins.CreateModelMixin ,
             else:
                 return CustomJSONRenderer().render({'message': 'code not math'} , status=400)
         else:
-            return CustomJSONRenderer().render404('sms','')
+            return CustomJSONRenderer().render404('sms' , '')
 
 
 class ReSendSmsView(APIView):

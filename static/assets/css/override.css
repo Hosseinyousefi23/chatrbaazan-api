@@ -1,9 +1,9 @@
 @font-face {
     font-family: "iranyekan";
     src: url('../fonts/iranyekanweblight.ttf') format('ttf'),
-        url('../fonts/iranyekanweblight.woff2') format('woff2'),
-        url('../fonts/iranyekanweblight.woff') format('woff'),
-        url('../fonts/iranyekanweblight.eot') format('eot');
+    url('../fonts/iranyekanweblight.woff2') format('woff2'),
+    url('../fonts/iranyekanweblight.woff') format('woff'),
+    url('../fonts/iranyekanweblight.eot') format('eot');
 }
 
 * {
@@ -24,3 +24,15 @@ input {
     -ms-user-select: auto !important;
     user-select: auto !important;
 }
+
+input[type="text"], input[type="email"], textarea, input[type="password"], input[type="url"], input[type="number"], textarea, select, .vTextField {
+    direction: rtl !important;
+}
+
+/*.form-row label{*/
+/*float: right;*/
+/*direction: rtl;*/
+/*}*/
+/*.select2-container--jet {*/
+/*float: right;*/
+/*}*/
