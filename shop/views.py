@@ -305,11 +305,19 @@ class LabelViews(APIView):
 
     def get(self , request , slug=None , format=None):
         search = request.GET.get('search' , None)
+        ordering = request.GET.get('ordering' , 'created_at')
+        order = ['favorites' , 'topchatrbazi' , 'created_at']
+        company = request.GET.get('company_slug' , None)
+        category = request.GET.get('category_slug' , None)
+        type_product = request.GET.get('type' , None)
+
+        if ordering not in order:
+            ordering = 'created_at'
+
         if slug:
             slug = str(slug).replace('/' , '')
             print('Slug' , str(slug))
-            company = request.GET.get('company' , None)
-            category = request.GET.get('category' , None)
+
             products = Product.objects.filter(Q(label__name__contains=slug))
             if search is not None:
                 products = products.filter(Q(category__name__contains=search) | Q(company__name__contains=search))
@@ -320,6 +328,19 @@ class LabelViews(APIView):
                 products = products.filter(
                     Q(category__name__contains=category) | Q(category__slug__contains=category)
                     | Q(category__english_name__contains=category))
+            if products.count() > 0:  # fix ordering products
+                if ordering == 'created_at':
+                    products = products.order_by('-created_at' , '-expiration_date')
+                else:
+                    if ordering == 'favorites':
+                        products = products.order_by('-click')
+
+                    elif ordering == 'topchatrbazi':
+                        products = products.order_by('-chatrbazi' , '-click')
+                    else:
+                        return None
+            if type_product is not None:
+                products = products.filter(type=type_product)
             return CustomJSONRenderer().renderData(
                 ProductSerializer(products , context={'request': request} , many=True).data)
         else:
