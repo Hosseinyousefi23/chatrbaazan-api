@@ -42,7 +42,10 @@ class UserSendCodeView(mixins.ListModelMixin ,
         return self.create(request , *args , **kwargs)
 
     def get(self , request , format=None , *args , **kwargs):
-        usercode = UserSendCode.objects.filter(user=request.user)
+        if not request.user.is_anonymous:
+            usercode = UserSendCode.objects.filter(user=request.user)
+        else:
+            usercode = None
         return CustomJSONRenderer().renderData(UserSendCodeSerializer(usercode , many=True).data)
 
 
