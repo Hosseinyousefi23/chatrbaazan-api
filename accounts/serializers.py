@@ -76,7 +76,7 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
-    mobile = serializers.CharField(required=True , validators=[validate_phone])
+    mobile = serializers.CharField(required=False , validators=[validate_phone])
     address = serializers.CharField(required=True)
 
     class Meta:
