@@ -354,7 +354,8 @@ class LabelViews(APIView, PageNumberPagination):
 
         return self.paginate_queryset(products , self.request)
 
-    def get(self , request , slug=None , format=None):
+    def get(self, request, slug=None, format=None):
+        search = request.GET.get('search',None)
         if slug:
             slug = str(slug).replace('/' , '')
             print('Slug' , str(slug))
