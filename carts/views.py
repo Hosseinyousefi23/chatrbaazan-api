@@ -186,6 +186,9 @@ class CompleteView(APIView):
             # Product is free ~ BUG :)
             return CustomJSONRenderer().render({'message': 'Problem The System Cart', 'success': False***REMOVED***, status=400)
 
+        if not request.user.address:
+            return CustomJSONRenderer().render({'message': 'لطفا ابتدا در قسمت حساب کاربری نسبت به تکمیل اطلاعات کاربری اقدام نمایید',
+            'success':False***REMOVED***,status=400)
         if settings.CART_DEBUG:
             # Debug enable for cart
             """""
