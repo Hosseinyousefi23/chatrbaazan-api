@@ -86,10 +86,12 @@ class UserViews(mixins.ListModelMixin , mixins.UpdateModelMixin ,
         return User.objects.get(pk=request.user.pk)
 
     def put(self , request , format=None , *args , **kwargs):
-        mobile = request.POST.get('mobile' , '')
-        validate_mobile(mobile)
-        if User.objects.filter(mobile=mobile):
-            return CustomJSONRenderer().render({'message': 'mobile is already!'} , status=400)
+        mobile = request.POST.get('mobile' , None)
+        if mobile is not None:
+            validate_mobile(mobile)
+            if User.objects.filter(mobile=mobile):
+                return CustomJSONRenderer().render({'message': 'تلفن همراه قبلا وارد شده است.'} , status=400)
+
         partial = kwargs.pop('partial' , False)
         instance = self.get_object(request)
         serializer = self.get_serializer(instance , data=request.data , partial=partial)
