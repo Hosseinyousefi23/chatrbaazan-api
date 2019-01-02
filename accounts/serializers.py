@@ -32,7 +32,7 @@ class RegisterSerializerCustom(serializers.Serializer):
         email = CustomUserAccountAdapter().clean_email(email)
         if email and email_address_exists(email):
             raise serializers.ValidationError(
-                _("A user is already registered with this e-mail address."))
+                _("این ایمیل قبلا ثبت نام شده است."))
 
     def validate_password1(self , password):
         return CustomUserAccountAdapter().clean_password(password)
@@ -40,10 +40,10 @@ class RegisterSerializerCustom(serializers.Serializer):
     def validate(self , data):
         if User.objects.filter(mobile=data['mobile']).exists():
             raise serializers.ValidationError(
-                _("Mobile Number Exists."))
+                _("شماره الزامی است.."))
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
-                _("The two password fields didn't match."))
+                _("رمز عبور یکسان نمی باشد"))
         return data
 
     def get_cleaned_data(self):
