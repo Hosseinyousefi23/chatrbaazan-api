@@ -89,8 +89,9 @@ class UserViews(mixins.ListModelMixin , mixins.UpdateModelMixin ,
         mobile = request.POST.get('mobile' , None)
         if mobile is not None:
             validate_mobile(mobile)
-            if User.objects.filter(mobile=mobile):
-                return CustomJSONRenderer().render({'message': 'تلفن همراه قبلا وارد شده است.'} , status=400)
+            if request.user.mobile != mobile:
+                if User.objects.filter(mobile=mobile):
+                    return CustomJSONRenderer().render({'message': 'تلفن همراه قبلا وارد شده است.'} , status=400)
 
         partial = kwargs.pop('partial' , False)
         instance = self.get_object(request)
