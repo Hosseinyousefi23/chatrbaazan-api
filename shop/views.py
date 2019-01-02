@@ -61,16 +61,17 @@ class GetCategory(APIView):
         categoryDataSerializer = CategoryMenuSerializer(categoryData , many=True , context={'request': request***REMOVED***).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
-        sumChatrbazi = Product.objects.annotate(sum=Sum('chatrbazi')).values('sum').filter(
-            Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
-        print('sql sum all chatrbaazi: ' , str(sumChatrbazi.query))
-        if sumChatrbazi.count() > 0:
-            sumChatrbazi = sumChatrbazi[0]['sum']
-        else:
-            sumChatrbazi = 0
+        sumChatrbazi = Product.objects.filter(
+            Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).aggregate(Sum('chatrbazi'))
+        # print('sql sum all chatrbaazi: ' , str(sumChatrbazi.query))
+        print('data sum all chatrbaazi' , str(sumChatrbazi))
+        # if sumChatrbazi.count() > 0:
+        #     sumChatrbazi = sumChatrbazi[0]['sum']
+        # else:
+        #     sumChatrbazi = 0
         return CustomJSONRenderer().render({
             'data': categoryDataSerializer ,
-            'all_chatrbazi': sumChatrbazi
+            'all_chatrbazi': sumChatrbazi['chatrbazi__sum']
         ***REMOVED***)
 
 
@@ -299,13 +300,13 @@ def marge_sort(first_list , second_list):
     return first_list + list(set(second_list) - set(first_list))
 
 
-class LabelViews(APIView, PageNumberPagination):
+class LabelViews(APIView , PageNumberPagination):
     permission_classes = (AllowAny ,)
-    allowed_methods = ('GET',)
+    allowed_methods = ('GET' ,)
     page_size = 20
     max_page_size = 1000
 
-    def get_queryset(self , request,slug):
+    def get_queryset(self , request , slug):
         limits = request.GET.get('limits' , 100)
         search = request.GET.get('search' , None)
         ordering = request.GET.get('ordering' , 'created_at')
@@ -338,7 +339,7 @@ class LabelViews(APIView, PageNumberPagination):
         if category is not None:
             products = products.filter(
                 Q(category__name__contains=category) | Q(category__slug__contains=category)
-                    | Q(category__english_name__contains=category))
+                | Q(category__english_name__contains=category))
         if products.count() > 0:  # fix ordering products
             if ordering == 'created_at':
                 products = products.order_by('-created_at' , '-expiration_date')
@@ -354,14 +355,14 @@ class LabelViews(APIView, PageNumberPagination):
 
         return self.paginate_queryset(products , self.request)
 
-    def get(self, request, slug=None, format=None):
-        search = request.GET.get('search',None)
+    def get(self , request , slug=None , format=None):
+        search = request.GET.get('search' , None)
         if slug:
             slug = str(slug).replace('/' , '')
             print('Slug' , str(slug))
-            products = self.get_queryset(request,slug)
+            products = self.get_queryset(request , slug)
             if products is None:
-                return CustomJSONRenderer().render404('product', '')
+                return CustomJSONRenderer().render404('product' , '')
             companySlug = request.GET.get('company_slug' , None)
             dataCompany = None
             if companySlug:
@@ -375,12 +376,12 @@ class LabelViews(APIView, PageNumberPagination):
                     ('previous' , self.get_previous_link()) ,
                     ('results' , ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data) ,
                     ('dataCompany' ,
-                        CompanySerializer(dataCompany , many=False , context={'request': request***REMOVED*** ,
-                                             pop=['available']).data if dataCompany else None)
+                     CompanySerializer(dataCompany , many=False , context={'request': request***REMOVED*** ,
+                                       pop=['available']).data if dataCompany else None)
                 ])
             )
             # return CustomJSONRenderer().renderData(
-                # ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data)
+            # ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data)
         else:
             print('None slug LabelViews ')
             PLable = None
