@@ -299,11 +299,14 @@ def marge_sort(first_list , second_list):
     return first_list + list(set(second_list) - set(first_list))
 
 
-class LabelViews(APIView):
+class LabelViews(APIView, PageNumberPagination):
     permission_classes = (AllowAny ,)
-    allowed_methods = ('GET' ,)
+    allowed_methods = ('GET',)
+    page_size = 20
+    max_page_size = 1000
 
-    def get(self , request , slug=None , format=None):
+    def get_queryset(self , request,slug):
+        limits = request.GET.get('limits' , 100)
         search = request.GET.get('search' , None)
         ordering = request.GET.get('ordering' , 'created_at')
         order = ['favorites' , 'topchatrbazi' , 'created_at']
@@ -314,35 +317,69 @@ class LabelViews(APIView):
         if ordering not in order:
             ordering = 'created_at'
 
+        try:
+            limits = int(limits)
+        except ValueError as e:
+            limits = 100
+        if limits >= 30:
+            limits = 30
+
+        self.page_size = limits  # fix limit query
+        ordering = request.GET.get('ordering' , 'created_at')
+        order = ['favorites' , 'topchatrbazi' , 'created_at']
+        if ordering not in order:
+            ordering = 'created_at'
+
+        products = Product.objects.filter(Q(label__name__contains=slug))
+        if search is not None:
+            products = products.filter(Q(category__name__contains=search) | Q(company__name__contains=search))
+        if company is not None:
+            products = products.filter(Q(company__name__contains=company) | Q(company__slug__contains=company))
+        if category is not None:
+            products = products.filter(
+                Q(category__name__contains=category) | Q(category__slug__contains=category)
+                    | Q(category__english_name__contains=category))
+        if products.count() > 0:  # fix ordering products
+            if ordering == 'created_at':
+                products = products.order_by('-created_at' , '-expiration_date')
+            else:
+                if ordering == 'favorites':
+                    products = products.order_by('-click')
+                elif ordering == 'topchatrbazi':
+                    products = products.order_by('-chatrbazi' , '-click')
+                else:
+                    return None
+        if type_product is not None:
+            products = products.filter(type=type_product)
+
+        return self.paginate_queryset(products , self.request)
+
+    def get(self , request , slug=None , format=None):
         if slug:
             slug = str(slug).replace('/' , '')
             print('Slug' , str(slug))
-
-            products = Product.objects.filter(Q(label__name__contains=slug))
-            if search is not None:
-                products = products.filter(Q(category__name__contains=search) | Q(company__name__contains=search))
-            if company is not None:
-                products = products.filter(
-                    Q(company__name__contains=company) | Q(company__slug__contains=company))
-            if category is not None:
-                products = products.filter(
-                    Q(category__name__contains=category) | Q(category__slug__contains=category)
-                    | Q(category__english_name__contains=category))
-            if products.count() > 0:  # fix ordering products
-                if ordering == 'created_at':
-                    products = products.order_by('-created_at' , '-expiration_date')
-                else:
-                    if ordering == 'favorites':
-                        products = products.order_by('-click')
-
-                    elif ordering == 'topchatrbazi':
-                        products = products.order_by('-chatrbazi' , '-click')
-                    else:
-                        return None
-            if type_product is not None:
-                products = products.filter(type=type_product)
+            products = self.get_queryset(request,slug)
+            if products is None:
+                return CustomJSONRenderer().render404('product', '')
+            companySlug = request.GET.get('company_slug' , None)
+            dataCompany = None
+            if companySlug:
+                company = Company.objects.filter(slug=companySlug)
+                if company.count() > 0:
+                    dataCompany = company.first()
             return CustomJSONRenderer().renderData(
-                ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data)
+                OrderedDict([
+                    ('count' , self.page.paginator.count) ,
+                    ('next' , self.get_next_link()) ,
+                    ('previous' , self.get_previous_link()) ,
+                    ('results' , ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data) ,
+                    ('dataCompany' ,
+                        CompanySerializer(dataCompany , many=False , context={'request': request***REMOVED*** ,
+                                             pop=['available']).data if dataCompany else None)
+                ])
+            )
+            # return CustomJSONRenderer().renderData(
+                # ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data)
         else:
             print('None slug LabelViews ')
             PLable = None
