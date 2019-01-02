@@ -127,18 +127,22 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
             self.fields.pop(fd)
 
     def get_all_chatrbazi(self , obj):
-        sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
-            category__id=obj.pk)
-        if sum.count() > 0:
-            return sum[0]['sum']
+        sum = Product.objects.filter(
+            category__id=obj.pk).aggregate(Sum('chatrbazi'))
+        print('sum get_all_chatrbazi' , str(sum))
+        if sum:
+            return sum['chatrbazi__sum']
+            # return sum[0]['sum']
         else:
             return 0
 
     def get_open_chatrbazi(self , obj):
-        sum = Product.objects.values('category').annotate(sum=Sum('chatrbazi')).values('sum').filter(
-            category__id=obj.pk).filter(priority=1)
-        if sum.count() > 0:
-            return sum[0]['sum']
+        sum = Product.objects.filter(
+            category__id=obj.pk).filter(priority=1).aggregate(Sum('chatrbazi'))
+        print('sum get_open_chatrbazi' , str(sum))
+        if sum:
+            return sum['chatrbazi__sum']
+            # return sum[0]['sum']
         else:
             return 0
 
