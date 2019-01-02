@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import url, include
 from rest_auth.registration.views import VerifyEmailView, RegisterView
-from rest_auth.views import LogoutView, PasswordResetView, PasswordResetConfirmView
+from rest_auth.views import LogoutView , PasswordResetView , PasswordResetConfirmView , LoginView
 from django.conf.urls.static import static
 from allauth.account.views import confirm_email as allauthemailconfirmation
 from allauth.account.views import confirm_email
@@ -39,7 +39,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', account_login, name="account_login"),
     url(r'^', include('shop.urls')),
-    path('auth/login/', ObtainJSONWebToken.as_view()),
+    path('auth/login/', LoginView.as_view()),
     path('auth/registration/', include('rest_auth.registration.urls')),
     re_path(r'^auth/account-confirm-email/', VerifyEmailView.as_view(),
             name='account_email_verification_sent'),
