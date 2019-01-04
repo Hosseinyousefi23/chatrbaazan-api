@@ -41,6 +41,8 @@ class SmsView(mixins.CreateModelMixin ,
         serializer.is_valid(raise_exception=True)
         if smsUser.filter(status=2).count() == 0:
             self.perform_create(serializer)
+        else:
+            code_verify = smsUser.filter(status=2).first().code_verify
         send_verification_sms(request.user , request , mobile=request.POST.get('phone') , verify_code=code_verify)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data , status=status.HTTP_201_CREATED , headers=headers)
