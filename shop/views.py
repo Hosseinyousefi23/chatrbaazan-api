@@ -352,8 +352,8 @@ class LabelViews(APIView , PageNumberPagination):
                     return None
         if type_product is not None:
             products = products.filter(type=type_product)
-        if company is None:
-            products = products.filter(
+        
+        products = products.filter(
                 Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
 
         return self.paginate_queryset(products , self.request)
