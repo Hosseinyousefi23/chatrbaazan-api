@@ -36,12 +36,18 @@ UserModel = get_user_model()
 
 
 class RegisterSerializerCustom(serializers.Serializer):
-    email = serializers.EmailField(required=True,error_messages = {'blank':'لطفا ایمیل خود را وارد نمایید.'})
-    first_name = serializers.CharField(required=True, write_only=True,error_messages={'blank':'لطفا نام خود را وارد نمایید.'})
-    last_name = serializers.CharField(required=True, write_only=True,error_messages = {'blank':'‌لطفا نام خانوادگی خود را وارد نمایید.'})
-    mobile = serializers.CharField(required=True, write_only=True)
-    password1 = serializers.CharField(required=True, write_only=True)
-    password2 = serializers.CharField(required=True, write_only=True)
+    email = serializers.EmailField(required=True, error_messages={
+                                   'blank': 'لطفا ایمیل خود را وارد نمایید.'})
+    first_name = serializers.CharField(required=True, write_only=True, error_messages={
+                                       'blank': 'لطفا نام خود را وارد نمایید.'})
+    last_name = serializers.CharField(required=True, write_only=True, error_messages={
+                                      'blank': '‌لطفا نام خانوادگی خود را وارد نمایید.'})
+    mobile = serializers.CharField(required=True, write_only=True,error_messages={
+                                      'blank': '‌لطفا تلفن همراه خود را وارد نمایید.'})
+    password1 = serializers.CharField(required=True, write_only=True,error_messages={
+                                      'blank': 'لطفا گذرواژه خود را وارد نمایید'})
+    password2 = serializers.CharField(required=True, write_only=True,error_messages={
+                                      'blank': '‌لطفا تکرار گذرواژه خود را وارد نمایید.'})
 
     def validate_email(self, email):
         email = CustomUserAccountAdapter().clean_email(email)
@@ -283,7 +289,8 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     set_password_form_class = SetPasswordForm
 
-    set_password_form_class.error_messages['password_mismatch'] =  _("گذرواژه ها یکسان نمی باشند."),
+    set_password_form_class.error_messages['password_mismatch'] = _(
+        "گذرواژه ها یکسان نمی باشند."),
 
     def custom_validation(self, attrs):
         pass
