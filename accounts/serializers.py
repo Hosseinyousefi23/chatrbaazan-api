@@ -73,7 +73,7 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email',
-                  'mobile', 'address', 'mobile_active')
+                  'mobile', 'address', 'mobile_active', 'postal_code')
         read_only_fields = ('email',)
 
     def get_mobile_active(self, obj):
@@ -96,7 +96,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'mobile', 'address')
+        fields = ('first_name', 'last_name', 'email',
+                  'mobile', 'address', 'postal_code')
         read_only_fields = ('email',)
 
 
