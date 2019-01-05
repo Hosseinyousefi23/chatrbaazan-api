@@ -274,9 +274,13 @@ REST_FRAMEWORK = {
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializerCustom',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+    'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
 ***REMOVED***
+LOGIN_SERIALIZER= 'accounts.serializers.LoginSerializer',
+
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+    'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
 ***REMOVED***
 REST_AUTH_REGISTER_PERMISSION_CLASSES = (
     ('accounts.permissions.AllowAnyAnonymous'),
