@@ -1,3 +1,4 @@
+from carts.models import Cart
 import random
 from collections import OrderedDict
 import operator
@@ -37,13 +38,13 @@ def test(request):
 
 
 class TestAPi(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     allowed_methods = ('GET',)
 
     # renderer_classes = (JSONRenderer,)
-
     def get(self, request, format=None, ):
-        return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
+            return Response("I Love You Python :) * Mohammad Reza *")
+        # return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
 
 
 def testr(request):
@@ -108,7 +109,7 @@ class GetUserProduct(APIView, PageNumberPagination):
     allowed_methods = ('GET',)
     page_size = 20
     max_page_size = 1000
-    
+
     # renderer_classes = (JSONRenderer,)
     def get_queryset(self, request):
         userData = UserProduct.objects.filter(
