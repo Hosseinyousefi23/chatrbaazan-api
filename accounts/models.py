@@ -70,7 +70,10 @@ class User(AbstractBaseUser):
                               verbose_name="mobile", db_index=True, validators=[validate_mobile], unique=True)
     first_name = models.CharField(max_length=150, verbose_name="first name")
     last_name = models.CharField(max_length=150, verbose_name="last name")
-    address = models.TextField(null=True, blank=True, default=None, verbose_name=u"آدرس")
+    address = models.CharField(
+        max_length=1000, null=True, blank=True, default=None, verbose_name=u"آدرس")
+    postal_code = models.CharField(
+        max_length=12, blank=True, null=True, default=None, verbose_name=u"کد پستی")
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -109,11 +112,16 @@ class UserSendCode(models.Model):
     )
     user = models.ForeignKey(User, related_name="user_send_code_user", blank=True, null=True,
                              on_delete=models.CASCADE, default=None, verbose_name=u"کاربر")
-    code = models.CharField(max_length=300, blank=False, null=False, verbose_name=u"کد تخفیف")
-    explanation = models.TextField(blank=True, null=True, verbose_name=u"توضیح")
-    expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
-    chatrbazi = models.CharField(max_length=150, default=None, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
-    status = models.PositiveSmallIntegerField(choices=STATUS, default=2, verbose_name=u"وضعیت")
+    code = models.CharField(max_length=300, blank=False,
+                            null=False, verbose_name=u"کد تخفیف")
+    explanation = models.TextField(
+        blank=True, null=True, verbose_name=u"توضیح")
+    expiration_date = models.DateTimeField(
+        blank=True, null=True, verbose_name=u"تاریخ انقضاء")
+    chatrbazi = models.CharField(
+        max_length=150, default=None, null=True, blank=True, verbose_name=u"مقدار چتر بازی")
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS, default=2, verbose_name=u"وضعیت")
 
     class Meta:
         verbose_name = u"کدهای ارسال کاربران"
