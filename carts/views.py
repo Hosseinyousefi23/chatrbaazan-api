@@ -1,3 +1,6 @@
+from django.template import Context
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
 from datetime import datetime, timedelta, time
 
 from django.db.models.expressions import F
@@ -17,19 +20,6 @@ from carts.serializers import CartSerializer
 from chatrbaazan import settings
 from shop.models import Product, UserProduct
 from shop.renderers import CustomJSONRenderer
-
-
-# def get_client_ip(request):
-#     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-#     if x_forwarded_for:
-#         ip = x_forwarded_for.split(',')[0]
-#     else:
-#         ip = request.META.get('REMOTE_ADDR')
-#     return ip
-#
-#
-# def get_uuid(c=20):
-#     return uuid.uuid4().hex[:c].upper()
 
 
 class AddCart(mixins.CreateModelMixin,
@@ -219,6 +209,7 @@ class CompleteView(APIView):
                 product = Product.objects.filter(
                     id=cartItem.product.id).update(count=F('count') - 1)
             Cart.objects.filter(pk=cart.pk).update(status=3)
+            send_factor(request, cart)  # send factor email
             return CustomJSONRenderer().render({
                 'redirect_uri': settings.URI_FRONT + 'cart/factor/{}/'.format(cart.pk),
                 'success': True,
@@ -248,3 +239,20 @@ class FactorView(APIView):
             return CustomJSONRenderer().render({
                 'message': u'محصول هم چنان در وضعیت معلق قرار دارد.',
             }, status=403)
+
+
+
+def send_factor(request, cart):
+    items = CartItem.objects.filter(cart__id=cart.pk)
+    print('count item cart', str(items.count()))
+    # return render(request, 'email/factor.html', {'cartItam': items,'cart':cart})
+    body_email = get_template('email/factor.html').render({
+        'cartItam': items,
+        'cart': cart
+    })
+    message = EmailMessage(subject="چتر بازان - رسید خرید",
+                           body=body_email,
+                           to=[cart.user.email])
+    message.content_subtype = 'html'
+    message.send()
+    return True

@@ -1,0 +1,46 @@
+<style>
+#tb-factor tr td{
+    padding:10px;
+}
+#tb-factor{
+    direction:rtl;
+}
+</style>
+<center>
+<h3 style="direction: rtl">
+چتر بازان، با تشکر از خرید شما
+</h3>
+</center>
+
+<p>
+    <center>
+        رسید خرید
+    </center>
+</p>
+<center>
+<table id="tb-factor" border="1">
+    <thead>
+        <tr>
+            <td>عنوان</td>
+            <td>قیمت</td>
+        </tr>
+    </thead>
+{% for item in cartItam %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.price }}</td>
+    </tr>
+{% endfor %}
+<tr>
+<td>جمع کل</td>
+<td>
+{{ cart.total_price }}
+</td>
+</tr>
+</table>
+</center>
+<p>
+    <center>
+        با تشکر از انتخاب شما
+    </center>
+</p>
