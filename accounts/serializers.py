@@ -17,9 +17,10 @@ from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode as uid_decoder
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
 from django.contrib.auth import authenticate, get_user_model
-from django.utils.translation import ugettext as _
+
 from rest_framework import serializers
 from rest_auth.models import TokenModel
 from rest_auth.utils import import_callable
@@ -34,46 +35,10 @@ from allauth.account import app_settings
 UserModel = get_user_model()
 
 
-class SetCustomErrorMessagesMixin:
-    """
-    Replaces built-in validator messages with messages, defined in Meta class. 
-    This mixin should be inherited before the actual Serializer class in order to call __init__ method.
-
-    Example of Meta class:
-
-    >>> class Meta:
-    >>>     model = User
-    >>>     fields = ('url', 'username', 'email', 'groups')
-    >>>     custom_error_messages_for_validators = {
-    >>>         'username': {
-    >>>             UniqueValidator: _('This username is already taken. Please, try again'),
-    >>>             RegexValidator: _('Invalid username')
-    >>>         ***REMOVED***
-    >>>     ***REMOVED***
-    """
-
-    def __init__(self, *args, **kwargs):
-        # noinspection PyArgumentList
-        super(SetCustomErrorMessagesMixin, self).__init__(*args, **kwargs)
-        self.replace_validators_messages()
-
-    def replace_validators_messages(self):
-        for field_name, validators_lookup in self.custom_error_messages_for_validators.items():
-            # noinspection PyUnresolvedReferences
-            for validator in self.fields[field_name].validators:
-                if type(validator) in validators_lookup:
-                    validator.message = validators_lookup[type(validator)]
-
-    @property
-    def custom_error_messages_for_validators(self):
-        meta = getattr(self, 'Meta', None)
-        return getattr(meta, 'custom_error_messages_for_validators', {***REMOVED***)
-
-
 class RegisterSerializerCustom(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    first_name = serializers.CharField(required=True, write_only=True)
-    last_name = serializers.CharField(required=True, write_only=True)
+    email = serializers.EmailField(required=True,error_messages = {'blank':'لطفا ایمیل خود را وارد نمایید.'***REMOVED***)
+    first_name = serializers.CharField(required=True, write_only=True,error_messages={'blank':'لطفا نام خود را وارد نمایید.'***REMOVED***)
+    last_name = serializers.CharField(required=True, write_only=True,error_messages = {'blank':'‌لطفا نام خانوادگی خود را وارد نمایید.'***REMOVED***)
     mobile = serializers.CharField(required=True, write_only=True)
     password1 = serializers.CharField(required=True, write_only=True)
     password2 = serializers.CharField(required=True, write_only=True)
@@ -273,7 +238,9 @@ class PasswordResetSerializer(serializers.Serializer):
     """
     Serializer for requesting a password reset e-mail.
     """
-    email = serializers.EmailField()
+    email = serializers.EmailField(error_messages={
+        'blank': 'لطفا ایمیل خود را وارد نمایید.'
+    ***REMOVED***)
 
     password_reset_form_class = PasswordResetForm
 
@@ -307,19 +274,30 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     """
     Serializer for requesting a password reset e-mail.
     """
-    new_password1 = serializers.CharField(max_length=128)
-    new_password2 = serializers.CharField(max_length=128)
+    new_password1 = serializers.CharField(
+        error_messages={'blank': 'لطفا گذرواژه خود را وارد نمایید'***REMOVED***, max_length=128)
+    new_password2 = serializers.CharField(
+        error_messages={'blank': 'لطفا گذرواژه خود را مجددا وارد نمایید'***REMOVED***, max_length=128)
     uid = serializers.CharField()
     token = serializers.CharField()
 
     set_password_form_class = SetPasswordForm
+
+    set_password_form_class.error_messages['password_mismatch'] =  _("گذرواژه ها یکسان نمی باشند."),
 
     def custom_validation(self, attrs):
         pass
 
     def validate(self, attrs):
         self._errors = {***REMOVED***
-
+        password1 = attrs['new_password1']
+        password2 = attrs['new_password2']
+        print('password1', password1)
+        print('password2', password2)
+        if password1 != password2:
+            print('ey joon')
+            raise ValidationError(
+                {'new_password2': ['گذرواژه ها یکسان نمی باشند.']***REMOVED***)
         # Decode the uidb64 to uid to get User object
         try:
             uid = force_text(uid_decoder(attrs['uid']))
