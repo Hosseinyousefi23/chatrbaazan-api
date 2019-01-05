@@ -64,7 +64,8 @@ class AddCart(mixins.CreateModelMixin,
         if cart.count() == 0:
             cart = self.create(request, *args, **kwargs)
         else:
-            cart = CartSerializer(cart.first(), many=False, context={'request': request***REMOVED***)
+            cart = CartSerializer(cart.first(), many=False,
+                                  context={'request': request***REMOVED***)
 
         print(str(cart.data['id']))
         try:
@@ -186,9 +187,12 @@ class CompleteView(APIView):
             # Product is free ~ BUG :)
             return CustomJSONRenderer().render({'message': 'Problem The System Cart', 'success': False***REMOVED***, status=400)
 
-        if not request.user.address:
+        cartItems_date = CartItem.objects.filter(cart__id=cart.pk)
+
+        # @TODO append postalcode for just product (type=1)
+        if cartItems_date.filter(product__type=1) and not request.user.address or not request.user.postal_code:
             return CustomJSONRenderer().render({'message': 'لطفا ابتدا در قسمت حساب کاربری نسبت به تکمیل اطلاعات کاربری اقدام نمایید',
-            'success':False***REMOVED***,status=400)
+                                                'success': False***REMOVED***, status=400)
         if settings.CART_DEBUG:
             # Debug enable for cart
             """""
@@ -197,7 +201,6 @@ class CompleteView(APIView):
             :: mince count product
             :: check count product
             """""
-            cartItems_date = CartItem.objects.filter(cart__id=cart.pk)
             for cartItem in cartItems_date:
                 product = Product.objects.filter(id=cartItem.product.id)
                 if product.first().count == 0:
@@ -213,7 +216,8 @@ class CompleteView(APIView):
                     user=request.user,
                     product=cartItem.product
                 )
-                product = Product.objects.filter(id=cartItem.product.id).update(count=F('count') - 1)
+                product = Product.objects.filter(
+                    id=cartItem.product.id).update(count=F('count') - 1)
             Cart.objects.filter(pk=cart.pk).update(status=3)
             return CustomJSONRenderer().render({
                 'redirect_uri': settings.URI_FRONT + 'cart/factor/{***REMOVED***/'.format(cart.pk),
@@ -232,7 +236,8 @@ class FactorView(APIView):
         if id is None:
             return CustomJSONRenderer().render404('cart', '')
         try:
-            cart = Cart.objects.filter(user=request.user).filter(status=3).get(id=id)
+            cart = Cart.objects.filter(
+                user=request.user).filter(status=3).get(id=id)
         except Exception as e:
             print('str e in factor ', str(e))
             return CustomJSONRenderer().render404('cart', '')
