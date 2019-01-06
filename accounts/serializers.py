@@ -49,14 +49,29 @@ class RegisterSerializerCustom(serializers.Serializer):
     password2 = serializers.CharField(required=True, write_only=True,error_messages={
                                       'blank': '‌لطفا تکرار گذرواژه خود را وارد نمایید.'***REMOVED***)
 
-    def validate_email(self, email):
-        email = CustomUserAccountAdapter().clean_email(email)
-        if email and email_address_exists(email):
+    # def validate_email(self, email):
+    #     email = CustomUserAccountAdapter().clean_email(email)
+    #     if email and email_address_exists(email):
+    #         raise serializers.ValidationError(
+    #             _("این ایمیل قبلا ثبت نام شده است."))
+    #     else:
+    #         raise serializers.ValidationError(
+    #           _("ایمیل معتبر نمی‌باشد."))
+    
+    def validate(self, data):
+        if User.objects.filter(mobile=data['mobile']).exists():
             raise serializers.ValidationError(
-                _("این ایمیل قبلا ثبت نام شده است."))
-        else:
+                _("شماره همراه موجود است"))
+        if data['mobile'] is None:
             raise serializers.ValidationError(
-               _("ایمیل معتبر نمی‌باشد."))
+                _("تلفن همراه الزامی است"))
+        if CustomUserAccountAdapter().clean_email(data['email']):
+            raise serializers.ValidationError(
+                _("ایمیل معتبر نمی‌باشد"))
+        if data['password1'] != data['password2']:
+            raise serializers.ValidationError(
+                _("رمز عبور یکسان نمی باشد"))
+        return data
 
     def validate_password1(self, password):
         return CustomUserAccountAdapter().clean_password(password)
