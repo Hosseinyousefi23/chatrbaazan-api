@@ -54,6 +54,9 @@ class RegisterSerializerCustom(serializers.Serializer):
         if email and email_address_exists(email):
             raise serializers.ValidationError(
                 _("این ایمیل قبلا ثبت نام شده است."))
+        else:
+            raise serializers.ValidationError(
+               _("ایمیل معتبر نمی‌باشد."))
 
     def validate_password1(self, password):
         return CustomUserAccountAdapter().clean_password(password)
