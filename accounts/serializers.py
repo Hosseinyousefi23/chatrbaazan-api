@@ -1,3 +1,4 @@
+from sms.serializers import validate_phone
 from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
 from rest_framework import serializers, exceptions
@@ -37,16 +38,17 @@ UserModel = get_user_model()
 
 class RegisterSerializerCustom(serializers.Serializer):
     email = serializers.EmailField(required=True, error_messages={
-                                   'blank': 'لطفا ایمیل خود را وارد نمایید.'***REMOVED***)
+                                   'blank': 'لطفا ایمیل خود را وارد نمایید.',
+                                   'invalid': 'لطفا ایمیل خود را صحیح وارد نمایید.'***REMOVED***)
     first_name = serializers.CharField(required=True, write_only=True, error_messages={
                                        'blank': 'لطفا نام خود را وارد نمایید.'***REMOVED***)
     last_name = serializers.CharField(required=True, write_only=True, error_messages={
                                       'blank': '‌لطفا نام خانوادگی خود را وارد نمایید.'***REMOVED***)
-    mobile = serializers.CharField(required=True, write_only=True,error_messages={
-                                      'blank': '‌لطفا تلفن همراه خود را وارد نمایید.'***REMOVED***)
-    password1 = serializers.CharField(required=True, write_only=True,error_messages={
+    mobile = serializers.CharField(required=True, write_only=True, error_messages={
+        'blank': '‌لطفا تلفن همراه خود را وارد نمایید.'***REMOVED***)
+    password1 = serializers.CharField(required=True, write_only=True, error_messages={
                                       'blank': 'لطفا گذرواژه خود را وارد نمایید'***REMOVED***)
-    password2 = serializers.CharField(required=True, write_only=True,error_messages={
+    password2 = serializers.CharField(required=True, write_only=True, error_messages={
                                       'blank': '‌لطفا تکرار گذرواژه خود را وارد نمایید.'***REMOVED***)
 
     # def validate_email(self, email):
@@ -57,7 +59,7 @@ class RegisterSerializerCustom(serializers.Serializer):
     #     else:
     #         raise serializers.ValidationError(
     #           _("ایمیل معتبر نمی‌باشد."))
-    
+
     def validate(self, data):
         if User.objects.filter(mobile=data['mobile']).exists():
             raise serializers.ValidationError(
@@ -83,6 +85,11 @@ class RegisterSerializerCustom(serializers.Serializer):
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
                 _("رمز عبور یکسان نمی باشد"))
+
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError(
+                _("این ایمیل قبلا در سیستم ثبت گردیده است"))
+        validate_phone(data['mobile'])
         return data
 
     def get_cleaned_data(self):

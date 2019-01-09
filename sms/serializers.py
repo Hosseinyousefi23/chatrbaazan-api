@@ -11,7 +11,7 @@ from sms.services import send_verification_sms
 def validate_phone(phone):
     if phone:  # 0913 430 8955
         if not re.match('^[0][9][0-9]{9,9***REMOVED***$' , str(phone)):
-            raise ValidationError({'message': u'not Invalid Mobile'***REMOVED***)
+            raise ValidationError({'message': u'لطفا موبایل خود را صحیح وارد نمایید'***REMOVED***)
 
 
 class SmsUserSerializer(serializers.ModelSerializer):

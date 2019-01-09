@@ -66,7 +66,7 @@ def validate_mobile(mobile):
 def validate_phone(phone):
     if phone:
         if not re.match('^[0][9][0-9]{9,9***REMOVED***$' , str(phone)):
-            raise ValidationError(u'not Invalid Phone')
+            raise ValidationError(u'لطفا موبایل خود را به صورت صحیح وارد نمایید.')
 
 
 class City(models.Model):
