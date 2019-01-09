@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _
 # Create your views here.
+from rest_framework import status
 from rest_auth.registration.serializers import RegisterSerializer
 from rest_auth.registration.views import RegisterView
 from rest_framework import mixins, generics
