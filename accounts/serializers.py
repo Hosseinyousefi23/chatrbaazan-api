@@ -171,7 +171,8 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(error_messages={
-                                   'blank': 'لطفا ایمیل خود را وارد نمایید'}, required=False, allow_blank=True)
+                                   'blank': 'لطفا ایمیل خود را وارد نمایید',
+                                   'invalid':'لطفا ایمیل خود را صحیح وارد نمایید'}, required=False, allow_blank=True)
     password = serializers.CharField(error_messages={
                                      'blank': 'لطفا گذرواژه خود را وارد نمایید'}, style={'input_type': 'password'})
 
