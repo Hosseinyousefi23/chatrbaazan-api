@@ -43,8 +43,8 @@ class TestAPi(APIView):
 
     # renderer_classes = (JSONRenderer,)
     def get(self, request, format=None, ):
-            return Response("I Love You Python :) * Mohammad Reza *")
-        # return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
+        return Response("I Love You Python :) * Mohammad Reza *")
+    # return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
 
 
 def testr(request):
@@ -159,6 +159,7 @@ class GetOffers(APIView, PageNumberPagination):
         companySlug = request.GET.get('company_slug', None)
         search = request.GET.get('search', None)
         type_product = request.GET.get('type', None)
+        expire = request.GET.get('expire', False)
         products = Product.objects.all()
         if cityId is not None:
             city = City.objects.filter(id=convert_to_int(cityId))
@@ -216,7 +217,7 @@ class GetOffers(APIView, PageNumberPagination):
                     return None
             if type_product is not None:
                 products = products.filter(type=type_product)
-        if companySlug is None:
+        if not expire:
             products = products.filter(
                 Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
         return self.paginate_queryset(products, self.request)
@@ -340,6 +341,7 @@ class LabelViews(APIView, PageNumberPagination):
         company = request.GET.get('company_slug', None)
         category = request.GET.get('category_slug', None)
         type_product = request.GET.get('type', None)
+        expire = request.GET.get('expire', False)
 
         if ordering not in order:
             ordering = 'created_at'
@@ -382,8 +384,9 @@ class LabelViews(APIView, PageNumberPagination):
         if type_product is not None:
             products = products.filter(type=type_product)
 
-        products = products.filter(
-            Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
+        if not expire:
+            products = products.filter(
+                Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
 
         return self.paginate_queryset(products, self.request)
 
