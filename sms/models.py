@@ -13,21 +13,7 @@ def generate_filename_phone(instance, filename):
     return os.path.join(u"UpLoadedFiles", "SmsFile", str(instance.id), (filename))
 
 
-class Sms(models.Model):
-    title = models.CharField(max_length=350, blank=False, null=False, verbose_name=u"عنوان")
-    text = models.TextField(verbose_name=u"متن پیامک", blank=False, null=False)
-    category = models.ManyToManyField(Category, related_name="sms_category", verbose_name=u"دسته بندی")
-    phone = models.FileField(storage=fs, upload_to=generate_filename_phone, verbose_name=u"فایل",
-                             blank=True, null=True, max_length=500)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = u"سرویس اشتراک پیامک"
-        verbose_name_plural = u"سرویس اشتراک پیامک"
+help_text_file_upload = u"شماره تلفن ها در هر خط باید قرار درج شده باشند"
 
 
 class SmsUser(models.Model):
@@ -35,14 +21,20 @@ class SmsUser(models.Model):
         (1, u"فعال"),
         (2, u"غیرفعال")
     )
-    user = models.ForeignKey(User, related_name=u"کاربر", blank=True, null=True, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=15, verbose_name=u"شماره همراه", null=True, blank=True)
-    status = models.PositiveSmallIntegerField(choices=STATUS, default=2, verbose_name=u"وضعیت")
-    code_verify = models.CharField(max_length=350, blank=False, null=False, verbose_name=u"کدتایید شده")
+    user = models.ForeignKey(User, related_name=u"کاربر",
+                             blank=True, null=True, on_delete=models.CASCADE)
+    phone = models.CharField(
+        max_length=15, verbose_name=u"شماره همراه", null=True, blank=True)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS, default=2, verbose_name=u"وضعیت")
+    code_verify = models.CharField(
+        max_length=350, blank=False, null=False, verbose_name=u"کدتایید شده")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    active_at = models.DateTimeField(blank=True, null=True, verbose_name=u"زمان تایید شده")
-    send_at = models.DateTimeField(auto_now_add=True, verbose_name=u"زمان ارسال کد")
+    active_at = models.DateTimeField(
+        blank=True, null=True, verbose_name=u"زمان تایید شده")
+    send_at = models.DateTimeField(
+        auto_now_add=True, verbose_name=u"زمان ارسال کد")
 
     def __str__(self):
         return self.phone
@@ -52,15 +44,41 @@ class SmsUser(models.Model):
         verbose_name_plural = u"اشتراک پیامک کاربر"
 
 
+class Sms(models.Model):
+    title = models.CharField(max_length=350, blank=False,
+                             null=False, verbose_name=u"عنوان")
+    text = models.TextField(verbose_name=u"متن پیامک", blank=False, null=False)
+    sms_user = models.ManyToManyField(SmsUser, related_name="sms_smsUser",verbose_name=u"کاربران عضو اشتراک")
+    # category = models.ManyToManyField(
+    # Category, related_name="sms_category", verbose_name=u"دسته بندی")
+    # phone = models.FileField(storage=fs, upload_to=generate_filename_phone, verbose_name=u"فایل",
+    #  blank=True, null=True, max_length=500, help_text=help_text_file_upload)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, **kwargs):
+        super(Sms, self).save(**kwargs)
+
+    class Meta:
+        verbose_name = u"سرویس اشتراک پیامک"
+        verbose_name_plural = u"سرویس اشتراک پیامک"
+#
 class SmsLog(models.Model):
     STATUS = (
         (1, "موفق"),
         (2, "نا موفق"),
         (3, "در حال ارسال")
     )
-    sms = models.ForeignKey(Sms, related_name="smslog_sms", on_delete=models.CASCADE, verbose_name=u"sms")
-    sms_user = models.ForeignKey(SmsUser, related_name="smsmlog_smsuser", on_delete=models.CASCADE)
-    status = models.PositiveSmallIntegerField(choices=STATUS, default=3, verbose_name=u"وضعیت")
+    sms = models.ForeignKey(Sms, related_name="smslog_sms",
+                            on_delete=models.CASCADE, verbose_name=u"sms")
+    sms_user = models.ForeignKey(SmsUser, related_name="smsmlog_smsuser",
+                                 on_delete=models.CASCADE, blank=True, null=True, default=None)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS, default=3, verbose_name=u"وضعیت")
+    mobile = models.CharField(max_length=15, default=None)
 
     class Meta:
         verbose_name = u"گزارش دهی سرویس پیامک"
