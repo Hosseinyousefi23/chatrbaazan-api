@@ -81,7 +81,7 @@ class RegisterSerializerCustom(serializers.Serializer):
     def validate(self, data):
         if User.objects.filter(mobile=data['mobile']).exists():
             raise serializers.ValidationError(
-                _("شماره الزامی است.."))
+                _("شماره همراه موجود می‌باشد."))
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
                 _("رمز عبور یکسان نمی باشد"))
