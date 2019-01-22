@@ -338,8 +338,8 @@ JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mohammad.chavoshipor@gmail.com'
-EMAIL_HOST_PASSWORD = 'soxftfkswnndhnkf'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
 # Cart Debug
 CART_DEBUG = ENV['CART_DEBUG'] if ENV['CART_DEBUG'] else False
