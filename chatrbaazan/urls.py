@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import url, include
 from rest_auth.registration.views import VerifyEmailView, RegisterView
-from rest_auth.views import LogoutView , PasswordResetView , PasswordResetConfirmView , LoginView
+from rest_auth.views import LogoutView, PasswordResetView, PasswordResetConfirmView, LoginView
 from django.conf.urls.static import static
 from allauth.account.views import confirm_email as allauthemailconfirmation
 from allauth.account.views import confirm_email
@@ -49,7 +49,8 @@ urlpatterns = [
     path('auth/verify/', verify_jwt_token),
     url(r'^auth/password/reset/$', accountsView.PasswordResetView.as_view(),
         name='rest_password_reset'),
-    url(r'^auth/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', accountsView.PasswordResetConfirmView.as_view(),
+    url(r'^auth/password/reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        accountsView.PasswordResetConfirmView.as_view(),
         name='password_reset_confirm'),
     url(r'^auth/user/$', UserDetailsView.as_view(), name='rest_user_details'),
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
