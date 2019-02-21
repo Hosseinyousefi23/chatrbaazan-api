@@ -1,36 +1,25 @@
-from carts.models import Cart
+# Create your views here.
+
 import random
-from collections import OrderedDict
-import operator
-import itertools
-from itertools import chain
 import uuid
+from collections import OrderedDict
+from datetime import datetime, timedelta
 
-from django.db.models import Count, Max
-
-from django.contrib.auth.models import User, AnonymousUser
+from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
 from django.shortcuts import render
-from django.http import HttpResponse
 # Create your views here.
-from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
-from django.db.models import Q
 
-from like.models import Like
-from like.serializers import LikeSerializer
 from shop.models import City, Banner, Category, Product, Company, UserProduct, Failure, ShopSetting, \
     ProductLabel
 from shop.renderers import CustomJSONRenderer
-from shop.serializers import CitySerializer, BannerSerializer, CategorySerializer, ProductSerializer, \
+from shop.serializers import CitySerializer, BannerSerializer, ProductSerializer, \
     UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer
-from rest_auth.registration.views import RegisterView
-from datetime import datetime
 
 
 def test(request):
@@ -44,7 +33,7 @@ class TestAPi(APIView):
     # renderer_classes = (JSONRenderer,)
     def get(self, request, format=None, ):
         return Response("I Love You Python :) * Mohammad Reza *")
-    # return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
+        # return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
 
 
 def testr(request):
@@ -100,7 +89,7 @@ class GetBanner(APIView):
         bannerData = Banner.objects.filter(available=True).filter(
             Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).order_by('-location')[:10]
         data = BannerSerializer(bannerData, many=True, context={
-                                'request': request***REMOVED***).data
+            'request': request***REMOVED***).data
         return CustomJSONRenderer().renderData(data)
 
 
@@ -119,7 +108,7 @@ class GetUserProduct(APIView, PageNumberPagination):
     def get(self, request, format=None, ):
         userData = self.get_queryset(request)
         data = UserProductSerializer(userData, many=True, context={
-                                     'request': request***REMOVED***).data
+            'request': request***REMOVED***).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
@@ -148,7 +137,7 @@ class GetOffers(APIView, PageNumberPagination):
 
         self.page_size = limits  # fix limit query
         ordering = request.GET.get('ordering', 'created_at')
-        order = ['favorites', 'topchatrbazi', 'created_at']
+        order = ['favorites', 'topchatrbazi', 'created_at', 'expired', ]
         if ordering not in order:
             ordering = 'created_at'
 
@@ -213,6 +202,11 @@ class GetOffers(APIView, PageNumberPagination):
 
                 elif ordering == 'topchatrbazi':
                     products = products.order_by('-chatrbazi', '-click')
+                elif ordering == 'expired':
+                    products = products.order_by('-expiration_date', '-created_at').filter(
+                        Q(expiration_date__isnull=False) & (Q(expiration_date__lte=datetime.now())) | (Q(
+                            expiration_date__isnull=True) & Q(
+                            created_at__lte=datetime.now() - timedelta(6 * 365 / 12))))  # 6 month ago
                 else:
                     return None
             if type_product is not None:
@@ -233,7 +227,7 @@ class GetOffers(APIView, PageNumberPagination):
             if company.count() > 0:
                 dataCompany = company.first()
         data = ProductSerializer(products, many=True, context={
-                                 'request': request***REMOVED***).data
+            'request': request***REMOVED***).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
