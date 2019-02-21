@@ -1,0 +1,14 @@
+.gitignore
+__pycache__/
+.idea/*
+.vscode/*
+db.sqlite3
+**/migrations/
+.pyc
+.env/
+.venv/
+chatrbaazan/local_settings.py
+/venv/
+public/*
+UpLoadedFiles/*
+chatrbaazan/env.py
