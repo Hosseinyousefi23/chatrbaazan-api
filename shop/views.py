@@ -204,9 +204,9 @@ class GetOffers(APIView, PageNumberPagination):
                     products = products.order_by('-chatrbazi', '-click')
                 elif ordering == 'expired':
                     products = products.order_by('-expiration_date', '-created_at').filter(
-                        Q(expiration_date__isnull=False) & (Q(expiration_date__lte=datetime.now())) | (Q(
+                        (Q(expiration_date__isnull=False) & Q(expiration_date__lte=datetime.now())) | (Q(
                             expiration_date__isnull=True) & Q(
-                            created_at__lte=datetime.now() - timedelta(6 * 365 / 12))))  # 6 month ago
+                            created_at__lte=datetime.now() - timedelta(6 * 365 / 12))))  # 6 m1onth ago
                 else:
                     return None
             if type_product is not None:
