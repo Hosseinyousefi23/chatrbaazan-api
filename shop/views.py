@@ -127,6 +127,7 @@ class GetOffers(APIView, PageNumberPagination):
 
     # renderer_classes = (JSONRenderer,)
     def get_queryset(self, request):
+        print("query part")
         limits = request.GET.get('limits', 100)
         try:
             limits = int(limits)
@@ -215,6 +216,7 @@ class GetOffers(APIView, PageNumberPagination):
         if not expire:
             products = products.filter(
                 Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
+        print("return part")
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
