@@ -1,4 +1,4 @@
 try:
     from .local_settings import *
-except FileNotFoundError:
+except ImportError or FileNotFoundError:
     from .default_settings import *
