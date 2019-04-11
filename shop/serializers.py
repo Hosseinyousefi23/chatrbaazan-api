@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 import re
 
 from django.core.exceptions import ValidationError
@@ -132,7 +131,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
             return 0
 
     def get_company(self, obj):
-        compnaies = Company.objects.filter(category__id=obj.id)
+        compnaies = Company.objects.filter(category__id=obj.id).order_by('-priority', 'id')
         if compnaies:
             return CompanySerializer(compnaies, many=True, context={'request': self.context['request']}).data
 
