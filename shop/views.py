@@ -32,7 +32,7 @@ class TestAPi(APIView):
 
     # renderer_classes = (JSONRenderer,)
     def get(self, request, format=None, ):
-        return Response("I Love You Python :) * Hossein *")
+        return Response("I Love You Python :) * Hossein yousefis *")
         # return HttpResponse(uuid.uuid1(random.randint(0, 281474976710655)))
 
 
