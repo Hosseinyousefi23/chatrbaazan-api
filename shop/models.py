@@ -239,7 +239,7 @@ class Product(models.Model):
                 self.slug = '%s-%d' % (orig, x)
             self.save()
             print('slug product write', str(self.slug))
-            url = 'http://chatrbaazan.ir/chatrbaazan_bot/broadcast.php?send_notification&slug={0}'.format(
+            url = u'https://chatrbaazan.ir/chatrbaazan_bot/broadcast.php?send_notification&slug={0}'.format(
                 self.slug)
             result = requests.get(url)
             if result.status_code == 200:
