@@ -9,6 +9,8 @@ import requests
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.message import EmailMessage
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.template.loader import get_template
 from rest_framework.exceptions import ValidationError
 
@@ -231,25 +233,30 @@ class Product(models.Model):
         verbose_name_plural = u"محصولات"
 
     def save(self, **kwargs):
-        super(Product, self).save(**kwargs)
+
         if not self.slug:
             self.slug = orig = str((self.name)).replace(' ', '-')
             for x in itertools.count(1):
                 if not Product.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
                     break
                 self.slug = '%s-%d' % (orig, x)
-            self.save()
-            print('slug product write', str(self.slug))
-            url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
-                self.slug)
-            result = requests.get(quote(url, safe=':/.?&='))
-            if result.status_code == 200:
-                print('send notification success: ', url)
-            else:
-                print('send notification failed: ', url)
+        super(Product, self).save(**kwargs)
+        print('slug product write', str(self.slug))
 
     def __str__(self):
         return str(self.name)
+
+
+@receiver(post_save, sender=Product)
+def my_handler(sender, instance, created, **kwargs):
+    url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+        instance.slug)
+    if created:
+        result = requests.get(quote(url, safe=':/.?&='))
+        if result.status_code == 200:
+            print('send notification success: ', url)
+        else:
+            print('send notification failed: ', url)
 
 
 class Failure(models.Model):
