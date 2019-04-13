@@ -2,16 +2,11 @@ import itertools
 import os
 # Create your models here.
 import re
-import time
 from datetime import date
-from urllib.parse import quote
 
-import requests
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.message import EmailMessage
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.template.loader import get_template
 from rest_framework.exceptions import ValidationError
 
@@ -248,17 +243,16 @@ class Product(models.Model):
         return str(self.name)
 
 
-@receiver(post_save, sender=Product)
-def my_handler(sender, instance, created, **kwargs):
-    url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
-        instance.slug)
-    time.sleep(5)
-    if created:
-        result = requests.get(quote(url, safe=':/.?&='))
-        if result.status_code == 200:
-            print('send notification success: ', url)
-        else:
-            print('send notification failed: ', url)
+# @receiver(post_save, sender=Product)
+# def my_handler(sender, instance, created, **kwargs):
+#     url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+#         instance.slug)
+#     if created:
+#         result = requests.get(quote(url, safe=':/.?&='))
+#         if result.status_code == 200:
+#             print('send notification success: ', url)
+#         else:
+#             print('send notification failed: ', url)
 
 
 class Failure(models.Model):
