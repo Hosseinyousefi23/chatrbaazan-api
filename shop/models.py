@@ -2,6 +2,7 @@ import itertools
 import os
 # Create your models here.
 import re
+import time
 from datetime import date
 from urllib.parse import quote
 
@@ -251,6 +252,7 @@ class Product(models.Model):
 def my_handler(sender, instance, created, **kwargs):
     url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0}'.format(
         instance.slug)
+    time.sleep(5)
     if created:
         result = requests.get(quote(url, safe=':/.?&='))
         if result.status_code == 200:
