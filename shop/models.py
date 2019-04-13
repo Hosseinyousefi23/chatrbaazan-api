@@ -240,7 +240,7 @@ class Product(models.Model):
             self.save()
             print('slug product write', str(self.slug))
             url = 'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0}'.format(
-                self.slug)
+                self.slug.encode('utf-8'))
             result = requests.get(url)
             if result.status_code == 200:
                 print('send notification success: ', url)
