@@ -242,7 +242,7 @@ class Product(models.Model):
             print('slug product write', str(self.slug))
             url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
                 self.slug)
-            result = requests.get(quote(url, safe=':/.'))
+            result = requests.get(quote(url, safe=':/.?&='))
             if result.status_code == 200:
                 print('send notification success: ', url)
             else:
