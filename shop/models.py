@@ -3,6 +3,7 @@ import os
 # Create your models here.
 import re
 from datetime import date
+from urllib.parse import quote
 
 import requests
 from django.core.files.storage import FileSystemStorage
@@ -239,9 +240,9 @@ class Product(models.Model):
                 self.slug = '%s-%d' % (orig, x)
             self.save()
             print('slug product write', str(self.slug))
-            url = 'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
-                self.slug.encode('utf-8'))
-            result = requests.get(url)
+            url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+                self.slug)
+            result = requests.get(quote(url, safe=':/.'))
             if result.status_code == 200:
                 print('send notification success: ', url)
             else:
