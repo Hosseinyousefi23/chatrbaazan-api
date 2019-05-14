@@ -1,6 +1,3 @@
-from urllib.parse import quote
-
-import requests
 from django.contrib import admin
 # Register your models here.
 from django.utils.safestring import mark_safe
@@ -30,16 +27,6 @@ class ProductAdmin(admin.ModelAdmin):
         )
 
     readonly_fields = ('headshot_image',)
-
-    def save_model(self, request, obj, form, change):
-        super(ProductAdmin, self).save_model(request, obj, form, change)
-        url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0}'.format(
-            obj.slug)
-        result = requests.get(quote(url, safe=':/.?&='))
-        if result.status_code == 200 and result.content:
-            print('send notification success: ', url)
-        else:
-            print('send notification failed: ', url)
 
 
 class CompanyAdmin(admin.ModelAdmin):
