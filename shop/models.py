@@ -2,8 +2,12 @@ import itertools
 import os
 # Create your models here.
 import re
+import threading
+import time
 from datetime import date
+from urllib.parse import quote
 
+import requests
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.message import EmailMessage
 from django.db import models
@@ -236,8 +240,21 @@ class Product(models.Model):
                 if not Product.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
                     break
                 self.slug = '%s-%d' % (orig, x)
-        super(Product, self).save(**kwargs)
+
         print('slug product write', str(self.slug))
+        if self.pk is None:
+            t = threading.Thread(target=my_handler, args=(self,))
+            t.start()
+            print('this should be running before request')
+
+        super(Product, self).save(**kwargs)
+        # url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+        #     self.slug)
+        # result = requests.get(quote(url, safe=':/.?&='))
+        # if result.status_code == 200 and result.content:
+        #     print('send notification success: ', url)
+        # else:
+        #     print('send notification failed: ', url)
 
     def __str__(self):
         return str(self.name)
@@ -245,14 +262,17 @@ class Product(models.Model):
 
 # @receiver(post_save, sender=Product)
 # def my_handler(sender, instance, created, **kwargs):
-#     url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
-#         instance.slug)
-#     if created:
-#         result = requests.get(quote(url, safe=':/.?&='))
-#         if result.status_code == 200:
-#             print('send notification success: ', url)
-#         else:
-#             print('send notification failed: ', url)
+def my_handler(instance):
+    print('waiting 3 sec')
+    time.sleep(3)
+    print('starting the process')
+    url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+        instance.slug)
+    result = requests.get(quote(url, safe=':/.?&='))
+    if result.status_code == 200 and result.content:
+        print('send notification success: ', url)
+    else:
+        print('send notification failed: ', url)
 
 
 class Failure(models.Model):
