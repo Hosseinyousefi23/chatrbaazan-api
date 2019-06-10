@@ -1,15 +1,16 @@
 # Create your views here.
-
+import operator
 import random
 import uuid
 from collections import OrderedDict
 from datetime import datetime, timedelta
+# Create your views here.
+from functools import reduce
 
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
 from django.shortcuts import render
-# Create your views here.
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -336,9 +337,16 @@ class LabelViews(APIView, PageNumberPagination):
         ordering = request.GET.get('ordering', 'created_at')
         order = ['favorites', 'topchatrbazi', 'created_at']
         company = request.GET.get('company_slug', None)
+        if company == 'ندارد':
+            company = None
         category = request.GET.get('category_slug', None)
+        if category == 'ندارد':
+            category = None
         type_product = request.GET.get('type', None)
         expire = request.GET.get('expire', False)
+        exclude = request.GET.get('exclude', None)
+        smart = request.GET.get('smart', False)
+        keywords = slug.split('$')
 
         if ordering not in order:
             ordering = 'created_at'
@@ -355,35 +363,48 @@ class LabelViews(APIView, PageNumberPagination):
         order = ['favorites', 'topchatrbazi', 'created_at']
         if ordering not in order:
             ordering = 'created_at'
-
-        products = Product.objects.filter(Q(label__name__contains=slug))
-        if search is not None:
-            products = products.filter(
-                Q(category__name__contains=search) | Q(company__name__contains=search))
-        if company is not None:
-            products = products.filter(
-                Q(company__name__contains=company) | Q(company__slug__contains=company))
-        if category is not None:
-            products = products.filter(
-                Q(category__name__contains=category) | Q(
-                    category__slug__contains=category)
-                | Q(category__english_name__contains=category))
-        if products.count() > 0:  # fix ordering products
-            if ordering == 'created_at':
-                products = products.order_by('-created_at', '-expiration_date')
-            else:
-                if ordering == 'favorites':
-                    products = products.order_by('-click')
-                elif ordering == 'topchatrbazi':
-                    products = products.order_by('-chatrbazi', '-click')
+        if smart:
+            products = Product.objects.filter(
+                reduce(operator.or_, (Q(label__name=x) for x in keywords))).distinct()
+            if exclude:
+                products = products.filter(~Q(id=exclude))
+            if len(products) < limits:
+                if category:
+                    support = Product.objects.filter(~Q(id=exclude) &
+                                                     (Q(category__name__contains=category) | Q(
+                                                         category__slug__contains=category)))
+                    # support = support.order_by('-created_at')
+                    products = products.union(support)
+            products = products[:limits]
+        else:
+            products = Product.objects.filter(Q(label__name__contains=keywords))
+            if search is not None:
+                products = products.filter(
+                    Q(category__name__contains=search) | Q(company__name__contains=search))
+            if company is not None:
+                products = products.filter(
+                    Q(company__name__contains=company) | Q(company__slug__contains=company))
+            if category is not None:
+                products = products.filter(
+                    Q(category__name__contains=category) | Q(
+                        category__slug__contains=category)
+                    | Q(category__english_name__contains=category))
+            if products.count() > 0:  # fix ordering products
+                if ordering == 'created_at':
+                    products = products.order_by('-created_at', '-expiration_date')
                 else:
-                    return None
-        if type_product is not None:
-            products = products.filter(type=type_product)
+                    if ordering == 'favorites':
+                        products = products.order_by('-click')
+                    elif ordering == 'topchatrbazi':
+                        products = products.order_by('-chatrbazi', '-click')
+                    else:
+                        return None
+            if type_product is not None:
+                products = products.filter(type=type_product)
 
-        if not expire:
-            products = products.filter(
-                Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
+            if not expire:
+                products = products.filter(
+                    Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
 
         return self.paginate_queryset(products, self.request)
 

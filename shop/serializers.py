@@ -263,7 +263,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_label(self, obj):
         if obj.label:
-            return ProductLabelSerializer(obj.label.all(), many=True, pop=['available']).data
+            return ProductLabelSerializer(obj.label.filter(available=True), many=True, pop=['available']).data
 
     def get_discount_code(self, obj):
         if obj.discount_code:
