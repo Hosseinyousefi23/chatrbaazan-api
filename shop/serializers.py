@@ -113,7 +113,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
     def get_all_chatrbazi(self, obj):
         sum = Product.objects.filter(
             category__id=obj.pk).aggregate(Sum('chatrbazi'))
-        print('sum get_all_chatrbazi', str(sum))
+        # print('sum get_all_chatrbazi', str(sum))
         if sum:
             return sum['chatrbazi__sum']
             # return sum[0]['sum']
@@ -123,7 +123,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
     def get_open_chatrbazi(self, obj):
         sum = Product.objects.filter(
             category__id=obj.pk).filter(priority=1).aggregate(Sum('chatrbazi'))
-        print('sum get_open_chatrbazi', str(sum))
+        # print('sum get_open_chatrbazi', str(sum))
         if sum:
             return sum['chatrbazi__sum']
             # return sum[0]['sum']
