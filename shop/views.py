@@ -372,7 +372,14 @@ class LabelViews(APIView, PageNumberPagination):
                 if category:
                     support = Product.objects.filter(~Q(id=exclude) &
                                                      (Q(category__name__contains=category) | Q(
-                                                         category__slug__contains=category)))
+                                                         category__slug__contains=category) | Q(
+                                                         category__english_name__contains=category)))
+                    print('products >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                    print(products)
+                    print(len(products))
+                    print('suport >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                    print(support)
+                    print(len(support))
                     # support = support.order_by('-created_at')
                     products = products.union(support)
             products = products[:limits]
@@ -412,7 +419,6 @@ class LabelViews(APIView, PageNumberPagination):
         search = request.GET.get('search', None)
         if slug:
             slug = str(slug).replace('/', '')
-            print('Slug', str(slug))
             products = self.get_queryset(request, slug)
             if products is None:
                 return CustomJSONRenderer().render404('product', '')
