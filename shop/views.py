@@ -364,6 +364,7 @@ class LabelViews(APIView, PageNumberPagination):
         if ordering not in order:
             ordering = 'created_at'
         if smart:
+            print("smaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaart")
             products = Product.objects.filter(
                 reduce(operator.or_, (Q(label__name=x) for x in keywords))).distinct()
             if exclude:
