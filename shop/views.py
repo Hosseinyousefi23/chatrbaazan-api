@@ -57,7 +57,7 @@ class GetCategory(APIView):
         sumChatrbazi = Product.objects.filter(
             Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).aggregate(Sum('chatrbazi'))
         # print('sql sum all chatrbaazi: ' , str(sumChatrbazi.query))
-        print('data sum all chatrbaazi', str(sumChatrbazi))
+        # print('data sum all chatrbaazi', str(sumChatrbazi))
         # if sumChatrbazi.count() > 0:
         #     sumChatrbazi = sumChatrbazi[0]['sum']
         # else:
@@ -368,15 +368,15 @@ class LabelViews(APIView, PageNumberPagination):
                 reduce(operator.or_, (Q(label__name=x) for x in keywords))).distinct()
             if exclude:
                 products = products.filter(~Q(id=exclude))
+            print('products >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+            print(products)
+            print(len(products))
             if len(products) < limits:
                 if category:
                     support = Product.objects.filter(~Q(id=exclude) &
                                                      (Q(category__name__contains=category) | Q(
                                                          category__slug__contains=category) | Q(
                                                          category__english_name__contains=category)))
-                    print('products >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                    print(products)
-                    print(len(products))
                     print('suport >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                     print(support)
                     print(len(support))
