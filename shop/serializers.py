@@ -156,6 +156,21 @@ class CompanySerializer(serializers.ModelSerializer):
             self.fields.pop(fd)
 
 
+class CompanyDetailSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Company
+        depth = 1
+        fields = ('name', 'slug', 'description', 'image', 'product_company',)
+
+    def get_image(self, obj):
+        if obj.image:
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        else:
+            pass
+
+
 class ProductLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductLabel

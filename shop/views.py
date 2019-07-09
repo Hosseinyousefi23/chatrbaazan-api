@@ -10,9 +10,11 @@ from functools import reduce
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
+from django.http.response import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -20,7 +22,8 @@ from shop.models import City, Banner, Category, Product, Company, UserProduct, F
     ProductLabel
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, ProductSerializer, \
-    UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer
+    UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer, \
+    CompanyDetailSerializer
 
 
 def test(request):
@@ -364,23 +367,16 @@ class LabelViews(APIView, PageNumberPagination):
         if ordering not in order:
             ordering = 'created_at'
         if smart:
-            print("smaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaart")
             products = Product.objects.filter(
                 reduce(operator.or_, (Q(label__name=x) for x in keywords))).distinct()
             if exclude:
                 products = products.filter(~Q(id=exclude))
-            print('products >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-            print(products)
-            print(len(products))
             if len(products) < limits:
                 if category:
                     support = Product.objects.filter(~Q(id=exclude) &
                                                      (Q(category__name__contains=category) | Q(
                                                          category__slug__contains=category) | Q(
                                                          category__english_name__contains=category)))
-                    print('suport >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                    print(support)
-                    print(len(support))
                     # support = support.order_by('-created_at')
                     products = products.union(support)
             products = products[:limits]
@@ -449,3 +445,20 @@ class LabelViews(APIView, PageNumberPagination):
             if search is not None:
                 PLable = ProductLabel.objects.filter(Q(name__contains=search))
             return CustomJSONRenderer().renderData(ProductLabelSerializer(PLable, many=True, pop=['available']).data)
+
+
+class Extension(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+    serializer_class = CompanyDetailSerializer
+
+    def get(self, request):
+        url = request.GET['url']
+        company_list = Company.objects.filter(link__contains=url)
+        if len(company_list) > 0:
+            company = company_list[0]
+            ser = self.serializer_class(company, context={'request': request})
+            json_data = JSONRenderer().render(ser.data)
+            return HttpResponse(json_data)
+        else:
+            return HttpResponseNotFound('not found')

@@ -13,9 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
 from django.conf.urls import url, include
-
 from rest_framework import routers
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -32,6 +30,7 @@ urlpatterns = [
     url(r'^user/product/$', views.GetUserProduct.as_view()),
     url(r'^offer/$', views.GetOffers.as_view(), name="getOffers"),
     url(r'^offer/(?P<slug>.*)/$', views.GetOffer.as_view(), name="getOffer"),
+    url(r'^extension/$', views.Extension.as_view(), name='extension'),
     url(r'^failure/(?P<slug>.*)/$',
         views.FailureOffer.as_view(), name="reportFailure"),
     url(r'^setting/$', views.SettingView.as_view(), name="setting"),
