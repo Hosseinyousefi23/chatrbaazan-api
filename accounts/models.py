@@ -1,16 +1,11 @@
-from platform import release
+# Create your models here.
+import re
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import User, PermissionsMixin, AbstractUser
+from django.contrib.auth.models import PermissionsMixin
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils.translation import gettext as _
-
-# Create your models here.
-from django.db.models.expressions import Combinable
-import re
-import os
-
+from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from chatrbaazan.settings import BASE_DIR
@@ -53,23 +48,29 @@ class UserManager(BaseUserManager):
             password=password,
             mobile=None
         )
-        user.is_admin = True
+        user.is_superuser = True
+        user.is_staff = True
         user.save(using=self._db)
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
         unique=True,
     )
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+    # is_admin = models.BooleanField(default=False)
     mobile = models.CharField(max_length=11, blank=True, null=True,
                               verbose_name="mobile", db_index=True, validators=[validate_mobile], unique=True)
-    first_name = models.CharField(max_length=150, verbose_name="first name")
-    last_name = models.CharField(max_length=150, verbose_name="last name")
+    first_name = models.CharField(max_length=150, null=True, blank=True, verbose_name="first name")
+    last_name = models.CharField(max_length=150, null=True, blank=True, verbose_name="last name")
     address = models.CharField(
         max_length=1000, null=True, blank=True, default=None, verbose_name=u"آدرس")
     postal_code = models.CharField(
@@ -87,21 +88,21 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
-        return True
+        # def has_perm(self, perm, obj=None):
+        #     "Does the user have a specific permission?"
+        #     # Simplest possible answer: Yes, always
+        #     return True
+        #
+        # def has_module_perms(self, app_label):
+        #     "Does the user have permissions to view the app `app_label`?"
+        #     # Simplest possible answer: Yes, always
+        #     return True
 
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
+        # @property
+        # def is_staff(self):
+        #     "Is the user a member of staff?"
+        #     # Simplest possible answer: All admins are staff
+        #     return self.is_admin
 
 
 class UserSendCode(models.Model):
