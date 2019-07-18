@@ -4,7 +4,7 @@ import os
 import re
 import threading
 import time
-from datetime import date
+from datetime import date, timedelta
 from urllib.parse import quote
 
 import requests
@@ -12,6 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail.message import EmailMessage
 from django.db import models
 from django.template.loader import get_template
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
@@ -225,7 +226,7 @@ class Product(models.Model):
                             verbose_name=u"فایل", blank=True, null=True, max_length=500)
     type = models.PositiveSmallIntegerField(choices=TYPE, default=1, verbose_name=u"نوع")
     count = models.IntegerField(default=0, verbose_name=u"تعداد")
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, verbose_name='زمان ایجاد')
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -255,6 +256,14 @@ class Product(models.Model):
         #     print('send notification success: ', url)
         # else:
         #     print('send notification failed: ', url)
+
+    @property
+    def is_expired(self):
+        now = timezone.now()
+        if self.expiration_date:
+            return self.expiration_date < now
+        else:
+            return self.created_at < now - timedelta(6 * 365 / 12)
 
     def __str__(self):
         return str(self.name)
