@@ -362,12 +362,14 @@ class LabelViews(APIView, PageNumberPagination):
             limits = 30
 
         self.page_size = limits  # fix limit query
-        ordering = request.GET.get('ordering', 'created_at')
-        order = ['favorites', 'topchatrbazi', 'created_at']
-        if ordering not in order:
-            ordering = 'created_at'
+        # ordering = request.GET.get('ordering', 'created_at')
+        # order = ['favorites', 'topchatrbazi', 'created_at']
+        # if ordering not in order:
+        #     ordering = 'created_at'
         if smart:
-            products = Product.objects.filter(
+            products = Product.objects.all()
+            ids = [product.id for product in products if not product.is_expired]
+            products = Product.objects.filter(id__in=ids).filter(
                 reduce(operator.or_, (Q(label__name=x) for x in keywords))).distinct()
             if exclude:
                 products = products.filter(~Q(id=exclude))
@@ -379,6 +381,7 @@ class LabelViews(APIView, PageNumberPagination):
                                                          category__english_name__contains=category)))
                     # support = support.order_by('-created_at')
                     products = products.union(support)
+            products = products.order_by('-created_at')
             products = products[:limits]
         else:
             products = Product.objects.filter(Q(label__name__contains=keywords))
