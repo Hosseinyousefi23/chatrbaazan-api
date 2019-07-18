@@ -381,7 +381,7 @@ class LabelViews(APIView, PageNumberPagination):
                                                          category__english_name__contains=category)))
                     # support = support.order_by('-created_at')
                     products = products.union(support)
-            products = products.order_by('-created_at')
+            # products = products.order_by('-created_at')
             products = products[:limits]
         else:
             products = Product.objects.filter(Q(label__name__contains=keywords))
