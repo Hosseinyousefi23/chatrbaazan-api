@@ -375,10 +375,10 @@ class LabelViews(APIView, PageNumberPagination):
                 products = products.filter(~Q(id=exclude))
             if len(products) < limits:
                 if category:
-                    support = Product.objects.filter(~Q(id=exclude) &
-                                                     (Q(category__name__contains=category) | Q(
-                                                         category__slug__contains=category) | Q(
-                                                         category__english_name__contains=category)))
+                    support = Product.objects.filter(id__in=ids).filter(~Q(id=exclude) &
+                                                                        (Q(category__name__contains=category) | Q(
+                                                                            category__slug__contains=category) | Q(
+                                                                            category__english_name__contains=category)))
                     # support = support.order_by('-created_at')
                     products = products.union(support)
             # products = products.order_by('-created_at')
