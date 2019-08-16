@@ -95,12 +95,35 @@ class CategorySerializer(serializers.ModelSerializer):
             return 0
 
 
+class CompanyCompactSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Company
+        fields = ('id', 'name', 'slug', 'image', 'link')
+
+    def get_image(self, obj):
+        if obj.image:
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        else:
+            pass
+
+    def __init__(self, instance, pop=[], *args, **kwargs):
+        super().__init__(instance, **kwargs)
+
+        for fd in pop:
+            self.fields.pop(fd)
+
+
 class CategoryMenuSerializer(serializers.ModelSerializer):
     open_chatrbazi = serializers.SerializerMethodField()
     all_chatrbazi = serializers.SerializerMethodField()
     company = serializers.SerializerMethodField()
 
+    # company = CompanyCompactSerializer(read_only=True, many=True)
+
     class Meta:
+        depth = 1
         model = Category
         fields = ('id', 'name', 'english_name', 'available',
                   'all_chatrbazi', 'open_chatrbazi', 'slug', 'company')
@@ -133,7 +156,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         compnaies = Company.objects.filter(category__id=obj.id).order_by('-priority', 'id')
         if compnaies:
-            return CompanySerializer(compnaies, many=True, context={'request': self.context['request']}).data
+            return CompanyCompactSerializer(compnaies, many=True, context={'request': self.context['request']}).data
 
 
 class CompanySerializer(serializers.ModelSerializer):
