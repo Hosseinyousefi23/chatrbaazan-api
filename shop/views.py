@@ -384,7 +384,7 @@ class LabelViews(APIView, PageNumberPagination):
             # products = products.order_by('-created_at')
             products = products[:limits]
         else:
-            products = Product.objects.filter(Q(label__name__contains=keywords))
+            products = Product.objects.filter(Q(label__name__contains=slug))
             if search is not None:
                 products = products.filter(
                     Q(category__name__contains=search) | Q(company__name__contains=search))
