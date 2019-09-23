@@ -224,6 +224,18 @@ class GetOffers(APIView, PageNumberPagination):
         return self.paginate_queryset(products, self.request)
 
     def get(self, request, format=None, ):
+        category_frontend_name = ""
+        categoryId = request.GET.get('category', None)
+        categorySlug = request.GET.get('category_slug', None)
+        category = None
+        if categoryId is not None:
+            category = Category.objects.filter(
+                id=convert_to_int(categoryId))
+        elif categorySlug is not None:
+            category = Category.objects.filter(slug=categorySlug)
+        if category is not None:
+            category_frontend_name = [i for i in category.values_list("name")][0][0]
+
         products = self.get_queryset(request)
         if products is None:
             return CustomJSONRenderer().render404('product', '')
@@ -243,7 +255,8 @@ class GetOffers(APIView, PageNumberPagination):
                 ('results', data),
                 ('dataCompany',
                  CompanySerializer(dataCompany, many=False, context={'request': request},
-                                   pop=['available']).data if dataCompany else None)
+                                   pop=['available']).data if dataCompany else None),
+                ('category', category_frontend_name)
             ])
         )
 
