@@ -234,7 +234,11 @@ class GetOffers(APIView, PageNumberPagination):
         elif categorySlug is not None:
             category = Category.objects.filter(slug=categorySlug)
         if category is not None:
-            category_frontend_name = [i for i in category.values_list("name")][0][0]
+            category_name = [i for i in category.values_list("name")]
+            print("category name:")
+            print(category_name)
+            if len(category_name) > 0:
+                category_frontend_name = category_name[0][0]
 
         products = self.get_queryset(request)
         if products is None:
