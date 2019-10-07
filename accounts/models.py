@@ -75,6 +75,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=1000, null=True, blank=True, default=None, verbose_name=u"آدرس")
     postal_code = models.CharField(
         max_length=12, blank=True, null=True, default=None, verbose_name=u"کد پستی")
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
