@@ -112,6 +112,7 @@ class Company(models.Model):
         (7, u"سطح فوق بالا"),
     )
     name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام")
+    english_name = models.CharField(max_length=500, blank=True, null=True, verbose_name=u"نام کمپانی به انگلیسی‌")
     category = models.ForeignKey(Category, related_name="category_company", null=True, default=None, blank=True,
                                  verbose_name=u"دسته بندی", on_delete=models.CASCADE)
     available = models.BooleanField(default=True, blank=False, null=False, verbose_name=u"فعال")
