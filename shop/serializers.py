@@ -361,3 +361,27 @@ class ShopSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShopSetting
         fields = '__all__'
+
+
+class ProductListSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    company = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField()
+    discount_code = serializers.SerializerMethodField()
+    gallery = serializers.SerializerMethodField()
+    like = serializers.SerializerMethodField()
+    explanation_short = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField()
+
+    # type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ('id',
+                  'name', 'priority', 'discount_code', 'expiration_date',
+                  'price',
+                  'chatrbazi', 'is_free', 'english_name',
+                  'image', 'category', 'label', 'city', 'company', 'slug',
+                  'like', 'link', 'file', 'type', 'count')

@@ -249,7 +249,7 @@ class GetOffers(APIView, PageNumberPagination):
             company = Company.objects.filter(slug=companySlug)
             if company.count() > 0:
                 dataCompany = company.first()
-        data = ProductSerializer(products, many=True, context={
+        data = ProductSerializer(products, many=True, pop=['explanation', 'explanation_short', 'file', 'gallery', 'like'], context={
             'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
