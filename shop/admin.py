@@ -14,9 +14,13 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'failure', 'click', 'count', 'chatrbazi', 'is_free')
+    list_display = ('name', 'failure', 'company_name', 'discount_code', 'click', 'chatrbazi')
     list_filter = ('type',)
     search_fields = ('name', 'category__name', 'company__name', 'label__name')
+
+    def company_name(self, obj):
+        return " ,".join([c.name for c in obj.company.all()])
+    company_name.short_description = "کمپانی"
 
     def headshot_image(self, obj):
         return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
