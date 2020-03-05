@@ -510,7 +510,7 @@ class BestCompanies(APIView, PageNumberPagination):
         if companies is None:
             return CustomJSONRenderer().render404('company', '')
 
-        data = CompanySerializer(companies, many=True, pop=['id', 'available', 'slug', 'description', ], context={
+        data = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
             'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
