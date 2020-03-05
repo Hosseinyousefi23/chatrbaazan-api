@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^offer/$', views.GetOffers.as_view(), name="getOffers"),
     url(r'^offer/(?P<slug>.*)/$', views.GetOffer.as_view(), name="getOffer"),
     url(r'^extension/$', views.Extension.as_view(), name='extension'),
+    url(r'^bestcompanies/$', views.BestCompanies.as_view()),
     url(r'^failure/(?P<slug>.*)/$',
         views.FailureOffer.as_view(), name="reportFailure"),
     url(r'^setting/$', views.SettingView.as_view(), name="setting"),
