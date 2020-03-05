@@ -482,3 +482,38 @@ class Extension(APIView):
             return HttpResponse(json_data)
         else:
             return HttpResponseNotFound('not found')
+
+
+class BestCompanies(APIView, PageNumberPagination):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+    page_size = 20
+    max_page_size = 1000
+
+    # renderer_classes = (JSONRenderer,)
+    def get_queryset(self, request):
+        size = request.GET.get('size', 36)
+        try:
+            size = int(size)
+        except ValueError as e:
+            size = 100
+        if size > 36:
+            size = 36
+
+        companies = Company.objects.filter(priority__gt=3).order_by('-priority')[:size]
+
+        return companies
+
+    def get(self, request, format=None, ):
+
+        companies = self.get_queryset(request)
+        if companies is None:
+            return CustomJSONRenderer().render404('company', '')
+
+        data = CompanySerializer(companies, many=True, pop=['id', 'available', 'slug', 'description', ], context={
+            'request': request***REMOVED***).data
+        return CustomJSONRenderer().renderData(
+            OrderedDict([
+                ('results', data),
+            ])
+        )

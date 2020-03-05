@@ -161,16 +161,25 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
 
 class CompanySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    all_available_codes = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
-        fields = ('id', 'name', 'english_name', 'available', 'slug', 'description', 'image', 'link')
+        fields = (
+            'id', 'name', 'english_name', 'available', 'slug', 'description', 'image', 'link', 'all_available_codes',
+        )
 
     def get_image(self, obj):
         if obj.image:
             return self.context['request'].build_absolute_uri(obj.image.url)
         else:
             pass
+
+    def get_all_available_codes(self, obj):
+        products = obj.product_company.all()
+        ids = [o.id for o in products if not o.is_expired]
+        products = products.filter(id__in=ids)
+        return products.count()
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
