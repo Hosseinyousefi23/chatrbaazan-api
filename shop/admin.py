@@ -2,7 +2,8 @@ from django.contrib import admin
 # Register your models here.
 from django.utils.safestring import mark_safe
 
-from shop.models import City, Banner, ShopSetting, Product, Category, Company, ProductLabel, ProductGallery, UserProduct
+from shop.models import City, Banner, ShopSetting, Product, Category, Company, ProductLabel, ProductGallery, \
+    UserProduct, Score
 
 
 class UserProductAdmin(admin.ModelAdmin):
@@ -20,6 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     def company_name(self, obj):
         return " ,".join([c.name for c in obj.company.all()])
+
     company_name.short_description = "کمپانی"
 
     def headshot_image(self, obj):
@@ -71,6 +73,10 @@ class BannerAdmin(admin.ModelAdmin):
     readonly_fields = ('headshot_image',)
 
 
+class ScoreAdmin(admin.ModelAdmin):
+    list_display = ('company', 'star',)
+
+
 admin.site.register(City)
 admin.site.register(Banner, BannerAdmin)
 admin.site.register(Product, ProductAdmin)
@@ -81,3 +87,4 @@ admin.site.register(ProductLabel)
 # admin.site.register(Discount)
 admin.site.register(ProductGallery, GalleryAdmin)
 admin.site.register(ShopSetting)
+admin.site.register(Score, ScoreAdmin)
