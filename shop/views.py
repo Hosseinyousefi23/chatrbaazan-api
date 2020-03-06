@@ -12,6 +12,7 @@ from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
 from django.http.response import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
+from rest_framework.generics import CreateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
@@ -23,7 +24,7 @@ from shop.models import City, Banner, Category, Product, Company, UserProduct, F
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, ProductSerializer, \
     UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer, \
-    CompanyDetailSerializer
+    CompanyDetailSerializer, ScoreSerializer
 
 
 def test(request):
@@ -517,3 +518,29 @@ class BestCompanies(APIView, PageNumberPagination):
                 ('results', data),
             ])
         )
+
+
+permission_classes = (AllowAny,)
+allowed_methods = ('GET',)
+
+
+class Score(CreateAPIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET', 'POST')
+    serializer_class = ScoreSerializer
+
+    def get(self, request):
+        company_slug = request.GET.get('company', None)
+        if company_slug:
+            try:
+                company = Company.objects.get(slug=company_slug)
+                stars = company.scores.values_list('star')
+                if len(stars) > 0:
+                    summ = 0
+                    for s in stars:
+                        summ += s[0]
+                    summ /= len(stars)
+                    return CustomJSONRenderer().renderData({'results': summ})
+            except:
+                return CustomJSONRenderer().render404('score', '')
+        return CustomJSONRenderer().render404('score', '')

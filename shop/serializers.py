@@ -5,10 +5,11 @@ from django.db.models.aggregates import Sum
 from django.urls.base import reverse
 from django.utils.text import Truncator
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField, SlugRelatedField
 
 from shop.models import City, Banner, Category, Product, Discount, Company, ShopSetting, ProductLabel, \
     ProductGallery, \
-    UserProduct
+    UserProduct, Score
 
 
 def validate_mobile(mobile):
@@ -394,3 +395,11 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'chatrbazi', 'is_free', 'english_name',
                   'image', 'category', 'label', 'city', 'company', 'slug',
                   'like', 'link', 'file', 'type', 'count')
+
+
+class ScoreSerializer(serializers.ModelSerializer):
+    company = SlugRelatedField(label='شرکت', queryset=Company.objects.all(), slug_field='slug')
+
+    class Meta:
+        model = Score
+        fields = ('company', 'star')

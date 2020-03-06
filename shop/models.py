@@ -10,9 +10,11 @@ from urllib.parse import quote
 import requests
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.message import EmailMessage
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.template.loader import get_template
 from django.utils import timezone
+from rest_framework.compat import MaxValueValidator
 from rest_framework.exceptions import ValidationError
 
 from accounts.models import User
@@ -140,6 +142,18 @@ class Company(models.Model):
     class Meta:
         verbose_name = u'شرکت'
         verbose_name_plural = u'شرکت'
+
+
+class Score(models.Model):
+    class Meta:
+        verbose_name = u'امتیاز'
+        verbose_name_plural = u'امتیاز ها'
+
+    company = models.ForeignKey(Company, related_name='scores', verbose_name='شرکت', on_delete=models.CASCADE)
+    star = models.PositiveSmallIntegerField(verbose_name='ستاره', validators=[MaxValueValidator(5)])
+
+    def __str__(self):
+        return str(self.star)
 
 
 class ProductLabel(models.Model):
