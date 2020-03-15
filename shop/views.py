@@ -52,14 +52,19 @@ class GetCategory(APIView):
     # renderer_classes = (JSONRenderer,)
 
     def get(self, request, format=None, ):
+        new = int(request.GET.get('new', 3))
         categoryData = Category.objects.filter(
             available=True).order_by('order', '-id')
         categoryDataSerializer = CategoryMenuSerializer(
-            categoryData, many=True, context={'request': request}).data
+            categoryData, pop=['all_chatrbazi', 'open_chatrbazi', 'company'], many=True,
+            context={'request': request}).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
         sumChatrbazi = Product.objects.filter(
             Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).aggregate(Sum('chatrbazi'))
+        newCompanies = Company.objects.order_by('-id')[:new]
+        companySerializerData = CompanySerializer(newCompanies, many=True, pop=['description', 'all_available_codes', ],
+                                                  context={'request': request}).data
         # print('sql sum all chatrbaazi: ' , str(sumChatrbazi.query))
         # print('data sum all chatrbaazi', str(sumChatrbazi))
         # if sumChatrbazi.count() > 0:
@@ -67,8 +72,9 @@ class GetCategory(APIView):
         # else:
         #     sumChatrbazi = 0
         return CustomJSONRenderer().render({
-            'data': categoryDataSerializer,
-            'all_chatrbazi': sumChatrbazi['chatrbazi__sum']
+            'categories': categoryDataSerializer,
+            'all_chatrbazi': sumChatrbazi['chatrbazi__sum'],
+            'new_companies': companySerializerData,
         })
 
 
