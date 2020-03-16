@@ -550,3 +550,29 @@ class Score(CreateAPIView):
             except:
                 return CustomJSONRenderer().render404('score', '')
         return CustomJSONRenderer().render404('score', '')
+
+
+class Search(APIView):
+    permission_classes = (AllowAny,)
+    allowed_methods = ('GET',)
+
+    def get(self, request):
+        query = request.GET.get('q', None)
+        keywords = query.split('%') if query else []
+
+        companies = Company.objects.filter(reduce(operator.or_,
+                                                  (Q(english_name__contains=x) | Q(name__contains=x) for x in
+                                                   keywords))).distinct()
+        categories = Category.objects.filter(reduce(operator.or_,
+                                                    (Q(english_name__contains=x) | Q(name__contains=x) for x in
+                                                     keywords))).distinct()
+        labels = ProductLabel.objects.filter(reduce(operator.or_,
+                                                    (Q(name__contains=x) for x in keywords))).distinct()
+
+        return CustomJSONRenderer().render({
+            'categories': CategoryMenuSerializer(categories, pop=['all_chatrbazi', 'open_chatrbazi', 'company'],
+                                                 many=True, context={'request': request***REMOVED***).data,
+            'companies': CompanyDetailSerializer(companies, many=True, pop=['description', 'image', 'product_company'],
+                                                 context={'request': request***REMOVED***).data,
+            'tags': ProductLabelSerializer(labels, many=True, context={'request': request***REMOVED***).data,
+        ***REMOVED***)
