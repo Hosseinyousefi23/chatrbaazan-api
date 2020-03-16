@@ -5,7 +5,7 @@ from django.db.models.aggregates import Sum
 from django.urls.base import reverse
 from django.utils.text import Truncator
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField, SlugRelatedField
+from rest_framework.relations import SlugRelatedField
 
 from shop.models import City, Banner, Category, Product, Discount, Company, ShopSetting, ProductLabel, \
     ProductGallery, \
@@ -191,11 +191,12 @@ class CompanySerializer(serializers.ModelSerializer):
 
 class CompanyDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    all_available_codes = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
         depth = 1
-        fields = ('name', 'slug', 'description', 'image', 'product_company',)
+        fields = ('id', 'name', 'slug', 'description', 'image', 'product_company', 'all_available_codes',)
 
     def get_image(self, obj):
         if obj.image:
@@ -203,11 +204,23 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
         else:
             pass
 
+    def get_all_available_codes(self, obj):
+        products = obj.product_company.all()
+        ids = [o.id for o in products if not o.is_expired]
+        products = products.filter(id__in=ids)
+        return products.count()
+
+    def __init__(self, instance, pop=[], *args, **kwargs):
+        super().__init__(instance, **kwargs)
+
+        for fd in pop:
+            self.fields.pop(fd)
+
 
 class ProductLabelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductLabel
-        fields = ('name', 'available')
+        fields = ('id', 'name', 'available')
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
