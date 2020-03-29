@@ -12,6 +12,7 @@ from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
 from django.http.response import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -24,7 +25,7 @@ from shop.models import City, Banner, Category, Product, Company, UserProduct, F
 from shop.renderers import CustomJSONRenderer
 from shop.serializers import CitySerializer, BannerSerializer, ProductSerializer, \
     UserProductSerializer, CompanySerializer, ShopSettingSerializer, CategoryMenuSerializer, ProductLabelSerializer, \
-    CompanyDetailSerializer, ScoreSerializer
+    CompanyDetailSerializer, ScoreSerializer, CompanyQuerySerializer
 
 
 def test(request):
@@ -136,6 +137,11 @@ class GetOffers(APIView, PageNumberPagination):
     page_size = 20
     max_page_size = 1000
 
+    def __init__(self):
+        super(GetOffers, self).__init__()
+        self.code_count = 0
+        self.offer_count = 0
+
     # renderer_classes = (JSONRenderer,)
     def get_queryset(self, request):
         print("query part")
@@ -227,6 +233,8 @@ class GetOffers(APIView, PageNumberPagination):
         if not expire:
             products = products.filter(
                 Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True))
+        self.code_count = products.filter(type=4).count()
+        self.offer_count = products.count() - self.code_count
         print("return part")
         return self.paginate_queryset(products, self.request)
 
@@ -261,6 +269,8 @@ class GetOffers(APIView, PageNumberPagination):
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
+                ('code_count', self.code_count),
+                ('offer_count', self.offer_count),
                 ('next', self.get_next_link()),
                 ('previous', self.get_previous_link()),
                 ('results', data),
@@ -576,3 +586,51 @@ class Search(APIView):
                                                  context={'request': request}).data,
             'tags': ProductLabelSerializer(labels, many=True, context={'request': request}).data,
         })
+
+
+class Companies(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = CompanyQuerySerializer
+    allowed_methods = ('GET',)
+
+    def get(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = {}
+        query = serializer.validated_data
+        c_id = query.get('id', None)
+        for q in query:
+            if q == 'id':
+                continue
+            size = query[q].get('size', None)
+            if size and isinstance(size, str):
+                if size.isnumeric():
+                    size = int(size)
+                else:
+                    size = None
+            result = self.get_result(request, q, size, c_id)
+            data[q] = result
+        return CustomJSONRenderer().renderData(data)
+
+    def get_result(self, request, query, size=None, c_id=None):
+        companies = None
+        if query == 'latest':
+            companies = Company.objects.order_by('-id')
+        elif query == 'populars':
+            companies = Company.objects.filter(priority__gt=3).order_by('-priority')
+        elif query == 'related':
+            if not c_id:
+                raise ValidationError('id required')
+            company = Company.objects.get(id=c_id)
+            companies = Company.objects.filter(category=company.category)
+        elif query == 'related_populars':
+            if not c_id:
+                raise ValidationError('id required')
+            company = Company.objects.get(id=c_id)
+            companies = Company.objects.filter(category=company.category).filter(priority__gt=3).order_by('-priority')
+        if size:
+            companies = companies[:size]
+        result = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
+            'request': request}).data
+
+        return result

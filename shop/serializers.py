@@ -416,3 +416,30 @@ class ScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Score
         fields = ('company', 'star')
+
+
+# class QuerySerializer(serializers.Serializer):
+#     def create(self, validated_data):
+#         pass
+#
+#     def update(self, instance, validated_data):
+#         pass
+#
+#     size = serializers.IntegerField(required=False)
+
+
+class CompanyQuerySerializer(serializers.Serializer):
+    class Meta:
+        depth = 1
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    id = serializers.IntegerField(required=False)
+    latest = serializers.JSONField(required=False)
+    populars = serializers.JSONField(required=False)
+    related = serializers.JSONField(required=False)
+    related_populars = serializers.JSONField(required=False)

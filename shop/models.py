@@ -200,7 +200,6 @@ class ProductGallery(models.Model):
 
 class Product(models.Model):
     PRIORITY = (
-        (1, u"فعال"),
         (3, u"غیرفعال"),
         (4, u"سطح پایین"),
         (5, u"سطح معمولی"),
@@ -221,7 +220,7 @@ class Product(models.Model):
     discount_code = models.CharField(max_length=300, null=True, blank=True, verbose_name=u"کد تخفیف")
     label = models.ManyToManyField(ProductLabel, related_name="product_label", verbose_name=u"تگ", null=True,
                                    blank=True)
-    priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=1, verbose_name=u"اولویت")
+    priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=5, verbose_name=u"اولویت")
     explanation = models.TextField(blank=True, null=True, verbose_name=u"توضیح")
     expiration_date = models.DateTimeField(blank=True, null=True, verbose_name=u"تاریخ انقضاء")
     city = models.ManyToManyField(City, related_name="product_city", verbose_name=u"شهر", null=True, blank=True)
