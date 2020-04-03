@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 # Create your views here.
 from functools import reduce
 
+from django.core.exceptions import FieldError
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
@@ -603,34 +604,44 @@ class Companies(APIView):
             if q == 'id':
                 continue
             size = query[q].get('size', None)
+            order = query[q].get('order', None)
+            if order and type(order) == str:
+                order = [order]
+            if order and type(order) != list:
+                raise ValidationError(q + ': order is not a string or list')
             if size and isinstance(size, str):
                 if size.isnumeric():
                     size = int(size)
                 else:
                     size = None
-            result = self.get_result(request, q, size, c_id)
+            result = self.get_result(request, q, size, order, c_id)
             data[q] = result
         return CustomJSONRenderer().renderData(data)
 
-    def get_result(self, request, query, size=None, c_id=None):
+    def get_result(self, request, query, size=None, order=None, c_id=None):
         companies = None
-        if query == 'latest':
-            companies = Company.objects.order_by('-id')
-        elif query == 'populars':
-            companies = Company.objects.filter(priority__gt=3).order_by('-priority')
-        elif query == 'related':
-            if not c_id:
-                raise ValidationError('id required')
-            company = Company.objects.get(id=c_id)
-            companies = Company.objects.filter(category=company.category)
-        elif query == 'related_populars':
-            if not c_id:
-                raise ValidationError('id required')
-            company = Company.objects.get(id=c_id)
-            companies = Company.objects.filter(category=company.category).filter(priority__gt=3).order_by('-priority')
-        if size:
-            companies = companies[:size]
-        result = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
-            'request': request}).data
+        try:
+            if query == 'latest':
+                companies = Company.objects.order_by('-id', *order)
+            elif query == 'populars':
+                companies = Company.objects.filter(priority__gt=3).order_by('-priority', *order)
+            elif query == 'related':
+                if not c_id:
+                    raise ValidationError('id required')
+                company = Company.objects.get(id=c_id)
+                companies = Company.objects.filter(category=company.category).order_by(*order)
+            elif query == 'related_populars':
+                if not c_id:
+                    raise ValidationError('id required')
+                company = Company.objects.get(id=c_id)
+                companies = Company.objects.filter(category=company.category).filter(priority__gt=3).order_by(
+                    '-priority',
+                    *order)
+            if size:
+                companies = companies[:size]
+            result = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
+                'request': request}).data
+        except FieldError as e:
+            raise ValidationError(e)
 
         return result

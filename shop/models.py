@@ -277,7 +277,8 @@ class Product(models.Model):
         if self.expiration_date:
             return self.expiration_date < now
         else:
-            return self.created_at < now - timedelta(6 * 365 / 12)
+            return False
+            # return self.created_at < now - timedelta(6 * 365 / 12)
 
     def __str__(self):
         return str(self.name)
