@@ -583,7 +583,7 @@ class Search(APIView):
         return CustomJSONRenderer().render({
             'categories': CategoryMenuSerializer(categories, pop=['all_chatrbazi', 'open_chatrbazi', 'company'],
                                                  many=True, context={'request': request}).data,
-            'companies': CompanyDetailSerializer(companies, many=True, pop=['description', 'image', 'product_company'],
+            'companies': CompanyDetailSerializer(companies, many=True, pop=['description', 'product_company'],
                                                  context={'request': request}).data,
             'tags': ProductLabelSerializer(labels, many=True, context={'request': request}).data,
         })
