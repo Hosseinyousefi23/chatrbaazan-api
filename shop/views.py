@@ -569,6 +569,8 @@ class Search(APIView):
 
     def get(self, request):
         query = request.GET.get('q', None)
+        if query is None:
+            raise ValidationError('q required')
         keywords = query.split('%') if query else []
 
         companies = Company.objects.filter(reduce(operator.or_,
