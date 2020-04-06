@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'rest_framework.authtoken',
+    'django_cleanup.apps.CleanupConfig',
 
 ]
 # CKEDITOR_BASEPATH = "/public/assets/ckeditor/ckeditor"
