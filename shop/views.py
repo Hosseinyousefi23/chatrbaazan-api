@@ -609,7 +609,7 @@ class Companies(APIView):
             if q == 'id':
                 continue
             size = query[q].get('size', None)
-            order = query[q].get('order', None)
+            order = query[q].get('order', [])
             if order and type(order) == str:
                 order = [order]
             if order and type(order) != list:
