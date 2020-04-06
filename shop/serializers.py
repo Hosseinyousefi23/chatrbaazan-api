@@ -196,7 +196,8 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         depth = 1
-        fields = ('id', 'name', 'slug', 'description', 'image', 'product_company', 'all_available_codes',)
+        fields = (
+            'id', 'name', 'english_name', 'slug', 'description', 'image', 'product_company', 'all_available_codes',)
 
     def get_image(self, obj):
         if obj.image:
