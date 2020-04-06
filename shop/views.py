@@ -1,6 +1,7 @@
 # Create your views here.
 import operator
 import random
+import re
 import uuid
 from collections import OrderedDict
 from datetime import datetime, timedelta
@@ -571,16 +572,18 @@ class Search(APIView):
         query = request.GET.get('q', None)
         if query is None:
             raise ValidationError('q required')
-        keywords = query.split('%') if query else []
+        half_space = '‌'
+        b = half_space + '|' + ' '
+        keywords = re.split(b, query) if query else[]
 
         companies = Company.objects.filter(reduce(operator.or_,
-                                                  (Q(english_name__contains=x) | Q(name__contains=x) for x in
+                                                  (Q(english_name__icontains=x) | Q(name__icontains=x) for x in
                                                    keywords))).distinct()
         categories = Category.objects.filter(reduce(operator.or_,
-                                                    (Q(english_name__contains=x) | Q(name__contains=x) for x in
+                                                    (Q(english_name__icontains=x) | Q(name__icontains=x) for x in
                                                      keywords))).distinct()
         labels = ProductLabel.objects.filter(reduce(operator.or_,
-                                                    (Q(name__contains=x) for x in keywords))).distinct()
+                                                    (Q(name__icontains=x) for x in keywords))).distinct()
 
         return CustomJSONRenderer().render({
             'categories': CategoryMenuSerializer(categories, pop=['all_chatrbazi', 'open_chatrbazi', 'company'],
