@@ -606,7 +606,7 @@ class Companies(APIView):
         query = serializer.validated_data
         c_id = query.get('id', None)
         for q in query:
-            if q == 'id':
+            if q == 'id' or query[q] is None:
                 continue
             size = query[q].get('size', None)
             order = query[q].get('order', [])
