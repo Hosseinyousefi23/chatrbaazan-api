@@ -15,10 +15,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='banner',
-            options={'verbose_name': 'بنر', 'verbose_name_plural': 'بنر'***REMOVED***,
+            options={'verbose_name': 'بنر', 'verbose_name_plural': 'بنر'},
         ),
         migrations.AlterModelOptions(
             name='transaction',
-            options={'verbose_name': 'بنر', 'verbose_name_plural': 'بنر'***REMOVED***,
+            options={'verbose_name': 'بنر', 'verbose_name_plural': 'بنر'},
         ),
     ]

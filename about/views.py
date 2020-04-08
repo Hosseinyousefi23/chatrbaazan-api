@@ -22,6 +22,6 @@ class AboutView(APIView):
         about = About.objects.filter(status=1).first()
         if about:
             return CustomJSONRenderer().renderData(
-                AboutSerializer(about, many=False, context={'request': request***REMOVED***).data)
+                AboutSerializer(about, many=False, context={'request': request}).data)
         else:
             return CustomJSONRenderer().renderData([])

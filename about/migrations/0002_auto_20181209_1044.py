@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='about',
-            options={'verbose_name': 'درباره ما', 'verbose_name_plural': 'درباره ما'***REMOVED***,
+            options={'verbose_name': 'درباره ما', 'verbose_name_plural': 'درباره ما'},
         ),
     ]

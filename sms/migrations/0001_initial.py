@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'سرویس اشتراک پیامک',
                 'verbose_name_plural': 'سرویس اشتراک پیامک',
-            ***REMOVED***,
+            },
         ),
         migrations.CreateModel(
             name='SmsLog',
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'گزارش دهی سرویس پیامک',
                 'verbose_name_plural': 'گزارش دهی سرویس پیامک',
-            ***REMOVED***,
+            },
         ),
         migrations.CreateModel(
             name='SmsUser',
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'اشتراک پیامک کاربر',
                 'verbose_name_plural': 'اشتراک پیامک کاربر',
-            ***REMOVED***,
+            },
         ),
         migrations.AddField(
             model_name='smslog',

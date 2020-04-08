@@ -1,2 +1,2 @@
-{% load i18n %***REMOVED***
-{% blocktrans %***REMOVED***You have signed out.{% endblocktrans %***REMOVED***
+{% load i18n %}
+{% blocktrans %}You have signed out.{% endblocktrans %}

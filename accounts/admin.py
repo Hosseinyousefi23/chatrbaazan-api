@@ -56,7 +56,7 @@ class MyUserAdmin(admin.ModelAdmin):
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
                 'name': self.model._meta.verbose_name,
                 'key': escape(id),
-            ***REMOVED***)
+            })
         if request.method == 'POST':
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
@@ -79,8 +79,8 @@ class MyUserAdmin(admin.ModelAdmin):
         else:
             form = self.change_password_form(user)
 
-        fieldsets = [(None, {'fields': list(form.base_fields)***REMOVED***)]
-        adminForm = admin.helpers.AdminForm(form, fieldsets, {***REMOVED***)
+        fieldsets = [(None, {'fields': list(form.base_fields)})]
+        adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
             'title': _('Change password: %s') % escape(user.get_username()),
@@ -99,7 +99,7 @@ class MyUserAdmin(admin.ModelAdmin):
             'save_as': False,
             'show_save': True,
             **self.admin_site.each_context(request),
-        ***REMOVED***
+        }
 
         request.current_app = self.admin_site.name
 

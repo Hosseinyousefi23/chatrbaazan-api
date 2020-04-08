@@ -1,23 +1,23 @@
-{% extends "account/base.html" %***REMOVED***
+{% extends "account/base.html" %}
 
-{% load i18n %***REMOVED***
+{% load i18n %}
 
-{% block head_title %***REMOVED***{% trans "Verify Your E-mail Address" %***REMOVED***{% endblock %***REMOVED***
+{% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
 
-{% block content %***REMOVED***
-<h1>{% trans "Verify Your E-mail Address" %***REMOVED***</h1>
+{% block content %}
+<h1>{% trans "Verify Your E-mail Address" %}</h1>
 
-{% url 'account_email' as email_url %***REMOVED***
+{% url 'account_email' as email_url %}
 
-<p>{% blocktrans %***REMOVED***This part of the site requires us to verify that
+<p>{% blocktrans %}This part of the site requires us to verify that
 you are who you claim to be. For this purpose, we require that you
-verify ownership of your e-mail address. {% endblocktrans %***REMOVED***</p>
+verify ownership of your e-mail address. {% endblocktrans %}</p>
 
-<p>{% blocktrans %***REMOVED***We have sent an e-mail to you for
+<p>{% blocktrans %}We have sent an e-mail to you for
 verification. Please click on the link inside this e-mail. Please
-contact us if you do not receive it within a few minutes.{% endblocktrans %***REMOVED***</p>
+contact us if you do not receive it within a few minutes.{% endblocktrans %}</p>
 
-<p>{% blocktrans %***REMOVED***<strong>Note:</strong> you can still <a href="{{ email_url ***REMOVED******REMOVED***">change your e-mail address</a>.{% endblocktrans %***REMOVED***</p>
+<p>{% blocktrans %}<strong>Note:</strong> you can still <a href="{{ email_url }}">change your e-mail address</a>.{% endblocktrans %}</p>
 
 
-{% endblock %***REMOVED***
+{% endblock %}

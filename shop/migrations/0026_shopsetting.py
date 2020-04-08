@@ -25,6 +25,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'تنظمیات فروشگاه',
                 'verbose_name_plural': 'تنظیمات فروشگاه',
-            ***REMOVED***,
+            },
         ),
     ]

@@ -25,7 +25,7 @@ class ProductAdmin(admin.ModelAdmin):
     company_name.short_description = "کمپانی"
 
     def headshot_image(self, obj):
-        return mark_safe('<img src="{url***REMOVED***" width="{width***REMOVED***" height={height***REMOVED*** />'.format(
+        return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.image.url,
             width=150,
             height=150,
@@ -39,7 +39,7 @@ class CompanyAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
     def headshot_image(self, obj):
-        return mark_safe('<img src="{url***REMOVED***" width="{width***REMOVED***" height={height***REMOVED*** />'.format(
+        return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.image.url,
             width=150,
             height=150,
@@ -51,7 +51,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
 class GalleryAdmin(admin.ModelAdmin):
     def headshot_image(self, obj):
-        return mark_safe('<img src="{url***REMOVED***" width="{width***REMOVED***" height={height***REMOVED*** />'.format(
+        return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.image.url,
             width=150,
             height=150,
@@ -63,7 +63,7 @@ class GalleryAdmin(admin.ModelAdmin):
 
 class BannerAdmin(admin.ModelAdmin):
     def headshot_image(self, obj):
-        return mark_safe('<img src="{url***REMOVED***" width="{width***REMOVED***" height={height***REMOVED*** />'.format(
+        return mark_safe('<img src="{url}" width="{width}" height={height} />'.format(
             url=obj.image.url,
             width=150,
             height=150,

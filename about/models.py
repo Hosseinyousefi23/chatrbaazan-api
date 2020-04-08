@@ -28,4 +28,4 @@ class About(models.Model):
         verbose_name = u"درباره ما"
 
     def __str__(self):
-        return 'متن {***REMOVED*** صفحه درباره ما'.format(self.pk)
+        return 'متن {} صفحه درباره ما'.format(self.pk)

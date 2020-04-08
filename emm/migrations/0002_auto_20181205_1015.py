@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='emailemm',
-            options={'verbose_name': 'ایمیل مارکتینگ', 'verbose_name_plural': 'ایمیل مارکتینگ'***REMOVED***,
+            options={'verbose_name': 'ایمیل مارکتینگ', 'verbose_name_plural': 'ایمیل مارکتینگ'},
         ),
         migrations.AlterModelOptions(
             name='emaillog',
-            options={'verbose_name': 'ایمیل های داخل صف', 'verbose_name_plural': 'ایمیل های داخل صف'***REMOVED***,
+            options={'verbose_name': 'ایمیل های داخل صف', 'verbose_name_plural': 'ایمیل های داخل صف'},
         ),
         migrations.AddField(
             model_name='emailemm',

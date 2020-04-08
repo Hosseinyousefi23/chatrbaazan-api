@@ -36,7 +36,7 @@ class SmsView(mixins.CreateModelMixin,
         validate_phone(request.POST.get('phone', ''))
         smsUser = SmsUser.objects.filter(phone=request.POST.get('phone'))
         if smsUser.filter(status=1):
-            return CustomJSONRenderer().render({'phone': 'شماره شما قبلا ثبت گردیده است'***REMOVED***, status=400)
+            return CustomJSONRenderer().render({'phone': 'شماره شما قبلا ثبت گردیده است'}, status=400)
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -49,7 +49,7 @@ class SmsView(mixins.CreateModelMixin,
             time_app = sms_user.send_at + timedelta(minutes=5)
 
             if now.replace(tzinfo=None) < time_app.replace(tzinfo=None):
-                return CustomJSONRenderer().render({'message': 'لطفا بعد از 5 دقیقه دیگر تلاش مجدد برای ارسال پیامک نمایید.'***REMOVED***, status=400)
+                return CustomJSONRenderer().render({'message': 'لطفا بعد از 5 دقیقه دیگر تلاش مجدد برای ارسال پیامک نمایید.'}, status=400)
 
         send_verification_sms(request.user, request, mobile=request.POST.get(
             'phone'), verify_code=code_verify)
@@ -63,18 +63,18 @@ class SmsView(mixins.CreateModelMixin,
         validate_phone(phone)
         code_verify = request.POST.get('code_verify', None)
         if code_verify is None:
-            return CustomJSONRenderer().render({'code': 'required'***REMOVED***, status=400)
+            return CustomJSONRenderer().render({'code': 'required'}, status=400)
         smsUser = SmsUser.objects.filter(phone=phone).filter(status=2)
         if smsUser:
             smsUser = smsUser.first()
             if smsUser.active_at and smsUser.status == 1:
-                return CustomJSONRenderer().render({'message': 'شماره همراه قبلا فعال شده است'***REMOVED***, status=401)
+                return CustomJSONRenderer().render({'message': 'شماره همراه قبلا فعال شده است'}, status=401)
             if smsUser.code_verify == code_verify:
                 SmsUser.objects.filter(pk=smsUser.pk).update(
                     active_at=datetime.now(), status=1)
-                return CustomJSONRenderer().render({'success': True***REMOVED***, status=200)
+                return CustomJSONRenderer().render({'success': True}, status=200)
             else:
-                return CustomJSONRenderer().render({'message': 'کد تاییدیه درست نمی باشد.'***REMOVED***, status=400)
+                return CustomJSONRenderer().render({'message': 'کد تاییدیه درست نمی باشد.'}, status=400)
         else:
             return CustomJSONRenderer().render404('sms', '')
 
@@ -91,7 +91,7 @@ class ReSendSmsView(APIView):
 
         smsUser = smsUser.first()
         if smsUser.active_at and smsUser.status == 1:
-            return CustomJSONRenderer().render({'message': 'شماره شما قبلا در سیستم فعال شده است.'***REMOVED***, status=400)
+            return CustomJSONRenderer().render({'message': 'شماره شما قبلا در سیستم فعال شده است.'}, status=400)
         now = datetime.now()
         time_app = smsUser.send_at + timedelta(minutes=5)
 
@@ -101,6 +101,6 @@ class ReSendSmsView(APIView):
                                   mobile=phone, verify_code=code_verify)
             SmsUser.objects.filter(pk=smsUser.pk).update(code_verify=code_verify, send_at=datetime.now(),
                                                          active_at=None)
-            return CustomJSONRenderer().render({'success': True***REMOVED***)
+            return CustomJSONRenderer().render({'success': True})
         else:
-            return CustomJSONRenderer().render({'message': 'لطفا بعد از 5 دقیقه دیگر تلاش مجدد برای ارسال پیامک نمایید.'***REMOVED***, status=400)
+            return CustomJSONRenderer().render({'message': 'لطفا بعد از 5 دقیقه دیگر تلاش مجدد برای ارسال پیامک نمایید.'}, status=400)

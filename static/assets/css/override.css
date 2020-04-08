@@ -4,7 +4,7 @@
     url('../fonts/iranyekanweblight.woff2') format('woff2'),
     url('../fonts/iranyekanweblight.woff') format('woff'),
     url('../fonts/iranyekanweblight.eot') format('eot');
-***REMOVED***
+}
 
 * {
     outline: none;
@@ -15,7 +15,7 @@
     -ms-user-select: none;
     user-select: none;
     font-family: iranyekan;
-***REMOVED***
+}
 
 /* Fix bug input in safari */
 input {
@@ -23,16 +23,16 @@ input {
     -webkit-user-select: auto !important;
     -ms-user-select: auto !important;
     user-select: auto !important;
-***REMOVED***
+}
 
 input[type="text"], input[type="email"], textarea, input[type="password"], input[type="url"], input[type="number"], textarea, select, .vTextField {
     direction: rtl !important;
-***REMOVED***
+}
 
 /*.form-row label{*/
 /*float: right;*/
 /*direction: rtl;*/
-/****REMOVED****/
+/*}*/
 /*.select2-container--jet {*/
 /*float: right;*/
-/****REMOVED****/
+/*}*/

@@ -11,7 +11,7 @@ def send_verification_sms(user, request=None, text=None, mobile=None, verify_cod
     """
     url_post = 'http://smspanel.Trez.ir/SendMessageWithPost.ashx'
     if text is None:
-        text = "کد تاییدیه:{***REMOVED*** با تشکر چتربازان".format(verify_code)
+        text = "کد تاییدیه:{} با تشکر چتربازان".format(verify_code)
     params = {
         'UserName': 'Vahidsaadat1',
         'Password': 'vma#123',
@@ -19,7 +19,7 @@ def send_verification_sms(user, request=None, text=None, mobile=None, verify_cod
         'MessageBody': text,
         'RecNumber': mobile,
         'Smsclass': '1',
-    ***REMOVED***
+    }
 
     r = requests.post(url_post, data=params)
     print(r.url)

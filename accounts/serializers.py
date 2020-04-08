@@ -39,17 +39,17 @@ UserModel = get_user_model()
 class RegisterSerializerCustom(serializers.Serializer):
     email = serializers.EmailField(required=True, error_messages={
                                    'blank': 'لطفا ایمیل خود را وارد نمایید.',
-                                   'invalid': 'لطفا ایمیل خود را صحیح وارد نمایید.'***REMOVED***)
+                                   'invalid': 'لطفا ایمیل خود را صحیح وارد نمایید.'})
     first_name = serializers.CharField(required=True, write_only=True, error_messages={
-                                       'blank': 'لطفا نام خود را وارد نمایید.'***REMOVED***)
+                                       'blank': 'لطفا نام خود را وارد نمایید.'})
     last_name = serializers.CharField(required=True, write_only=True, error_messages={
-                                      'blank': '‌لطفا نام خانوادگی خود را وارد نمایید.'***REMOVED***)
+                                      'blank': '‌لطفا نام خانوادگی خود را وارد نمایید.'})
     mobile = serializers.CharField(required=True, write_only=True, error_messages={
-        'blank': '‌لطفا تلفن همراه خود را وارد نمایید.'***REMOVED***)
+        'blank': '‌لطفا تلفن همراه خود را وارد نمایید.'})
     password1 = serializers.CharField(required=True, write_only=True, error_messages={
-                                      'blank': 'لطفا گذرواژه خود را وارد نمایید'***REMOVED***)
+                                      'blank': 'لطفا گذرواژه خود را وارد نمایید'})
     password2 = serializers.CharField(required=True, write_only=True, error_messages={
-                                      'blank': '‌لطفا تکرار گذرواژه خود را وارد نمایید.'***REMOVED***)
+                                      'blank': '‌لطفا تکرار گذرواژه خود را وارد نمایید.'})
 
     # def validate_email(self, email):
     #     email = CustomUserAccountAdapter().clean_email(email)
@@ -100,7 +100,7 @@ class RegisterSerializerCustom(serializers.Serializer):
             'mobile': self.validated_data.get('address', ''),
             'password1': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', ''),
-        ***REMOVED***
+        }
 
     def save(self, request):
         adapter = CustomUserAccountAdapter()
@@ -150,9 +150,9 @@ class UserSendCodeSerializer(serializers.ModelSerializer):
         model = UserSendCode
         fields = '__all__'
         extra_kwargs = {
-            'user': {'write_only': True***REMOVED***,
-            'status': {'write_only': True***REMOVED***
-        ***REMOVED***
+            'user': {'write_only': True},
+            'status': {'write_only': True}
+        }
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
@@ -164,17 +164,17 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('password_old', 'password_1', 'password_2')
         extra_kwargs = {
-            'password': {'write_only': True***REMOVED***
-        ***REMOVED***
+            'password': {'write_only': True}
+        }
 
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(error_messages={
                                    'blank': 'لطفا ایمیل خود را وارد نمایید',
-                                   'invalid':'لطفا ایمیل خود را صحیح وارد نمایید'***REMOVED***, required=False, allow_blank=True)
+                                   'invalid':'لطفا ایمیل خود را صحیح وارد نمایید'}, required=False, allow_blank=True)
     password = serializers.CharField(error_messages={
-                                     'blank': 'لطفا گذرواژه خود را وارد نمایید'***REMOVED***, style={'input_type': 'password'***REMOVED***)
+                                     'blank': 'لطفا گذرواژه خود را وارد نمایید'}, style={'input_type': 'password'})
 
     def _validate_email(self, email, password):
         user = None
@@ -272,13 +272,13 @@ class PasswordResetSerializer(serializers.Serializer):
     """
     email = serializers.EmailField(error_messages={
         'blank': 'لطفا ایمیل خود را وارد نمایید.'
-    ***REMOVED***)
+    })
 
     password_reset_form_class = PasswordResetForm
 
     def get_email_options(self):
         """Override this method to change default e-mail options"""
-        return {***REMOVED***
+        return {}
 
     def validate_email(self, value):
         # Create PasswordResetForm with the serializer
@@ -296,7 +296,7 @@ class PasswordResetSerializer(serializers.Serializer):
             'use_https': request.is_secure(),
             'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
             'request': request,
-        ***REMOVED***
+        }
 
         opts.update(self.get_email_options())
         self.reset_form.save(**opts)
@@ -307,9 +307,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     Serializer for requesting a password reset e-mail.
     """
     new_password1 = serializers.CharField(
-        error_messages={'blank': 'لطفا گذرواژه خود را وارد نمایید'***REMOVED***, max_length=128)
+        error_messages={'blank': 'لطفا گذرواژه خود را وارد نمایید'}, max_length=128)
     new_password2 = serializers.CharField(
-        error_messages={'blank': 'لطفا گذرواژه خود را مجددا وارد نمایید'***REMOVED***, max_length=128)
+        error_messages={'blank': 'لطفا گذرواژه خود را مجددا وارد نمایید'}, max_length=128)
     uid = serializers.CharField()
     token = serializers.CharField()
 
@@ -322,7 +322,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         pass
 
     def validate(self, attrs):
-        self._errors = {***REMOVED***
+        self._errors = {}
         password1 = attrs['new_password1']
         password2 = attrs['new_password2']
         print('password1', password1)
@@ -330,13 +330,13 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if password1 != password2:
             print('ey joon')
             raise ValidationError(
-                {'new_password2': ['گذرواژه ها یکسان نمی باشند.']***REMOVED***)
+                {'new_password2': ['گذرواژه ها یکسان نمی باشند.']})
         # Decode the uidb64 to uid to get User object
         try:
             uid = force_text(uid_decoder(attrs['uid']))
             self.user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
-            raise ValidationError({'uid': ['Invalid value']***REMOVED***)
+            raise ValidationError({'uid': ['Invalid value']})
 
         self.custom_validation(attrs)
         # Construct SetPasswordForm instance
@@ -346,7 +346,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         if not self.set_password_form.is_valid():
             raise serializers.ValidationError(self.set_password_form.errors)
         if not default_token_generator.check_token(self.user, attrs['token']):
-            raise ValidationError({'token': ['Invalid value']***REMOVED***)
+            raise ValidationError({'token': ['Invalid value']})
 
         return attrs
 

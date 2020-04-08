@@ -12,22 +12,22 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='category',
-            options={'verbose_name': 'دسته بندی', 'verbose_name_plural': 'دسته بندی'***REMOVED***,
+            options={'verbose_name': 'دسته بندی', 'verbose_name_plural': 'دسته بندی'},
         ),
         migrations.AlterModelOptions(
             name='company',
-            options={'verbose_name': 'شرکت', 'verbose_name_plural': 'شرکت'***REMOVED***,
+            options={'verbose_name': 'شرکت', 'verbose_name_plural': 'شرکت'},
         ),
         migrations.AlterModelOptions(
             name='product',
-            options={'verbose_name': 'کد تخفیف', 'verbose_name_plural': 'کد تخفیف'***REMOVED***,
+            options={'verbose_name': 'کد تخفیف', 'verbose_name_plural': 'کد تخفیف'},
         ),
         migrations.AlterModelOptions(
             name='productgallery',
-            options={'verbose_name': 'گالری', 'verbose_name_plural': 'گالری'***REMOVED***,
+            options={'verbose_name': 'گالری', 'verbose_name_plural': 'گالری'},
         ),
         migrations.AlterModelOptions(
             name='productlabel',
-            options={'verbose_name': 'تگ ها', 'verbose_name_plural': 'تگ ها'***REMOVED***,
+            options={'verbose_name': 'تگ ها', 'verbose_name_plural': 'تگ ها'},
         ),
     ]

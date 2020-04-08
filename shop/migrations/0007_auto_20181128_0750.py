@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'کدتخفیف',
                 'verbose_name_plural': 'کد تخفیف',
-            ***REMOVED***,
+            },
         ),
         migrations.AddField(
             model_name='product',

@@ -31,7 +31,7 @@ class Command(BaseCommand):
                     'MessageBody': strip_tags(key.sms.text),
                     'RecNumber': key.mobile,
                     'Smsclass': '1',
-                ***REMOVED***
+                }
 
                 r = requests.post(url_post, data=params)
                 print(r.url)

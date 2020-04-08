@@ -81,40 +81,40 @@ CKEDITOR_CONFIGS = {
         ],
         'toolbar_YourCustomToolbarConfig': [
             {'name': 'document', 'items': [
-                'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']***REMOVED***,
+                'Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']},
             {'name': 'clipboard', 'items': [
-                'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']***REMOVED***,
+                'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
             {'name': 'editing', 'items': [
-                'Find', 'Replace', '-', 'SelectAll']***REMOVED***,
+                'Find', 'Replace', '-', 'SelectAll']},
             {'name': 'forms',
              'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
-                       'HiddenField']***REMOVED***,
+                       'HiddenField']},
             '/',
             {'name': 'basicstyles',
-             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']***REMOVED***,
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']},
             {'name': 'paragraph',
              'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
                        'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl',
-                       'Language']***REMOVED***,
-            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']***REMOVED***,
+                       'Language']},
+            {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
             {'name': 'insert',
-             'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']***REMOVED***,
+             'items': ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']},
             '/',
             {'name': 'styles', 'items': [
-                'Styles', 'Format', 'Font', 'FontSize']***REMOVED***,
-            {'name': 'colors', 'items': ['TextColor', 'BGColor']***REMOVED***,
-            {'name': 'tools', 'items': ['Maximize', 'ShowBlocks']***REMOVED***,
-            {'name': 'about', 'items': ['About']***REMOVED***,
+                'Styles', 'Format', 'Font', 'FontSize']},
+            {'name': 'colors', 'items': ['TextColor', 'BGColor']},
+            {'name': 'tools', 'items': ['Maximize', 'ShowBlocks']},
+            {'name': 'about', 'items': ['About']},
             '/',  # put this to force next toolbar on new line
             {'name': 'yourcustomtools', 'items': [
                 # put the name of your editor.ui.addButton here
                 'Preview',
                 'Maximize',
 
-            ]***REMOVED***,
+            ]},
         ],
         'toolbar': 'YourCustomToolbarConfig',  # put selected toolbar config here
-        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] ***REMOVED***],
+        # 'toolbarGroups': [{ 'name': 'document', 'groups': [ 'mode', 'document', 'doctools' ] }],
         # 'height': 291,
         # 'width': '100%',
         # 'filebrowserWindowHeight': 725,
@@ -138,8 +138,8 @@ CKEDITOR_CONFIGS = {
             'dialogui',
             'elementspath'
         ]),
-    ***REMOVED***
-***REMOVED***
+    }
+}
 # end config edit
 LOGIN_REDIRECT_URL = "/"
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -172,8 +172,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-        ***REMOVED***,
-    ***REMOVED***,
+        },
+    },
 ]
 
 WSGI_APPLICATION = 'chatrbaazan.wsgi.application'
@@ -185,8 +185,8 @@ SITE_ID = 1
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     ***REMOVED***
-# ***REMOVED***
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -195,8 +195,8 @@ DATABASES = {
         'PASSWORD': ENV['PASSWORDDB'],
         'HOST': ENV['HOST'],
         'PORT': ENV['PORT'],
-    ***REMOVED***
-***REMOVED***
+    }
+}
 # Configure the JWTs to expire after 1 hour, and allow users to refresh near-expiration tokens
 JWT_AUTH = {
 
@@ -205,7 +205,7 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3000),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 
-***REMOVED***
+}
 
 # Enables django-rest-auth to use JWT tokens instead of regular tokens.
 
@@ -215,16 +215,16 @@ JWT_AUTH = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    ***REMOVED***,
+    },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    ***REMOVED***,
+    },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    ***REMOVED***,
+    },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    ***REMOVED***,
+    },
 ]
 
 # Internationalization
@@ -273,18 +273,18 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
-***REMOVED***
+}
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.RegisterSerializerCustom',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
-***REMOVED***
+}
 LOGIN_SERIALIZER = 'accounts.serializers.LoginSerializer',
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
     'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
-***REMOVED***
+}
 REST_AUTH_REGISTER_PERMISSION_CLASSES = (
     ('accounts.permissions.AllowAnyAnonymous'),
 )
@@ -303,32 +303,32 @@ JET_THEMES = [
         'theme': 'default',  # theme folder name
         'color': '#47bac1',  # color of the theme's button in user menu
         'title': 'Default'  # theme title
-    ***REMOVED***,
+    },
     {
         'theme': 'green',
         'color': '#44b78b',
         'title': 'Green'
-    ***REMOVED***,
+    },
     {
         'theme': 'light-green',
         'color': '#2faa60',
         'title': 'Light Green'
-    ***REMOVED***,
+    },
     {
         'theme': 'light-violet',
         'color': '#a464c4',
         'title': 'Light Violet'
-    ***REMOVED***,
+    },
     {
         'theme': 'light-blue',
         'color': '#5EADDE',
         'title': 'Light Blue'
-    ***REMOVED***,
+    },
     {
         'theme': 'light-gray',
         'color': '#222',
         'title': 'Light Gray'
-    ***REMOVED***
+    }
 ]
 '''
 Adds buttons to change forms that allows you to navigate to previous/next 

@@ -60,14 +60,14 @@ class GetCategory(APIView):
             available=True).order_by('order', '-id')
         categoryDataSerializer = CategoryMenuSerializer(
             categoryData, pop=['all_chatrbazi', 'open_chatrbazi', 'company'], many=True,
-            context={'request': request***REMOVED***).data
+            context={'request': request}).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
         sumChatrbazi = Product.objects.filter(
             Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).aggregate(Sum('chatrbazi'))
         newCompanies = Company.objects.order_by('-id')[:new]
         companySerializerData = CompanySerializer(newCompanies, many=True, pop=['description', 'all_available_codes', ],
-                                                  context={'request': request***REMOVED***).data
+                                                  context={'request': request}).data
         # print('sql sum all chatrbaazi: ' , str(sumChatrbazi.query))
         # print('data sum all chatrbaazi', str(sumChatrbazi))
         # if sumChatrbazi.count() > 0:
@@ -78,7 +78,7 @@ class GetCategory(APIView):
             'categories': categoryDataSerializer,
             'all_chatrbazi': sumChatrbazi['chatrbazi__sum'],
             'new_companies': companySerializerData,
-        ***REMOVED***)
+        })
 
 
 class GetCity(APIView):
@@ -103,7 +103,7 @@ class GetBanner(APIView):
         bannerData = Banner.objects.filter(available=True).filter(
             Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).order_by('-location')[:10]
         data = BannerSerializer(bannerData, many=True, context={
-            'request': request***REMOVED***).data
+            'request': request}).data
         return CustomJSONRenderer().renderData(data)
 
 
@@ -122,7 +122,7 @@ class GetUserProduct(APIView, PageNumberPagination):
     def get(self, request, format=None, ):
         userData = self.get_queryset(request)
         data = UserProductSerializer(userData, many=True, context={
-            'request': request***REMOVED***).data
+            'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
@@ -267,7 +267,7 @@ class GetOffers(APIView, PageNumberPagination):
             if company.count() > 0:
                 dataCompany = company.first()
         data = ProductSerializer(products, many=True, pop=['explanation_short', 'file', 'gallery', 'like'], context={
-            'request': request***REMOVED***).data
+            'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('count', self.page.paginator.count),
@@ -277,7 +277,7 @@ class GetOffers(APIView, PageNumberPagination):
                 ('previous', self.get_previous_link()),
                 ('results', data),
                 ('dataCompany',
-                 CompanySerializer(dataCompany, many=False, context={'request': request***REMOVED***,
+                 CompanySerializer(dataCompany, many=False, context={'request': request},
                                    pop=['available']).data if dataCompany else None),
                 ('category', category_frontend_name)
             ])
@@ -293,7 +293,7 @@ class GetOffer(APIView, PageNumberPagination):
         if not product.exists():
             return CustomJSONRenderer().render400()
         return CustomJSONRenderer().renderData(
-            ProductSerializer(product.first(), context={'request': request***REMOVED***, many=False).data)
+            ProductSerializer(product.first(), context={'request': request}, many=False).data)
 
 
 class FailureOffer(APIView):
@@ -307,7 +307,7 @@ class FailureOffer(APIView):
 
         print(str(vars(request.session)))
         if 'uuid_failure' in request.session:
-            return CustomJSONRenderer().render({'message': 'گزارش توسط شما قبلا ارسال شده است'***REMOVED***, status=400)
+            return CustomJSONRenderer().render({'message': 'گزارش توسط شما قبلا ارسال شده است'}, status=400)
         if not request.user.is_anonymous:
             user = request.user
         else:
@@ -319,7 +319,7 @@ class FailureOffer(APIView):
                                user=user,
                                uuid=uuid_failure)
         product.update(failure=F('failure') + 1)
-        return CustomJSONRenderer().render({'success': True***REMOVED***, 200)
+        return CustomJSONRenderer().render({'success': True}, 200)
 
 
 class SettingView(APIView):
@@ -343,7 +343,7 @@ class GetCompanies(APIView):
         else:
             Companies = None
         return CustomJSONRenderer().renderData(
-            CompanySerializer(Companies, many=True, context={'request': request***REMOVED***).data)
+            CompanySerializer(Companies, many=True, context={'request': request}).data)
 
 
 def convert_to_int(number):
@@ -470,14 +470,14 @@ class LabelViews(APIView, PageNumberPagination):
                     ('next', self.get_next_link()),
                     ('previous', self.get_previous_link()),
                     ('results', ProductSerializer(products,
-                                                  context={'request': request***REMOVED***, many=True).data),
+                                                  context={'request': request}, many=True).data),
                     ('dataCompany',
-                     CompanySerializer(dataCompany, many=False, context={'request': request***REMOVED***,
+                     CompanySerializer(dataCompany, many=False, context={'request': request},
                                        pop=['available']).data if dataCompany else None)
                 ])
             )
             # return CustomJSONRenderer().renderData(
-            # ProductSerializer(products , context={'request': request***REMOVED*** , many=True).data)
+            # ProductSerializer(products , context={'request': request} , many=True).data)
         else:
             print('None slug LabelViews ')
             PLable = None
@@ -496,7 +496,7 @@ class Extension(APIView):
         company_list = Company.objects.filter(link__contains=url)
         if len(company_list) > 0:
             company = company_list[0]
-            ser = self.serializer_class(company, context={'request': request***REMOVED***)
+            ser = self.serializer_class(company, context={'request': request})
             json_data = JSONRenderer().render(ser.data)
             return HttpResponse(json_data)
         else:
@@ -530,7 +530,7 @@ class BestCompanies(APIView, PageNumberPagination):
             return CustomJSONRenderer().render404('company', '')
 
         data = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
-            'request': request***REMOVED***).data
+            'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('results', data),
@@ -558,7 +558,7 @@ class Score(CreateAPIView):
                     for s in stars:
                         summ += s[0]
                     summ /= len(stars)
-                    return CustomJSONRenderer().renderData({'results': summ***REMOVED***)
+                    return CustomJSONRenderer().renderData({'results': summ})
             except:
                 return CustomJSONRenderer().render404('score', '')
         return CustomJSONRenderer().render404('score', '')
@@ -587,11 +587,11 @@ class Search(APIView):
 
         return CustomJSONRenderer().render({
             'categories': CategoryMenuSerializer(categories, pop=['all_chatrbazi', 'open_chatrbazi', 'company'],
-                                                 many=True, context={'request': request***REMOVED***).data,
+                                                 many=True, context={'request': request}).data,
             'companies': CompanyDetailSerializer(companies, many=True, pop=['description', 'product_company'],
-                                                 context={'request': request***REMOVED***).data,
-            'tags': ProductLabelSerializer(labels, many=True, context={'request': request***REMOVED***).data,
-        ***REMOVED***)
+                                                 context={'request': request}).data,
+            'tags': ProductLabelSerializer(labels, many=True, context={'request': request}).data,
+        })
 
 
 class Companies(APIView):
@@ -602,11 +602,11 @@ class Companies(APIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = {***REMOVED***
+        data = {}
         query = serializer.validated_data
         c_id = query.get('id', None)
         for q in query:
-            if q == 'id':
+            if q == 'id' or query[q] is None:
                 continue
             size = query[q].get('size', None)
             order = query[q].get('order', [])
@@ -645,7 +645,7 @@ class Companies(APIView):
             if size:
                 companies = companies[:size]
             result = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
-                'request': request***REMOVED***).data
+                'request': request}).data
         except FieldError as e:
             raise ValidationError(e)
 

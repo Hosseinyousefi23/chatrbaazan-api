@@ -14,7 +14,7 @@ from shop.models import City, Banner, Category, Product, Discount, Company, Shop
 
 def validate_mobile(mobile):
     if mobile:
-        if not re.match('^09[\d]{9***REMOVED***$', mobile):
+        if not re.match('^09[\d]{9}$', mobile):
             raise ValidationError(u'شماره موبایل صحیح نمی باشد.')
         return mobile
 
@@ -49,7 +49,7 @@ class BannerSerializer(serializers.ModelSerializer):
         elif obj.category:
             if obj.category.slug:
                 return self.context['request'].build_absolute_uri(
-                    reverse('getOffers') + '?category_slug={***REMOVED***'.format(obj.category.slug))
+                    reverse('getOffers') + '?category_slug={}'.format(obj.category.slug))
                 return self.context['request'].build_absolute_uri(reverse('getOffer', args=[obj.category.slug]))
             pass
         elif obj.product:
@@ -157,7 +157,7 @@ class CategoryMenuSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         compnaies = Company.objects.filter(category__id=obj.id).order_by('-priority', 'id')
         if compnaies:
-            return CompanyCompactSerializer(compnaies, many=True, context={'request': self.context['request']***REMOVED***).data
+            return CompanyCompactSerializer(compnaies, many=True, context={'request': self.context['request']}).data
 
 
 class CompanySerializer(serializers.ModelSerializer):
@@ -316,7 +316,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_company(self, obj):
         if obj.company:
             return CompanySerializer(obj.company.all().order_by('-priority'), many=True,
-                                     context={'request': self.context['request']***REMOVED***,
+                                     context={'request': self.context['request']},
                                      pop=['available']).data
 
     def get_category(self, obj):
@@ -376,7 +376,7 @@ class UserProductSerializer(serializers.ModelSerializer):
     def get_product(self, obj):
         if obj.product:
             return ProductSerializer(Product.objects.get(pk=obj.product.pk), many=False,
-                                     context={'request': self.context['request']***REMOVED***).data
+                                     context={'request': self.context['request']}).data
         else:
             return None
 

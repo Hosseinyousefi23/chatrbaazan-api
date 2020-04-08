@@ -12,10 +12,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='user',
-            options={'verbose_name': 'کاربران', 'verbose_name_plural': 'کاربران'***REMOVED***,
+            options={'verbose_name': 'کاربران', 'verbose_name_plural': 'کاربران'},
         ),
         migrations.AlterModelOptions(
             name='usersendcode',
-            options={'verbose_name': 'کدهای ارسال کاربران', 'verbose_name_plural': 'کدهای ارسال کاربران'***REMOVED***,
+            options={'verbose_name': 'کدهای ارسال کاربران', 'verbose_name_plural': 'کدهای ارسال کاربران'},
         ),
     ]

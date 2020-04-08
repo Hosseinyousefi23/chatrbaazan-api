@@ -15,7 +15,7 @@ fs = FileSystemStorage(location=BASE_DIR)
 
 def validate_mobile(mobile):
     if mobile:
-        if not re.match('^09[\d]{9***REMOVED***$', mobile):
+        if not re.match('^09[\d]{9}$', mobile):
             raise ValidationError(u'شماره موبایل صحیح نمی باشد.')
 
 

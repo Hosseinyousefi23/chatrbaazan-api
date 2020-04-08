@@ -55,13 +55,13 @@ def generate_filename_fieldFileProduct(instance, filename):
 
 def validate_mobile(mobile):
     if mobile:
-        if not re.match('^[0][9][0-9]{9,9***REMOVED***$', str(mobile)):
-            raise ValidationError({'message': u'not Invalid Mobile'***REMOVED***)
+        if not re.match('^[0][9][0-9]{9,9}$', str(mobile)):
+            raise ValidationError({'message': u'not Invalid Mobile'})
 
 
 def validate_phone(phone):
     if phone:
-        if not re.match('^[0][9][0-9]{9,9***REMOVED***$', str(phone)):
+        if not re.match('^[0][9][0-9]{9,9}$', str(phone)):
             raise ValidationError(u'لطفا موبایل خود را به صورت صحیح وارد نمایید.')
 
 
@@ -191,7 +191,7 @@ class ProductGallery(models.Model):
     # self.save()
 
     def __str__(self):
-        return self.title if self.title else 'Image {***REMOVED***'.format(self.pk)
+        return self.title if self.title else 'Image {}'.format(self.pk)
 
     class Meta:
         verbose_name = u'گالری'
@@ -263,7 +263,7 @@ class Product(models.Model):
             print('this should be running before request')
 
         super(Product, self).save(**kwargs)
-        # url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+        # url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0}'.format(
         #     self.slug)
         # result = requests.get(quote(url, safe=':/.?&='))
         # if result.status_code == 200 and result.content:
@@ -290,7 +290,7 @@ def my_handler(instance):
     print('waiting 3 sec')
     time.sleep(3)
     print('starting the process')
-    url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0***REMOVED***'.format(
+    url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0}'.format(
         instance.slug)
     result = requests.get(quote(url, safe=':/.?&='))
     if result.status_code == 200 and result.content:
@@ -316,7 +316,7 @@ class Failure(models.Model):
                                        body=get_template('email/failure.html').render(
                                            {
                                                'product': self.product,
-                                           ***REMOVED***),
+                                           }),
                                        # to=[user.email for user in User.objects.filter(is_admin=True)]
                                        to=['mohammad.chavoshipor@gmail.com']
                                        )
@@ -376,7 +376,7 @@ class Transaction(models.Model):
         verbose_name_plural = u"پرداخت"
 
     def __unicode__(self):
-        return 'پرداخت {***REMOVED***'.format(self.title)
+        return 'پرداخت {}'.format(self.title)
 
 
 class UserProduct(models.Model):

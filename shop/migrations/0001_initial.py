@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'محصولات',
                 'verbose_name_plural': 'محصولات',
-            ***REMOVED***,
+            },
         ),
         migrations.CreateModel(
             name='ProductLabel',
@@ -145,6 +145,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='user',
-            unique_together={('email',)***REMOVED***,
+            unique_together={('email',)},
         ),
     ]

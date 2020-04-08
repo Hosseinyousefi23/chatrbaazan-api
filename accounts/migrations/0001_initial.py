@@ -28,6 +28,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='user',
-            unique_together={('email',)***REMOVED***,
+            unique_together={('email',)},
         ),
     ]

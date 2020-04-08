@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='city',
-            options={'verbose_name': 'شهر', 'verbose_name_plural': 'شهر'***REMOVED***,
+            options={'verbose_name': 'شهر', 'verbose_name_plural': 'شهر'},
         ),
         migrations.AlterField(
             model_name='product',

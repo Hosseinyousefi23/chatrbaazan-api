@@ -1,10 +1,10 @@
-{% extends "admin/change_form.html" %***REMOVED***
+{% extends "admin/change_form.html" %}
 
-{% block extrahead %***REMOVED***
-{% load static %***REMOVED***
-<script src="{% static "jquery/jquery.js" %***REMOVED***"></script>
-<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %***REMOVED***"></script>
-<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %***REMOVED***"></script>
+{% block extrahead %}
+{% load static %}
+<script src="{% static "jquery/jquery.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
 
 <script>
     //    CKEDITOR.replaceClass('vLargeTextField');
@@ -12,24 +12,24 @@ $(document).ready(function () {
         $("textarea").each(function(){
             console.log(this)
             CKEDITOR.replace( this );
-        ***REMOVED***);
+        });
 var vars = [];
 var hash;
 var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
 for (var i = 0; i < hashes.length; i++) { hash=hashes[i].split('=');
             vars[hash[0]] = hash[1];
-        ***REMOVED***
+        }
         if(vars['type'] != 'undefined'){
             $("#id_type").find('option[value="'+vars['type']+'"]').prop('selected', 'selected');
-        ***REMOVED***
-***REMOVED***);
+        }
+});
 function back(){
     window.history.back();
-***REMOVED***
+}
 </script>
-{{ block.super ***REMOVED******REMOVED***
-{% endblock %***REMOVED***
-{% block submit_buttons_bottom %***REMOVED***
-{{ block.super ***REMOVED******REMOVED***
+{{ block.super }}
+{% endblock %}
+{% block submit_buttons_bottom %}
+{{ block.super }}
 <input type="submit" value="Cancel" onclick="back()" name="_make-unique">
-{% endblock %***REMOVED***
+{% endblock %}

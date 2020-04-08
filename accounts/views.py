@@ -104,7 +104,7 @@ class UserViews(mixins.ListModelMixin, mixins.UpdateModelMixin,
             validate_mobile(mobile)
             if request.user.mobile != mobile:
                 if User.objects.filter(mobile=mobile):
-                    return CustomJSONRenderer().render({'message': 'تلفن همراه قبلا وارد شده است.'***REMOVED***, status=400)
+                    return CustomJSONRenderer().render({'message': 'تلفن همراه قبلا وارد شده است.'}, status=400)
 
         partial = kwargs.pop('partial', False)
         instance = self.get_object(request)
@@ -113,7 +113,7 @@ class UserViews(mixins.ListModelMixin, mixins.UpdateModelMixin,
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         if getattr(instance, '_prefetched_objects_cache', None):
-            instance._prefetched_objects_cache = {***REMOVED***
+            instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
 
@@ -131,7 +131,7 @@ class ChangePassword(mixins.UpdateModelMixin, generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         if password_1 != password_2:
-            raise ValidationError({'message': 'password not contains '***REMOVED***)
+            raise ValidationError({'message': 'password not contains '})
 
         user = User.objects.get(pk=request.user.pk)
 
@@ -140,7 +140,7 @@ class ChangePassword(mixins.UpdateModelMixin, generics.GenericAPIView):
             user.save()
             return CustomJSONRenderer().renderData(CustomUserDetailsSerializer(user, many=False).data)
         else:
-            raise ValidationError({'password_old': 'password old not match'***REMOVED***)
+            raise ValidationError({'password_old': 'password old not match'})
 
 
 def confirm_emil(request, key):
@@ -171,7 +171,7 @@ class PasswordResetView(GenericAPIView):
         # Return the success message with OK HTTP status
         return Response(
             {"detail": _(
-                "لینک بازنشانی گذرواژه به ایمیل ثبت نامی شما ارسال گردید.")***REMOVED***,
+                "لینک بازنشانی گذرواژه به ایمیل ثبت نامی شما ارسال گردید.")},
             status=status.HTTP_200_OK
         )
 
@@ -197,7 +197,7 @@ class PasswordResetConfirmView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
-            {"detail": _("گذرواژه شما با موفقیت بروز رسانی گردید.")***REMOVED***
+            {"detail": _("گذرواژه شما با موفقیت بروز رسانی گردید.")}
         )
 
 
@@ -219,4 +219,4 @@ class PasswordChangeView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"detail": _("New password has been saved.")***REMOVED***)
+        return Response({"detail": _("New password has been saved.")})

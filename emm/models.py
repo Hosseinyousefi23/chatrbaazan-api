@@ -92,7 +92,7 @@ class EmailLog(models.Model):
 #                         {
 #                             'user': user,
 #                             'text': instance.text
-#                         ***REMOVED***
+#                         }
 #                     )
 #                 )
 #         except Exception as e:

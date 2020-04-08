@@ -1,31 +1,31 @@
-{% extends "account/base.html" %***REMOVED***
+{% extends "account/base.html" %}
 
-{% load i18n %***REMOVED***
-{% load account %***REMOVED***
+{% load i18n %}
+{% load account %}
 
-{% block head_title %***REMOVED***{% trans "Confirm E-mail Address" %***REMOVED***{% endblock %***REMOVED***
+{% block head_title %}{% trans "Confirm E-mail Address" %}{% endblock %}
 
 
-{% block content %***REMOVED***
-<h1>{% trans "Confirm E-mail Address" %***REMOVED***</h1>
+{% block content %}
+<h1>{% trans "Confirm E-mail Address" %}</h1>
 
-{% if confirmation %***REMOVED***
+{% if confirmation %}
 
-{% user_display confirmation.email_address.user as user_display %***REMOVED***
+{% user_display confirmation.email_address.user as user_display %}
 
-<p>{% blocktrans with confirmation.email_address.email as email %***REMOVED***Please confirm that <a href="mailto:{{ email ***REMOVED******REMOVED***">{{ email ***REMOVED******REMOVED***</a> is an e-mail address for user {{ user_display ***REMOVED******REMOVED***.{% endblocktrans %***REMOVED***</p>
+<p>{% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endblocktrans %}</p>
 
-<form method="post" action="{% url 'account_confirm_email' confirmation.key %***REMOVED***">
-{% csrf_token %***REMOVED***
-    <button type="submit">{% trans 'Confirm' %***REMOVED***</button>
+<form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+{% csrf_token %}
+    <button type="submit">{% trans 'Confirm' %}</button>
 </form>
 
-{% else %***REMOVED***
+{% else %}
 
-{% url 'account_email' as email_url %***REMOVED***
+{% url 'account_email' as email_url %}
 
-<p>{% blocktrans %***REMOVED***This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url ***REMOVED******REMOVED***">issue a new e-mail confirmation request</a>.{% endblocktrans %***REMOVED***</p>
+<p>{% blocktrans %}This e-mail confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new e-mail confirmation request</a>.{% endblocktrans %}</p>
 
-{% endif %***REMOVED***
+{% endif %}
 
-{% endblock %***REMOVED***
+{% endblock %}

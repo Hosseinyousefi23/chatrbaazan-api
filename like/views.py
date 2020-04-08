@@ -20,7 +20,7 @@ class LikeView(mixins.CreateModelMixin,
         # if 'like_session' in request.session:
         #     return CustomJSONRenderer().render({
         #         'message': 'You Have Already Like This Post.'
-        #     ***REMOVED***, status=400)
+        #     }, status=400)
         # session = str(uuid.uuid1(random.randint(0, 281474976710655)))
         mutable = request.POST._mutable
         request.POST._mutable = True
@@ -36,7 +36,7 @@ class LikeView(mixins.CreateModelMixin,
         #         product__id=request.POST.get('product')).exists():
         #     return CustomJSONRenderer().render({
         #         'message': 'Liked Before!'
-        #     ***REMOVED***)
+        #     })
         # like = 1
         # if int(request.POST.get('like')) not in like:
         # return CustomJSONRenderer().render400()

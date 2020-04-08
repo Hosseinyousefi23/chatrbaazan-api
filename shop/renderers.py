@@ -12,7 +12,7 @@ class CustomJSONRenderer:
         # call super to render the response
         response = {
             'data': data
-        ***REMOVED***
+        }
         return Response(response, status=status)
 
     def render404(self, model_name, params):
@@ -22,11 +22,11 @@ class CustomJSONRenderer:
                     "param": params,
                     "status": 404,
                     "code": "not-found",
-                    "title": "{***REMOVED*** Not Found".format(model_name),
-                    "detail": "{***REMOVED*** is not available on this server".format(model_name)
-                ***REMOVED***
+                    "title": "{} Not Found".format(model_name),
+                    "detail": "{} is not available on this server".format(model_name)
+                }
             ]
-        ***REMOVED***
+        }
 
         return Response(response_data)
 
@@ -36,10 +36,10 @@ class CustomJSONRenderer:
                 {
                     "status": 401,
                     "code": "Can Not Accept Request.",
-                    "detail": "{***REMOVED***".format(detail)
-                ***REMOVED***
+                    "detail": "{}".format(detail)
+                }
             ]
-        ***REMOVED***
+        }
 
         return Response(response_data)
 
@@ -49,9 +49,9 @@ class CustomJSONRenderer:
                 {
                     "status": 400,
                     "code": "Bad Request!",
-                ***REMOVED***
+                }
             ]
-        ***REMOVED***
+        }
 
         return Response(response_data)
 
@@ -62,7 +62,7 @@ class CustomJSONRenderer:
             'error': error,
             'status': 500
 
-        ***REMOVED***
+        }
         # call super to render the response
 
         return Response(response_data, status=500)

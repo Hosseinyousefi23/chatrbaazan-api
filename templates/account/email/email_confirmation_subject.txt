@@ -1,4 +1,4 @@
-{% load i18n %***REMOVED***
-{% autoescape off %***REMOVED***
-{% blocktrans %***REMOVED***فعال سازی حساب کاربری{% endblocktrans %***REMOVED***
-{% endautoescape %***REMOVED***
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}فعال سازی حساب کاربری{% endblocktrans %}
+{% endautoescape %}

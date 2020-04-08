@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='cart',
-            options={'verbose_name': 'سبد خرید', 'verbose_name_plural': 'سبد خرید'***REMOVED***,
+            options={'verbose_name': 'سبد خرید', 'verbose_name_plural': 'سبد خرید'},
         ),
         migrations.AlterModelOptions(
             name='cartitem',
-            options={'verbose_name': 'آیتم های سبد خرید', 'verbose_name_plural': 'آیتم های سبد خرید'***REMOVED***,
+            options={'verbose_name': 'آیتم های سبد خرید', 'verbose_name_plural': 'آیتم های سبد خرید'},
         ),
         migrations.AlterField(
             model_name='cart',

@@ -12,11 +12,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='product',
-            options={'verbose_name': 'محصول', 'verbose_name_plural': 'محصولات'***REMOVED***,
+            options={'verbose_name': 'محصول', 'verbose_name_plural': 'محصولات'},
         ),
         migrations.AlterModelOptions(
             name='transaction',
-            options={'verbose_name': 'پرداخت', 'verbose_name_plural': 'پرداخت'***REMOVED***,
+            options={'verbose_name': 'پرداخت', 'verbose_name_plural': 'پرداخت'},
         ),
         migrations.AddField(
             model_name='product',

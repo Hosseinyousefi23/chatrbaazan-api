@@ -38,7 +38,7 @@ class AddCart(mixins.CreateModelMixin,
             return CustomJSONRenderer().render404('product', '')
         product = product.first()
         if product.is_free or product.price == 0:
-            return Response({'message': 'Product Is Free, can not add to cart'***REMOVED***, status=400)
+            return Response({'message': 'Product Is Free, can not add to cart'}, status=400)
         mutable = request.POST._mutable
         request.POST._mutable = True
         # if request.user:
@@ -55,7 +55,7 @@ class AddCart(mixins.CreateModelMixin,
             cart = self.create(request, *args, **kwargs)
         else:
             cart = CartSerializer(cart.first(), many=False,
-                                  context={'request': request***REMOVED***)
+                                  context={'request': request})
 
         print(str(cart.data['id']))
         try:
@@ -78,7 +78,7 @@ class AddCart(mixins.CreateModelMixin,
             raise e
             # Cart.objects.filter(id=cart.data['id']).delete()
             print('error when create item', str(e))
-            return Response({'message': 'Problem When Add product To Cart Try Again.'***REMOVED***)
+            return Response({'message': 'Problem When Add product To Cart Try Again.'})
         # Create Item Product
         # cart = Cart.objects.get(pk=cart.data['id'])
         CartItem().update_price(Cart.objects.get(pk=int(cart.data['id'])).id)
@@ -88,8 +88,8 @@ class AddCart(mixins.CreateModelMixin,
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
-                'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
-            ***REMOVED***, status=201
+                'result': CartSerializer(cart, many=True, context={'request': request}).data
+            }, status=201
         )
 
     def get(self, request, format=None, *args, **kwargs):
@@ -98,8 +98,8 @@ class AddCart(mixins.CreateModelMixin,
         return CustomJSONRenderer().render(
             {
                 'count': cart.count(),
-                'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
-            ***REMOVED***
+                'result': CartSerializer(cart, many=True, context={'request': request}).data
+            }
         )
 
     def delete(self, request, format=None, *args, **kwargs):
@@ -126,8 +126,8 @@ class AddCart(mixins.CreateModelMixin,
             return CustomJSONRenderer().render(
                 {
                     'count': cart.count(),
-                    'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
-                ***REMOVED***, status=200
+                    'result': CartSerializer(cart, many=True, context={'request': request}).data
+                }, status=200
             )
 
     def put(self, request, format=None, *args, **kwags):
@@ -147,11 +147,11 @@ class AddCart(mixins.CreateModelMixin,
             return CustomJSONRenderer().render(
                 {
                     'count': cart.count(),
-                    'result': CartSerializer(cart, many=True, context={'request': request***REMOVED***).data
-                ***REMOVED***
+                    'result': CartSerializer(cart, many=True, context={'request': request}).data
+                }
             )
         except Exception as e:
-            return CustomJSONRenderer().render({'success': False, 'e': str(e)***REMOVED***, status=500)
+            return CustomJSONRenderer().render({'success': False, 'e': str(e)}, status=500)
 
 
 class CompleteView(APIView):
@@ -170,19 +170,19 @@ class CompleteView(APIView):
             return CustomJSONRenderer().render({
                 'message': 'cart is empty',
                 'success': False
-            ***REMOVED***, status=400)
+            }, status=400)
 
         cart = cart.first()
         if cart.total_price == 0:
             # Product is free ~ BUG :)
-            return CustomJSONRenderer().render({'message': 'Problem The System Cart', 'success': False***REMOVED***, status=400)
+            return CustomJSONRenderer().render({'message': 'Problem The System Cart', 'success': False}, status=400)
 
         cartItems_date = CartItem.objects.filter(cart__id=cart.pk)
 
         # @TODO append postalcode for just product (type=1)
         if cartItems_date.filter(product__type=1) and not request.user.address or not request.user.postal_code:
             return CustomJSONRenderer().render({'message': 'لطفا ابتدا در قسمت حساب کاربری نسبت به تکمیل اطلاعات کاربری اقدام نمایید',
-                                                'success': False***REMOVED***, status=400)
+                                                'success': False}, status=400)
         if settings.CART_DEBUG:
             # Debug enable for cart
             """""
@@ -197,10 +197,10 @@ class CompleteView(APIView):
                     # deleted item product from cart item
                     CartItem.objects.filter(id=cartItem.id).delete()
                     return CustomJSONRenderer().render({
-                        'message': 'Product {***REMOVED*** Not Exists'.format(cartItem.product),
+                        'message': 'Product {} Not Exists'.format(cartItem.product),
                         'success': False,
                         'reload': True
-                    ***REMOVED***, status=400)
+                    }, status=400)
             for cartItem in cartItems_date:
                 UserProduct.objects.create(
                     user=request.user,
@@ -211,9 +211,9 @@ class CompleteView(APIView):
             Cart.objects.filter(pk=cart.pk).update(status=3)
             send_factor(request, cart)  # send factor email
             return CustomJSONRenderer().render({
-                'redirect_uri': settings.URI_FRONT + 'cart/factor/{***REMOVED***/'.format(cart.pk),
+                'redirect_uri': settings.URI_FRONT + 'cart/factor/{}/'.format(cart.pk),
                 'success': True,
-            ***REMOVED***)
+            })
         else:
             pass
 
@@ -234,22 +234,22 @@ class FactorView(APIView):
             return CustomJSONRenderer().render404('cart', '')
 
         if cart.status == 3:
-            return CustomJSONRenderer().renderData(CartSerializer(cart, many=False, context={'request': request***REMOVED***).data)
+            return CustomJSONRenderer().renderData(CartSerializer(cart, many=False, context={'request': request}).data)
         else:
             return CustomJSONRenderer().render({
                 'message': u'محصول هم چنان در وضعیت معلق قرار دارد.',
-            ***REMOVED***, status=403)
+            }, status=403)
 
 
 
 def send_factor(request, cart):
     items = CartItem.objects.filter(cart__id=cart.pk)
     print('count item cart', str(items.count()))
-    # return render(request, 'email/factor.html', {'cartItam': items,'cart':cart***REMOVED***)
+    # return render(request, 'email/factor.html', {'cartItam': items,'cart':cart})
     body_email = get_template('email/factor.html').render({
         'cartItam': items,
         'cart': cart
-    ***REMOVED***)
+    })
     message = EmailMessage(subject="چتر بازان - رسید خرید",
                            body=body_email,
                            to=[cart.user.email])

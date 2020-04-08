@@ -14,7 +14,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_product(self, obj):
         return ProductSerializer(Product.objects.get(id=obj.product.id), many=False,
-                                 context={'request': self.context['request']***REMOVED***).data
+                                 context={'request': self.context['request']}).data
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -26,4 +26,4 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_item(self, obj):
         return CartItemSerializer(CartItem.objects.filter(cart__id=obj.pk), many=True,
-                                  context={'request': self.context['request']***REMOVED***).data
+                                  context={'request': self.context['request']}).data

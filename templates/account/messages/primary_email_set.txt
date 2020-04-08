@@ -1,2 +1,2 @@
-{% load i18n %***REMOVED***
-{% blocktrans %***REMOVED***Primary e-mail address set.{% endblocktrans %***REMOVED***
+{% load i18n %}
+{% blocktrans %}Primary e-mail address set.{% endblocktrans %}
