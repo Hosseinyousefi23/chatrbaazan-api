@@ -597,9 +597,9 @@ class Search(APIView):
 class Companies(APIView):
     permission_classes = (AllowAny,)
     serializer_class = CompanyQuerySerializer
-    allowed_methods = ('GET',)
+    allowed_methods = ('POST',)
 
-    def get(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = {***REMOVED***
