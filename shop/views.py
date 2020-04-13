@@ -4,7 +4,7 @@ import random
 import re
 import uuid
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import datetime
 # Create your views here.
 from functools import reduce
 
@@ -224,10 +224,13 @@ class GetOffers(APIView, PageNumberPagination):
                     products = products.order_by('-chatrbazi', '-click')
                 elif ordering == 'expired':
                     print("expired part")
-                    products = products.order_by('-expiration_date', '-created_at').filter(
-                        (Q(expiration_date__isnull=False) & Q(expiration_date__lt=datetime.now())) | (Q(
-                            expiration_date__isnull=True) & Q(
-                            created_at__lt=datetime.now() - timedelta(6 * 365 / 12))))  # 6 month ago
+                    ids = [product.id for product in products if product.is_expired]
+                    products = products.order_by('-expiration_date', '-created_at').filter(id__in=ids)
+
+                    # products = products.order_by('-expiration_date', '-created_at').filter(
+                    #     (Q(expiration_date__isnull=False) & Q(expiration_date__lt=datetime.now())) | (Q(
+                    #         expiration_date__isnull=True) & Q(
+                    #         created_at__lt=datetime.now() - timedelta(6 * 365 / 12))))  # 6 month ago
                 else:
                     return None
             if type_product is not None:
