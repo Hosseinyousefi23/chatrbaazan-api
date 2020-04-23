@@ -17,26 +17,35 @@ from django.conf.urls import url, include
 from rest_framework import routers
 
 # Routers provide an easy way of automatically determining the URL conf.
+from shop import views2
 from . import views
 
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    url(r'^category/$', views.GetCategory.as_view()),
-    url(r'^city/$', views.GetCity.as_view()),
-    url(r'^banner/$', views.GetBanner.as_view()),
-    url(r'^company/$', views.GetCompanies.as_view()),
-    url(r'^label/(?P<slug>.*)$', views.LabelViews.as_view()),
-    url(r'^user/product/$', views.GetUserProduct.as_view()),
-    url(r'^offer/$', views.GetOffers.as_view(), name="getOffers"),
-    url(r'^offer/(?P<slug>.*)/$', views.GetOffer.as_view(), name="getOffer"),
-    url(r'^extension/$', views.Extension.as_view(), name='extension'),
-    url(r'^bestcompanies/$', views.BestCompanies.as_view()),
-    url(r'^search/$', views.Search.as_view()),
-    url(r'^companies/$', views.Companies.as_view()),
-    url(r'^score/$', views.Score.as_view()),
-    url(r'^failure/(?P<slug>.*)/$',
+    url(r'^v1/category/$', views.GetCategory.as_view()),
+    url(r'^v1/city/$', views.GetCity.as_view()),
+    url(r'^v1/banner/$', views.GetBanner.as_view()),
+    url(r'^v1/company/$', views.GetCompanies.as_view()),
+    url(r'^v1/label/(?P<slug>.*)$', views.LabelViews.as_view()),
+    url(r'^v1/user/product/$', views.GetUserProduct.as_view()),
+    url(r'^v1/offer/$', views.GetOffers.as_view(), name="getOffers"),
+    url(r'^v1/offer/(?P<slug>.*)/$', views.GetOffer.as_view(), name="getOffer"),
+    url(r'^v1/extension/$', views.Extension.as_view(), name='extension'),
+    url(r'^v1/bestcompanies/$', views.BestCompanies.as_view()),
+    url(r'^v1/search/$', views.Search.as_view()),
+    url(r'^v1/companies/$', views.Companies.as_view()),
+    url(r'^v1/score/$', views.Score.as_view()),
+    url(r'^v1/failure/(?P<slug>.*)/$',
         views.FailureOffer.as_view(), name="reportFailure"),
-    url(r'^setting/$', views.SettingView.as_view(), name="setting"),
-    url(r'^route/', include(router.urls)),
+    url(r'^v1/setting/$', views.SettingView.as_view(), name="setting"),
+    url(r'^v1/route/', include(router.urls)),
 ]
+
+v2patterns = [
+    url(r'^v2/coupon/$', views2.CouponAPI.as_view()),
+    url(r'^v2/company/$', views2.CompanyAPI.as_view()),
+    url(r'^v2/category/$', views2.CategoryAPI.as_view()),
+]
+
+urlpatterns += v2patterns

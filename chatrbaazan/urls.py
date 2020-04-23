@@ -61,7 +61,7 @@ urlpatterns = [
     url(r'^api/v1/user/', include('accounts.routers')),
     url(r'^api/v1/email/', include('emm.routers')),
     url(r'^api/v1/sms/', include('sms.routers')),
-    url(r'^api/v1/', include('shop.routers')),
+    url(r'^api/', include('shop.routers')),
 
 ]
 if settings.DEBUG:
