@@ -1,7 +1,22 @@
 from rest_framework import serializers
+from rest_framework.serializers import ListSerializer
 
 from shop.models import Product, Category, Company
-from shop.static import FIELD_NAMES
+from shop.static import FIELD_NAMES, FILTERS
+
+
+class FilteredListSerializer(ListSerializer):
+    def __init__(self, *args, **kwargs):
+        self.q = kwargs['child'].q
+        self.model_name = kwargs['child'].model_name
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, data):
+        where = self.q.get('where', None)
+        if where:
+            f = FILTERS[self.model_name](where, queryset=data)
+            data = f.qs
+        return super().to_representation(data)
 
 
 class ClassField(serializers.Field):
@@ -63,13 +78,32 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = None
         fields = '__all__'
+        list_serializer_class = FilteredListSerializer
+
+    # def __new__(cls, *args, **kwargs):
+    #     q = kwargs.get('q', None)
+    #     if q:
+    #         where = q.get('where', None)
+    #         model = kwargs.get('model', None)
+    #         instance = kwargs.get('instance', None)
+    #         if where and model and instance:
+    #             model_name = model._meta.model_name
+    #             f = FILTERS[model_name](where, queryset=instance)
+    #             new_instance = f.qs
+    #             kwargs['instance'] = new_instance
+    #     return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, instance=None, model=None, q=None, **kwargs):
-        super().__init__(instance, **kwargs)
+        self.q = q
         if model:
             self.Meta.model = model
         self.model_name = self.Meta.model._meta.model_name
-        self.q = q
+        # where = q.get('where', None)
+        # if where:
+        #     f = FILTERS[self.model_name](where, queryset=instance)
+        #     kwargs['instance'] = f.qs
+        super().__init__(**kwargs)
+
         if self.q:
             fields = q.get('attributes', None)
             include = q.get('include', None)

@@ -4,36 +4,41 @@ from shop.models import Product
 
 
 class ProductFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr='icontains')
-    ideq = filters.NumberFilter(field_name='id')
-    created_at = filters.NumberFilter(lookup_expr='year')
 
     class Meta:
         model = Product
         fields = {
-            'id': ['exact'],
+            'id': ['exact', 'lt', 'gt'],
+            'name': ['exact', 'contains', 'icontains'],
+            'english_name': ['exact', 'contains', 'icontains'],
+            'company__id': ['exact'],
+            'category__id': ['exact'],
+            'company__name': ['exact', 'contains', 'icontains'],
+            'category__name': ['exact', 'contains', 'icontains'],
+            'company__english_name': ['exact', 'contains', 'icontains'],
+            'category__english_name': ['exact', 'contains', 'icontains'],
         }
 
 
 class CompanyFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr='icontains')
-    ideq = filters.NumberFilter(field_name='id')
-    created_at = filters.NumberFilter(lookup_expr='year')
 
     class Meta:
         model = Product
         fields = {
             'id': ['exact', 'lt', 'gt'],
+            'name': ['exact', 'contains', 'icontains'],
+            'english_name': ['exact', 'contains', 'icontains'],
+            'category__id': ['exact'],
+            'category__name': ['exact', 'contains', 'icontains'],
+            'category__english_name': ['exact', 'contains', 'icontains'],
         }
 
 
 class CategoryFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr='icontains')
-    ideq = filters.NumberFilter(field_name='id')
-    created_at = filters.NumberFilter(lookup_expr='year')
-
     class Meta:
         model = Product
         fields = {
             'id': ['exact', 'lt', 'gt'],
+            'name': ['exact', 'contains', 'icontains'],
+            'english_name': ['exact', 'contains', 'icontains'],
         }
