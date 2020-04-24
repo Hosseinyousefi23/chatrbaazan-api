@@ -3,6 +3,7 @@ from collections import OrderedDict
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
+from shop.filters import ProductFilter, CompanyFilter
 from shop.models import Product, Company, Category
 from shop.renderers import CustomJSONRenderer
 from shop.serializers2 import QuerySerializer, CouponSerializer, CompanySerializer, CategorySerializer
@@ -13,19 +14,20 @@ class CouponAPI(APIView):
     allowed_methods = ('POST',)
     serializer_class = QuerySerializer
 
-    def get_queryset(self, request, serializer):
-        result = Product.objects.filter(pk=1000)
-        return result
+    def get_queryset(self):
+        return Product.objects.all()
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, model=Product)
         serializer.is_valid(raise_exception=True)
-        result = self.get_queryset(request, serializer)
-        fields = serializer.validated_data.get('attributes', None)
-        include = serializer.validated_data.get('include', None)
+        q = serializer.validated_data
+        result = self.get_queryset()
+        where = q.get('where', None)
+        if where:
+            f = ProductFilter(where, queryset=result)
+            result = f.qs
 
-        data = CouponSerializer(result, fields=fields,
-                                include=include, many=True,
+        data = CouponSerializer(result, q=q, many=True,
                                 context={'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
@@ -41,6 +43,8 @@ class CouponAPI(APIView):
                 # ('category', category_frontend_name)
             ])
         )
+        # except Exception as e:
+        #     raise serializers.ValidationError(e)
 
 
 class CompanyAPI(APIView):
@@ -48,19 +52,19 @@ class CompanyAPI(APIView):
     allowed_methods = ('POST',)
     serializer_class = QuerySerializer
 
-    def get_queryset(self, request, serializer):
-        result = Company.objects.filter(pk__lt=1000)
-        return result
+    def get_queryset(self):
+        return Company.objects.all()
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, model=Company)
         serializer.is_valid(raise_exception=True)
-        result = self.get_queryset(request, serializer)
-        fields = serializer.validated_data.get('attributes', None)
-        include = serializer.validated_data.get('include', None)
-
-        data = CompanySerializer(result, fields=fields,
-                                 include=include, many=True,
+        q = serializer.validated_data
+        result = self.get_queryset()
+        where = q.get('where', None)
+        if where:
+            f = CompanyFilter(where, queryset=result)
+            result = f.qs
+        data = CompanySerializer(result, q=q, many=True,
                                  context={'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
@@ -83,19 +87,19 @@ class CategoryAPI(APIView):
     allowed_methods = ('POST',)
     serializer_class = QuerySerializer
 
-    def get_queryset(self, request, serializer):
-        result = Category.objects.filter(pk=5)
-        return result
+    def get_queryset(self):
+        return Category.objects.all()
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, model=Category)
         serializer.is_valid(raise_exception=True)
-        result = self.get_queryset(request, serializer)
-        fields = serializer.validated_data.get('attributes', None)
-        include = serializer.validated_data.get('include', None)
-
-        data = CategorySerializer(result, fields=fields,
-                                  include=include, many=True,
+        q = serializer.validated_data
+        result = self.get_queryset()
+        where = q.get('where', None)
+        if where:
+            f = CompanyFilter(where, queryset=result)
+            result = f.qs
+        data = CategorySerializer(result, q=q, many=True,
                                   context={'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([

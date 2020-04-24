@@ -15,23 +15,48 @@ class ClassField(serializers.Field):
             raise serializers.ValidationError("class %s is not defined" % data.capitalize())
 
 
-class IncludeQuerySeializer(serializers.Serializer):
-    association = ClassField()
+class BaseQuerySerializer(serializers.Serializer):
     attributes = serializers.ListField(child=serializers.CharField(), allow_empty=False)
+    where = serializers.JSONField(required=False)
 
-    def __init__(self, instance=None, depth=0, **kwargs):
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(instance, **kwargs)
+
+    def validate_where(self, value):
+        if type(value) != dict:
+            raise serializers.ValidationError("Should be a dictionary, but is of type '%s'" % type(value).__name__)
+        return value
+
+
+class IncludeQuerySeializer(BaseQuerySerializer):
+    association = ClassField()
+
+    def __init__(self, instance=None, queryset=None, depth=0, **kwargs):
         super().__init__(instance, **kwargs)
         if depth <= 5:
             self.fields['include'] = IncludeQuerySeializer(many=True, required=False, depth=depth + 1)
 
+    def validate(self, data):
+        for item in data['attributes']:
+            if not hasattr(data['association'], item):
+                raise serializers.ValidationError(
+                    "Model '%s' has no attribute '%s'" % (data['association']._meta.model_name, item))
+        return data
 
-class QuerySerializer(serializers.Serializer):
-    attributes = serializers.ListField(child=serializers.CharField(), required=False)
+
+class QuerySerializer(BaseQuerySerializer):
     include = IncludeQuerySeializer(many=True, required=False)
 
-    def __init__(self, instance=None, model_name=None, **kwargs):
+    def __init__(self, instance=None, model=None, **kwargs):
         super().__init__(instance, **kwargs)
-        self.model_name = model_name
+        self.model = model
+
+    def validate_attributes(self, value):
+        for item in value:
+            if not hasattr(self.model, item):
+                raise serializers.ValidationError(
+                    "Model '%s' has no attribute '%s'" % (self.model._meta.model_name, item))
+        return value
 
 
 class DynamicQueryResponseSerializer(serializers.ModelSerializer):
@@ -39,26 +64,30 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
         model = None
         fields = '__all__'
 
-    def __init__(self, instance=None, model=None, fields=None, include=None, **kwargs):
+    def __init__(self, instance=None, model=None, q=None, **kwargs):
         super().__init__(instance, **kwargs)
         if model:
             self.Meta.model = model
         self.model_name = self.Meta.model._meta.model_name
-        if fields:
-            self.Meta.fields = fields
-        if include:
-            for field_desc in include:
-                model = field_desc['association']
-                model_name = model._meta.model_name
-                fields = field_desc.get('attributes', None)
-                include = field_desc.get('include', None)
-                if model_name in FIELD_NAMES[self.model_name]:
-                    serializer = DynamicQueryResponseSerializer(model=model, fields=fields, include=include,
-                                                                many=FIELD_NAMES[self.model_name][model_name][
-                                                                    'iterable'])
-                    self.fields[FIELD_NAMES[self.model_name][model_name]['name']] = serializer
-                else:
-                    raise serializers.ValidationError("model '%s' has no relation '%s'" % (self.model_name, model_name))
+        self.q = q
+        if self.q:
+            fields = q.get('attributes', None)
+            include = q.get('include', None)
+            if fields:
+                self.Meta.fields = fields
+            if include:
+                for field_desc in include:
+                    model = field_desc['association']
+                    where = field_desc.get('where', None)
+                    model_name = model._meta.model_name
+                    if model_name in FIELD_NAMES[self.model_name]:
+                        serializer = DynamicQueryResponseSerializer(model=model, q=field_desc,
+                                                                    many=FIELD_NAMES[self.model_name][model_name][
+                                                                        'iterable'])
+                        self.fields[FIELD_NAMES[self.model_name][model_name]['name']] = serializer
+                    else:
+                        raise serializers.ValidationError(
+                            "model '%s' has no relation '%s'" % (self.model_name, model_name))
 
 
 class CouponSerializer(DynamicQueryResponseSerializer):

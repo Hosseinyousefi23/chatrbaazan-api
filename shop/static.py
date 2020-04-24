@@ -1,3 +1,6 @@
+from shop.filters import ProductFilter, CompanyFilter, CategoryFilter
+from shop.models import Product, Company, Category
+
 FIELD_NAMES = {
     'category': {
         'company': {'name': 'category_company', 'iterable': True},
@@ -12,4 +15,10 @@ FIELD_NAMES = {
         'company': {'name': 'company', 'iterable': True},
         'category': {'name': 'category', 'iterable': True},
     }
+}
+
+FILTERS = {
+    'product': ProductFilter,
+    'company': CompanyFilter,
+    'category': CategoryFilter,
 }
