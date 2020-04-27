@@ -1,7 +1,6 @@
 # Create your views here.
 import operator
 import random
-import re
 import uuid
 from collections import OrderedDict
 from datetime import datetime
@@ -556,12 +555,13 @@ class Score(CreateAPIView):
             try:
                 company = Company.objects.get(slug=company_slug)
                 stars = company.scores.values_list('star')
+                summ = 0
                 if len(stars) > 0:
-                    summ = 0
                     for s in stars:
                         summ += s[0]
                     summ /= len(stars)
-                    return CustomJSONRenderer().renderData({'results': summ})
+
+                return CustomJSONRenderer().renderData({'results': summ})
             except:
                 return CustomJSONRenderer().render404('score', '')
         return CustomJSONRenderer().render404('score', '')
@@ -576,17 +576,13 @@ class Search(APIView):
         if query is None:
             raise ValidationError('q required')
         half_space = '‌'
-        b = half_space + '|' + ' '
-        keywords = re.split(b, query) if query else[]
-
-        companies = Company.objects.filter(reduce(operator.or_,
-                                                  (Q(english_name__icontains=x) | Q(name__icontains=x) for x in
-                                                   keywords))).distinct()
-        categories = Category.objects.filter(reduce(operator.or_,
-                                                    (Q(english_name__icontains=x) | Q(name__icontains=x) for x in
-                                                     keywords))).distinct()
-        labels = ProductLabel.objects.filter(reduce(operator.or_,
-                                                    (Q(name__icontains=x) for x in keywords))).distinct()
+        query = query.replace(half_space, ' ')
+        keywords = query.split(' ')
+        companies = Company.objects.filter(reduce(operator.and_, (Q(english_name__icontains=x) for x in keywords))
+                                           | reduce(operator.and_, (Q(name__icontains=x) for x in keywords)))
+        categories = Category.objects.filter(reduce(operator.and_, (Q(english_name__icontains=x) for x in keywords))
+                                             | reduce(operator.and_, (Q(name__icontains=x) for x in keywords)))
+        labels = ProductLabel.objects.filter(reduce(operator.and_, (Q(name__icontains=x) for x in keywords)))
 
         return CustomJSONRenderer().render({
             'categories': CategoryMenuSerializer(categories, pop=['all_chatrbazi', 'open_chatrbazi', 'company'],

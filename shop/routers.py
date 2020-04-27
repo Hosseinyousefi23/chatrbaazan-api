@@ -46,6 +46,7 @@ v2patterns = [
     url(r'^v2/coupon/$', views2.CouponAPI.as_view()),
     url(r'^v2/company/$', views2.CompanyAPI.as_view()),
     url(r'^v2/category/$', views2.CategoryAPI.as_view()),
+    url(r'^v2/search/$', views2.Search.as_view()),
 ]
 
 urlpatterns += v2patterns
