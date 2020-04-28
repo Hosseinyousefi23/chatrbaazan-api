@@ -8,9 +8,10 @@ from datetime import datetime
 from functools import reduce
 
 from django.core.exceptions import FieldError
-from django.db.models import Q
+from django.db.models import Q, Value
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
+from django.db.models.functions.text import Replace
 from django.http.response import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 from rest_framework.exceptions import ValidationError
@@ -555,16 +556,17 @@ class Score(CreateAPIView):
             try:
                 company = Company.objects.get(slug=company_slug)
                 stars = company.scores.values_list('star')
+                length = len(stars)
                 summ = 0
-                if len(stars) > 0:
+                if length > 0:
                     for s in stars:
                         summ += s[0]
-                    summ /= len(stars)
+                    summ /= length
 
-                return CustomJSONRenderer().renderData({'results': summ})
+                return CustomJSONRenderer().renderData({'results': summ, 'score_count': length})
             except:
-                return CustomJSONRenderer().render404('score', '')
-        return CustomJSONRenderer().render404('score', '')
+                return CustomJSONRenderer().render404('company', '')
+        return CustomJSONRenderer().render404('company', '')
 
 
 class Search(APIView):
@@ -578,11 +580,18 @@ class Search(APIView):
         half_space = '‌'
         query = query.replace(half_space, ' ')
         keywords = query.split(' ')
-        companies = Company.objects.filter(reduce(operator.and_, (Q(english_name__icontains=x) for x in keywords))
-                                           | reduce(operator.and_, (Q(name__icontains=x) for x in keywords)))
-        categories = Category.objects.filter(reduce(operator.and_, (Q(english_name__icontains=x) for x in keywords))
-                                             | reduce(operator.and_, (Q(name__icontains=x) for x in keywords)))
-        labels = ProductLabel.objects.filter(reduce(operator.and_, (Q(name__icontains=x) for x in keywords)))
+        companies = Company.objects.annotate(catname=Replace('name', Value(' '), Value(''))).annotate(
+            catname=Replace('catname', Value(half_space), Value(''))).filter(
+            reduce(operator.and_, (Q(english_name__icontains=x) for x in keywords))
+            | reduce(operator.and_, (Q(catname__icontains=x) for x in keywords)))
+        categories = Category.objects.annotate(
+            catname=Replace('name', Value(' '), Value(''))).annotate(
+            catname=Replace('catname', Value(half_space), Value(''))).filter(
+            reduce(operator.and_, (Q(english_name__icontains=x) for x in keywords))
+            | reduce(operator.and_, (Q(catname__icontains=x) for x in keywords)))
+        labels = ProductLabel.objects.annotate(catname=Replace('name', Value(' '), Value(''))).annotate(
+            catname=Replace('catname', Value(half_space), Value(''))).filter(
+            reduce(operator.and_, (Q(catname__icontains=x) for x in keywords)))
 
         return CustomJSONRenderer().render({
             'categories': CategoryMenuSerializer(categories, pop=['all_chatrbazi', 'open_chatrbazi', 'company'],
