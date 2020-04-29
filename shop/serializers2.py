@@ -12,11 +12,17 @@ class FilteredListSerializer(ListSerializer):
         super().__init__(*args, **kwargs)
 
     def to_representation(self, data):
-        where = self.q.get('where', None)
-        if where:
-            f = FILTERS[self.model_name](where, queryset=data)
-            data = f.qs
-        return super().to_representation(data)
+        try:
+            where = self.q.get('where', None)
+            order = self.q.get('order', None)
+            if where:
+                f = FILTERS[self.model_name](where, queryset=data)
+                data = f.qs
+            if order:
+                data = data.order_by(*order)
+            return super().to_representation(data)
+        except Exception as e:
+            raise serializers.ValidationError(e)
 
 
 class ClassField(serializers.Field):
@@ -33,6 +39,7 @@ class ClassField(serializers.Field):
 class BaseQuerySerializer(serializers.Serializer):
     attributes = serializers.ListField(child=serializers.CharField(), allow_empty=False)
     where = serializers.JSONField(required=False)
+    order = serializers.ListField(child=serializers.CharField(), allow_empty=True, required=False)
 
     def __init__(self, instance=None, **kwargs):
         super().__init__(instance, **kwargs)
@@ -98,10 +105,6 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
         if model:
             self.Meta.model = model
         self.model_name = self.Meta.model._meta.model_name
-        # where = q.get('where', None)
-        # if where:
-        #     f = FILTERS[self.model_name](where, queryset=instance)
-        #     kwargs['instance'] = f.qs
         super().__init__(**kwargs)
 
         if self.q:
@@ -112,7 +115,6 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
             if include:
                 for field_desc in include:
                     model = field_desc['association']
-                    where = field_desc.get('where', None)
                     model_name = model._meta.model_name
                     if model_name in FIELD_NAMES[self.model_name]:
                         serializer = DynamicQueryResponseSerializer(model=model, q=field_desc,
