@@ -550,23 +550,34 @@ class Score(CreateAPIView):
     allowed_methods = ('GET', 'POST')
     serializer_class = ScoreSerializer
 
+    def get_score_data(self, company):
+        stars = company.scores.values_list('star')
+        length = len(stars)
+        summ = 0
+        if length > 0:
+            for s in stars:
+                summ += s[0]
+            summ /= length
+        return {'result': summ, 'score_count': length}
+
     def get(self, request):
         company_slug = request.GET.get('company', None)
         if company_slug:
             try:
                 company = Company.objects.get(slug=company_slug)
-                stars = company.scores.values_list('star')
-                length = len(stars)
-                summ = 0
-                if length > 0:
-                    for s in stars:
-                        summ += s[0]
-                    summ /= length
-
-                return CustomJSONRenderer().renderData({'results': summ, 'score_count': length})
+                score_data = self.get_score_data(company)
+                return CustomJSONRenderer().renderData(score_data)
             except:
                 return CustomJSONRenderer().render404('company', '')
+
         return CustomJSONRenderer().render404('company', '')
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        company = Company.objects.get(slug=request.data['company'])
+        return CustomJSONRenderer().renderData(self.get_score_data(company))
 
 
 class Search(APIView):
