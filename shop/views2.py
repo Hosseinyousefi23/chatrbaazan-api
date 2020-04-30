@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
@@ -24,18 +22,7 @@ class FetchAPI(GenericAPIView):
                                                              context={'request': request})
         data = response_serializer.data
         return CustomJSONRenderer().renderData(
-            OrderedDict([
-                # ('count', self.page.paginator.count),
-                # ('code_count', self.code_count),
-                # ('offer_count', self.offer_count),
-                # ('next', self.get_next_link()),
-                # ('previous', self.get_previous_link()),
-                ('results', data),
-                # ('dataCompany',
-                #  CompanySerializer(dataCompany, many=False, context={'request': request},
-                #                    pop=['available']).data if dataCompany else None),
-                # ('category', category_frontend_name)
-            ])
+            {'result': data}
         )
 
 

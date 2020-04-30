@@ -1,13 +1,19 @@
 from django_filters import rest_framework as filters
-from rest_framework.generics import GenericAPIView
 
 from shop.models import Product
-GenericAPIView
+
+CHOICES = {
+    "product": 1,
+    "app": 2,
+    "offer": 3,
+    "code": 4
+}
 
 
 class ProductFilter(filters.FilterSet):
     expired = filters.BooleanFilter(method='filter_expired')
     tag = filters.CharFilter(method='filter_tags')
+    type = filters.CharFilter(method='filter_type')
 
     class Meta:
         model = Product
@@ -31,6 +37,11 @@ class ProductFilter(filters.FilterSet):
     def filter_expired(self, queryset, name, value):
         ids = [item.id for item in queryset if item.is_expired == value]
         return queryset.filter(id__in=ids)
+
+    def filter_type(self, queryset, name, lst):
+        types = [item.strip("'\" ") for item in lst.strip('[]').split(',')]
+        type_numbers = [CHOICES.get(typ, 0) for typ in types]
+        return queryset.filter(type__in=type_numbers)
 
 
 class CompanyFilter(filters.FilterSet):

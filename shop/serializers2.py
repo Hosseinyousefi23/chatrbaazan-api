@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator, EmptyPage, Page
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
@@ -13,7 +13,7 @@ class FilteredListSerializer(ListSerializer):
         super().__init__(*args, **kwargs)
 
     def to_representation(self, data):
-        pagination_data = None
+        meta_data = {}
         try:
             where = self.q.get('where', None)
             order = self.q.get('order', None)
@@ -27,16 +27,32 @@ class FilteredListSerializer(ListSerializer):
 
             if page:
                 paginator = Paginator(data.all(), limit)
-                pagination_data = {'num_pages': paginator.num_pages, 'page': page}
+                meta_data['num_pages'] = paginator.num_pages
+                meta_data['page'] = page
                 data = paginator.page(page)
+            if self.model_name == 'product':
+                meta_data['count'] = self.type_count(data)
+                meta_data['code_count'] = self.type_count(data, 4)
+                meta_data['offer_count'] = self.type_count(data, 3)
+                meta_data['app_count'] = self.type_count(data, 2)
+                meta_data['product_count'] = self.type_count(data, 1)
             rep = super().to_representation(data)
-            if pagination_data:
-                rep = [pagination_data] + rep
+            rep = [meta_data, rep]
             return rep
         except EmptyPage:
-            return [pagination_data, "empty"]
+            return [meta_data, 'empty']
         except Exception as e:
             raise serializers.ValidationError(e)
+
+    def type_count(self, data, product_type=None):
+        try:
+            qs = data.object_list if type(data) == Page else data
+            if product_type:
+                return sum([1 for item in qs if item.type == product_type])
+            else:
+                return qs.count()
+        except EmptyPage:
+            return 0
 
 
 class ClassField(serializers.Field):

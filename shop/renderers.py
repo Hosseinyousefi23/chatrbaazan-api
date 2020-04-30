@@ -1,4 +1,3 @@
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 
@@ -28,7 +27,7 @@ class CustomJSONRenderer:
             ]
         }
 
-        return Response(response_data)
+        return Response(response_data, status=404)
 
     def render401(self, detail):
         response_data = {
