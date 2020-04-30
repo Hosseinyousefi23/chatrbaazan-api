@@ -15,7 +15,7 @@ class FilteredListSerializer(ListSerializer):
         super().__init__(*args, **kwargs)
 
     def to_representation(self, data):
-        meta_data = {}
+        meta_data = OrderedDict()
         try:
             where = self.q.get('where', None)
             order = self.q.get('order', None)
@@ -40,11 +40,13 @@ class FilteredListSerializer(ListSerializer):
                 meta_data['app_count'] = self.type_count(data, 2)
                 meta_data['product_count'] = self.type_count(data, 1)
             rep_data = super().to_representation(data)
-            rep = OrderedDict()
-            if meta_data:
-                rep['meta'] = meta_data
-            rep['data'] = rep_data
-            return rep
+            for item in rep_data:
+                item.update(meta_data)
+            # rep = OrderedDict()
+            # if meta_data:
+            #     rep['meta'] = meta_data
+            # rep['data'] = rep_data
+            return rep_data
         except EmptyPage:
             return [meta_data, 'empty']
         except Exception as e:
