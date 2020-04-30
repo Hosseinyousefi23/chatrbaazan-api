@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
@@ -10,12 +11,9 @@ from shop.serializers import CategoryMenuSerializer, CompanyDetailSerializer, Pr
 from shop.serializers2 import QuerySerializer, DynamicQueryResponseSerializer
 
 
-class FetchAPI(APIView):
+class FetchAPI(GenericAPIView):
     permission_classes = (AllowAny,)
     allowed_methods = ('POST',)
-
-    def get_queryset(self):
-        return None
 
     def post_api(self, request, model):
         serializer = QuerySerializer(data=request.data, model=model)

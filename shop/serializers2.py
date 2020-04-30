@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, EmptyPage
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
@@ -12,15 +13,28 @@ class FilteredListSerializer(ListSerializer):
         super().__init__(*args, **kwargs)
 
     def to_representation(self, data):
+        pagination_data = None
         try:
             where = self.q.get('where', None)
             order = self.q.get('order', None)
+            page = self.q.get('page', None)
+            limit = self.q.get('limit', 10)
             if where:
                 f = FILTERS[self.model_name](where, queryset=data)
                 data = f.qs
             if order:
                 data = data.order_by(*order)
-            return super().to_representation(data)
+
+            if page:
+                paginator = Paginator(data.all(), limit)
+                pagination_data = {'num_pages': paginator.num_pages, 'page': page}
+                data = paginator.page(page)
+            rep = super().to_representation(data)
+            if pagination_data:
+                rep = [pagination_data] + rep
+            return rep
+        except EmptyPage:
+            return [pagination_data, "empty"]
         except Exception as e:
             raise serializers.ValidationError(e)
 
@@ -40,6 +54,8 @@ class BaseQuerySerializer(serializers.Serializer):
     attributes = serializers.ListField(child=serializers.CharField(), allow_empty=False)
     where = serializers.JSONField(required=False)
     order = serializers.ListField(child=serializers.CharField(), allow_empty=True, required=False)
+    limit = serializers.IntegerField(min_value=1, required=False)
+    page = serializers.IntegerField(min_value=1, required=False)
 
     def __init__(self, instance=None, **kwargs):
         super().__init__(instance, **kwargs)
