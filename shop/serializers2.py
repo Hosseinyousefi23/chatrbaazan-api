@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.core.paginator import Paginator, EmptyPage, Page
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
@@ -30,14 +32,18 @@ class FilteredListSerializer(ListSerializer):
                 meta_data['num_pages'] = paginator.num_pages
                 meta_data['page'] = page
                 data = paginator.page(page)
-            if self.model_name == 'product':
-                meta_data['count'] = self.type_count(data)
+            cnt = self.type_count(data)
+            if self.model_name == 'product' and cnt > 1:
+                meta_data['count'] = cnt
                 meta_data['code_count'] = self.type_count(data, 4)
                 meta_data['offer_count'] = self.type_count(data, 3)
                 meta_data['app_count'] = self.type_count(data, 2)
                 meta_data['product_count'] = self.type_count(data, 1)
-            rep = super().to_representation(data)
-            rep = [meta_data, rep]
+            rep_data = super().to_representation(data)
+            rep = OrderedDict()
+            if meta_data:
+                rep['meta'] = meta_data
+            rep['data'] = rep_data
             return rep
         except EmptyPage:
             return [meta_data, 'empty']
@@ -53,6 +59,10 @@ class FilteredListSerializer(ListSerializer):
                 return qs.count()
         except EmptyPage:
             return 0
+
+    @property
+    def data(self):
+        return super(ListSerializer, self).data
 
 
 class ClassField(serializers.Field):
@@ -135,7 +145,7 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
     def __init__(self, instance=None, model=None, q=None, **kwargs):
         self.q = q
         if model:
-            self.Meta.model = model
+            self.Meta.model = self.meta_model = model
         self.model_name = self.Meta.model._meta.model_name
         super().__init__(**kwargs)
 
@@ -143,7 +153,8 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
             fields = q.get('attributes', None)
             include = q.get('include', None)
             if fields:
-                self.Meta.fields = fields
+                self.Meta.fields = self.meta_fields = fields
+
             if include:
                 for field_desc in include:
                     model = field_desc['association']
@@ -156,6 +167,11 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
                     else:
                         raise serializers.ValidationError(
                             "model '%s' has no relation '%s'" % (self.model_name, model_name))
+
+    def get_fields(self):
+        self.Meta.model = self.meta_model
+        self.Meta.fields = self.meta_fields
+        return super().get_fields()
 
 
 class CouponSerializer(DynamicQueryResponseSerializer):

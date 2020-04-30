@@ -1,6 +1,7 @@
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shop.models import Product, Company, Category, ProductLabel
@@ -21,9 +22,7 @@ class FetchAPI(GenericAPIView):
                                                              many=True,
                                                              context={'request': request})
         data = response_serializer.data
-        return CustomJSONRenderer().renderData(
-            {'result': data}
-        )
+        return Response({'result': data})
 
 
 class CouponAPI(FetchAPI):
