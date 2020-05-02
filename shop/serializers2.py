@@ -15,6 +15,7 @@ class FilteredListSerializer(ListSerializer):
         super().__init__(*args, **kwargs)
 
     def to_representation(self, data):
+        data = data.all()
         meta_data = OrderedDict()
         try:
             where = self.q.get('where', None)
