@@ -27,6 +27,7 @@ class ProductFilter(filters.FilterSet):
             'category__name': ['exact', 'contains', 'icontains'],
             'company__english_name': ['exact', 'contains', 'icontains'],
             'category__english_name': ['exact', 'contains', 'icontains'],
+            'slug': ['exact', 'contains', 'icontains'],
 
         }
 
@@ -56,6 +57,7 @@ class CompanyFilter(filters.FilterSet):
             'category__id': ['exact'],
             'category__name': ['exact', 'contains', 'icontains'],
             'category__english_name': ['exact', 'contains', 'icontains'],
+            'slug': ['exact', 'contains', 'icontains'],
         }
 
 
@@ -68,4 +70,5 @@ class CategoryFilter(filters.FilterSet):
             'id': ['exact', 'lt', 'gt'],
             'name': ['exact', 'contains', 'icontains'],
             'english_name': ['exact', 'contains', 'icontains'],
+            'slug': ['exact', 'contains', 'icontains'],
         }

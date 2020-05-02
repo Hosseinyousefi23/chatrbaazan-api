@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from django.core.paginator import Paginator, EmptyPage, Page
+from django.core.paginator import Paginator, EmptyPage
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
@@ -20,18 +20,16 @@ class FilteredListSerializer(ListSerializer):
             where = self.q.get('where', None)
             order = self.q.get('order', None)
             page = self.q.get('page', None)
-            limit = self.q.get('limit', 10)
+            page_size = self.q.get('page_size', 10)
+            limit = self.q.get('limit', None)
+            random = self.q.get('random', False)
             if where:
                 f = FILTERS[self.model_name](where, queryset=data)
-                data = f.qs
+                data = f.qs.all()
             if order:
                 data = data.order_by(*order)
-
-            if page:
-                paginator = Paginator(data.all(), limit)
-                meta_data['num_pages'] = paginator.num_pages
-                meta_data['page'] = page
-                data = paginator.page(page)
+            if limit:
+                data = self.slice(data, limit, random=random)
             cnt = self.type_count(data)
             if self.model_name == 'product' and cnt > 1:
                 meta_data['count'] = cnt
@@ -39,32 +37,43 @@ class FilteredListSerializer(ListSerializer):
                 meta_data['offer_count'] = self.type_count(data, 3)
                 meta_data['app_count'] = self.type_count(data, 2)
                 meta_data['product_count'] = self.type_count(data, 1)
+
+            if page:
+                paginator = Paginator(data, page_size)
+                meta_data['num_pages'] = paginator.num_pages
+                meta_data['page'] = page
+                data = paginator.page(page)
+
             rep_data = super().to_representation(data)
-            for item in rep_data:
-                item.update(meta_data)
-            # rep = OrderedDict()
-            # if meta_data:
-            #     rep['meta'] = meta_data
-            # rep['data'] = rep_data
-            return rep_data
+            rep = {'data': rep_data}
+            rep.update(meta_data)
+            return rep
         except EmptyPage:
-            return [meta_data, 'empty']
+            rep = {'data': []}
+            rep.update(meta_data)
+            return rep
         except Exception as e:
             raise serializers.ValidationError(e)
 
     def type_count(self, data, product_type=None):
         try:
-            qs = data.object_list if type(data) == Page else data
+            qs = data.all()
             if product_type:
                 return sum([1 for item in qs if item.type == product_type])
             else:
                 return qs.count()
-        except EmptyPage:
-            return 0
+        except:
+            print("HI")
 
     @property
     def data(self):
         return super(ListSerializer, self).data
+
+    def slice(self, data, limit, random=False):
+        if random:
+            return data.order_by('?')[:limit]
+        else:
+            return data[:limit]
 
 
 class ClassField(serializers.Field):
@@ -84,6 +93,8 @@ class BaseQuerySerializer(serializers.Serializer):
     order = serializers.ListField(child=serializers.CharField(), allow_empty=True, required=False)
     limit = serializers.IntegerField(min_value=1, required=False)
     page = serializers.IntegerField(min_value=1, required=False)
+    page_size = serializers.IntegerField(min_value=1, required=False)
+    random = serializers.BooleanField(required=False, default=False)
 
     def __init__(self, instance=None, **kwargs):
         super().__init__(instance, **kwargs)
