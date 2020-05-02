@@ -22,7 +22,7 @@ class FetchAPI(GenericAPIView):
                                                              many=True,
                                                              context={'request': request})
         data = response_serializer.data
-        return Response({'result': data})
+        return Response(data)
 
 
 class CouponAPI(FetchAPI):
