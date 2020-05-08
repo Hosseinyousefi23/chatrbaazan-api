@@ -15,14 +15,14 @@ class ProductFilter(filters.FilterSet):
     expired = filters.BooleanFilter(method='filter_expired')
     tag = filters.CharFilter(method='filter_tags')
     type = filters.CharFilter(method='filter_type')
+    company__id = filters.CharFilter(method='filter_company_ids')
+    category__id = filters.CharFilter(method='filter_category_ids')
 
     class Meta:
         model = Product
         fields = {
             'name': ['exact', 'contains', 'icontains'],
             'english_name': ['exact', 'contains', 'icontains'],
-            'company__id': ['exact'],
-            'category__id': ['exact'],
             'company__name': ['exact', 'contains', 'icontains'],
             'category__name': ['exact', 'contains', 'icontains'],
             'company__english_name': ['exact', 'contains', 'icontains'],
@@ -48,17 +48,25 @@ class ProductFilter(filters.FilterSet):
         type_numbers = [CHOICES.get(typ, 0) for typ in types]
         return queryset.filter(type__in=type_numbers)
 
+    def filter_company_ids(self, queryset, name, value):
+        items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
+        return queryset.filter(company__id__in=items)
+
+    def filter_category_ids(self, queryset, name, value):
+        items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
+        return queryset.filter(category__id__in=items)
+
 
 class CompanyFilter(filters.FilterSet):
     active = filters.BooleanFilter(field_name='available')
     id = filters.CharFilter(method='filter_ids')
+    category__id = filters.CharFilter(method='filter_category_ids')
 
     class Meta:
         model = Product
         fields = {
             'name': ['exact', 'contains', 'icontains'],
             'english_name': ['exact', 'contains', 'icontains'],
-            'category__id': ['exact'],
             'category__name': ['exact', 'contains', 'icontains'],
             'category__english_name': ['exact', 'contains', 'icontains'],
             'slug': ['exact', 'contains', 'icontains'],
@@ -67,6 +75,10 @@ class CompanyFilter(filters.FilterSet):
     def filter_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
         return queryset.filter(id__in=items)
+
+    def filter_category_ids(self, queryset, name, value):
+        items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
+        return queryset.filter(category__id__in=items)
 
 
 class CategoryFilter(filters.FilterSet):
