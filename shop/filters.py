@@ -11,6 +11,7 @@ CHOICES = {
 
 
 class ProductFilter(filters.FilterSet):
+    id = filters.CharFilter(method='filter_ids')
     expired = filters.BooleanFilter(method='filter_expired')
     tag = filters.CharFilter(method='filter_tags')
     type = filters.CharFilter(method='filter_type')
@@ -18,7 +19,6 @@ class ProductFilter(filters.FilterSet):
     class Meta:
         model = Product
         fields = {
-            'id': ['exact', 'lt', 'gt'],
             'name': ['exact', 'contains', 'icontains'],
             'english_name': ['exact', 'contains', 'icontains'],
             'company__id': ['exact'],
@@ -30,6 +30,10 @@ class ProductFilter(filters.FilterSet):
             'slug': ['exact', 'contains', 'icontains'],
 
         }
+
+    def filter_ids(self, queryset, name, value):
+        items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
+        return queryset.filter(id__in=items)
 
     def filter_tags(self, queryset, name, lst):
         items = [item.strip("'\" ") for item in lst.strip('[]').split(',')]
@@ -47,11 +51,11 @@ class ProductFilter(filters.FilterSet):
 
 class CompanyFilter(filters.FilterSet):
     active = filters.BooleanFilter(field_name='available')
+    id = filters.CharFilter(method='filter_ids')
 
     class Meta:
         model = Product
         fields = {
-            'id': ['exact', 'lt', 'gt'],
             'name': ['exact', 'contains', 'icontains'],
             'english_name': ['exact', 'contains', 'icontains'],
             'category__id': ['exact'],
@@ -60,15 +64,23 @@ class CompanyFilter(filters.FilterSet):
             'slug': ['exact', 'contains', 'icontains'],
         }
 
+    def filter_ids(self, queryset, name, value):
+        items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
+        return queryset.filter(id__in=items)
+
 
 class CategoryFilter(filters.FilterSet):
     active = filters.BooleanFilter(field_name='available')
+    id = filters.CharFilter(method='filter_ids')
 
     class Meta:
         model = Product
         fields = {
-            'id': ['exact', 'lt', 'gt'],
             'name': ['exact', 'contains', 'icontains'],
             'english_name': ['exact', 'contains', 'icontains'],
             'slug': ['exact', 'contains', 'icontains'],
         }
+
+    def filter_ids(self, queryset, name, value):
+        items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
+        return queryset.filter(id__in=items)

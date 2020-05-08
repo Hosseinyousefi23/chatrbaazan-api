@@ -42,7 +42,7 @@ class FilteredListSerializer(ListSerializer):
             if page:
                 paginator = Paginator(data, page_size)
                 meta_data['num_pages'] = paginator.num_pages
-                meta_data['page'] = page
+                meta_data['next'] = page + 1 if paginator.num_pages > page else None
                 data = paginator.page(page)
 
             rep_data = super().to_representation(data)
@@ -57,14 +57,11 @@ class FilteredListSerializer(ListSerializer):
             raise serializers.ValidationError(e)
 
     def type_count(self, data, product_type=None):
-        try:
-            qs = data.all()
-            if product_type:
-                return sum([1 for item in qs if item.type == product_type])
-            else:
-                return qs.count()
-        except:
-            print("HI")
+        qs = data.all()
+        if product_type:
+            return sum([1 for item in qs if item.type == product_type])
+        else:
+            return qs.count()
 
     @property
     def data(self):
