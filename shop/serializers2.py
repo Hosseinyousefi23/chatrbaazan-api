@@ -142,7 +142,6 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = None
         fields = '__all__'
-        depth: 2
         list_serializer_class = FilteredListSerializer
 
     # def __new__(cls, *args, **kwargs):
