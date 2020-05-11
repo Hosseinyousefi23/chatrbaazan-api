@@ -4,7 +4,7 @@ import os
 import re
 import threading
 import time
-from datetime import date, timedelta
+from datetime import date
 from urllib.parse import quote
 
 import requests
@@ -138,6 +138,9 @@ class Company(models.Model):
                 self.slug = '%s-%d' % (orig, x)
             self.save()
             print(str(self.slug))
+
+    def get_categories(self):
+        return Category.objects.filter(product_category__company=self).distinct()
 
     class Meta:
         verbose_name = u'شرکت'

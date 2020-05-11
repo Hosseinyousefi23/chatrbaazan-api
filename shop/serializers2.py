@@ -171,10 +171,20 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
                     model = field_desc['association']
                     model_name = model._meta.model_name
                     if model_name in FIELD_NAMES[self.model_name]:
-                        serializer = DynamicQueryResponseSerializer(model=model, q=field_desc,
-                                                                    many=FIELD_NAMES[self.model_name][model_name][
-                                                                        'iterable'])
-                        self.fields[FIELD_NAMES[self.model_name][model_name]['name']] = serializer
+                        if model_name == 'category' and self.model_name == 'company':
+                            serializer = DynamicQueryResponseSerializer(source='get_categories', model=model,
+                                                                        q=field_desc,
+                                                                        many=FIELD_NAMES[self.model_name][model_name][
+                                                                            'iterable'])
+                            # self.fields[
+                            #     FIELD_NAMES[self.model_name][model_name]['name']] = ExtendedMethodField(
+                            #     'get_categories', q=field_desc)
+                            self.fields[FIELD_NAMES[self.model_name][model_name]['name']] = serializer
+                        else:
+                            serializer = DynamicQueryResponseSerializer(model=model, q=field_desc,
+                                                                        many=FIELD_NAMES[self.model_name][model_name][
+                                                                            'iterable'])
+                            self.fields[FIELD_NAMES[self.model_name][model_name]['name']] = serializer
                     else:
                         raise serializers.ValidationError(
                             "model '%s' has no relation '%s'" % (self.model_name, model_name))
@@ -183,6 +193,9 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
         self.Meta.model = self.meta_model
         self.Meta.fields = self.meta_fields
         return super().get_fields()
+
+    def get_categories(self):
+        return Category.objects.all()
 
 
 class CouponSerializer(DynamicQueryResponseSerializer):
