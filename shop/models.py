@@ -142,6 +142,10 @@ class Company(models.Model):
     def get_categories(self):
         return Category.objects.filter(product_category__company=self).distinct()
 
+    def score(self):
+        lst = [s.star for s in self.scores.all()]
+        return sum(lst) / len(lst) if len(lst) > 0 else 0
+
     class Meta:
         verbose_name = u'شرکت'
         verbose_name_plural = u'شرکت'

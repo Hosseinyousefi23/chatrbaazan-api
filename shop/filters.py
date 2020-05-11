@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters import rest_framework as filters
 
 from shop.models import Product
@@ -33,11 +34,17 @@ class ProductFilter(filters.FilterSet):
 
     def filter_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
-        return queryset.filter(id__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(id__in=excludes))
 
     def filter_tags(self, queryset, name, lst):
         items = [item.strip("'\" ") for item in lst.strip('[]').split(',')]
-        return queryset.filter(label__name__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(label__name__in=excludes))
+        else:
+            return queryset.filter(label__name__in=items)
 
     def filter_expired(self, queryset, name, value):
         ids = [item.id for item in queryset if item.is_expired == value]
@@ -50,11 +57,19 @@ class ProductFilter(filters.FilterSet):
 
     def filter_company_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
-        return queryset.filter(company__id__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(company__id__in=excludes))
+        else:
+            return queryset.filter(company__id__in=items)
 
     def filter_category_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
-        return queryset.filter(category__id__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(category__id__in=excludes))
+        else:
+            return queryset.filter(category__id__in=items)
 
 
 class CompanyFilter(filters.FilterSet):
@@ -74,11 +89,19 @@ class CompanyFilter(filters.FilterSet):
 
     def filter_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
-        return queryset.filter(id__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(id__in=excludes))
+        else:
+            return queryset.filter(id__in=items)
 
     def filter_category_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
-        return queryset.filter(category__id__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(category__id__in=excludes))
+        else:
+            return queryset.filter(category__id__in=items)
 
 
 class CategoryFilter(filters.FilterSet):
@@ -95,4 +118,6 @@ class CategoryFilter(filters.FilterSet):
 
     def filter_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
-        return queryset.filter(id__in=items)
+        excludes = [i[1:] for i in items if i.startswith("-")]
+        if len(excludes) > 0:
+            return queryset.filter(~Q(id__in=excludes))

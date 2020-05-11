@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
 from django.core.paginator import Paginator, EmptyPage
+from django.db.models import Avg
+from django.db.models.functions import Coalesce
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
@@ -28,6 +30,8 @@ class FilteredListSerializer(ListSerializer):
                 f = FILTERS[self.model_name](where, queryset=data)
                 data = f.qs.all()
             if order:
+                if self.model_name == 'company' and ('score' in order or '-score' in order):
+                    data = data.annotate(score=Coalesce(Avg('scores__star'), 0))
                 data = data.order_by(*order)
             if limit:
                 data = self.slice(data, limit, random=random)
@@ -138,6 +142,7 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = None
         fields = '__all__'
+        depth: 2
         list_serializer_class = FilteredListSerializer
 
     # def __new__(cls, *args, **kwargs):
@@ -192,6 +197,7 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
     def get_fields(self):
         self.Meta.model = self.meta_model
         self.Meta.fields = self.meta_fields
+        self.Meta.depth = 1
         return super().get_fields()
 
     def get_categories(self):
