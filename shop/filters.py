@@ -37,6 +37,8 @@ class ProductFilter(filters.FilterSet):
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(id__in=excludes))
+        else:
+            return queryset.filter(id__in=items)
 
     def filter_tags(self, queryset, name, lst):
         items = [item.strip("'\" ") for item in lst.strip('[]').split(',')]
@@ -121,3 +123,5 @@ class CategoryFilter(filters.FilterSet):
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(id__in=excludes))
+        else:
+            return queryset.filter(id__in=items)

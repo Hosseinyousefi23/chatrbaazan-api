@@ -27,6 +27,8 @@ class FilteredListSerializer(ListSerializer):
             limit = self.q.get('limit', None)
             random = self.q.get('random', False)
             if where:
+                if 'expired' not in where:
+                    where['expired'] = False
                 f = FILTERS[self.model_name](where, queryset=data)
                 data = f.qs.all()
             if order:
