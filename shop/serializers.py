@@ -192,6 +192,7 @@ class CompanySerializer(serializers.ModelSerializer):
 class CompanyDetailSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     all_available_codes = serializers.SerializerMethodField()
+    product_company = serializers.SerializerMethodField()
 
     class Meta:
         model = Company
@@ -210,6 +211,10 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
         ids = [o.id for o in products if not o.is_expired]
         products = products.filter(id__in=ids)
         return products.count()
+
+    def get_product_company(self, obj):
+        return ProductListSerializer(obj.product_company.all().order_by('-created_at'), many=True,
+                                     context={'request': self.context['request']}).data
 
     def __init__(self, instance, pop=[], *args, **kwargs):
         super().__init__(instance, **kwargs)
@@ -389,15 +394,47 @@ class ShopSettingSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    company = serializers.SerializerMethodField()
+    # company = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
-    label = serializers.SerializerMethodField()
-    city = serializers.SerializerMethodField()
+    # label = serializers.SerializerMethodField()
+    # city = serializers.SerializerMethodField()
     discount_code = serializers.SerializerMethodField()
-    gallery = serializers.SerializerMethodField()
-    like = serializers.SerializerMethodField()
-    explanation_short = serializers.SerializerMethodField()
-    file = serializers.SerializerMethodField()
+
+    # gallery = serializers.SerializerMethodField()
+    # like = serializers.SerializerMethodField()
+    # explanation_short = serializers.SerializerMethodField()
+    # file = serializers.SerializerMethodField()
+
+    def __init__(self, instance, pop=[], *args, **kwargs):
+        super().__init__(instance, **kwargs)
+
+        for fd in pop:
+            self.fields.pop(fd)
+
+    def get_image(self, obj, **kwargs):
+        if obj.image:
+            return self.context['request'].build_absolute_uri(obj.image.url)
+        elif obj.company.count() > 0:
+            if obj.company.first().image:
+                return self.context['request'].build_absolute_uri(obj.company.first().image.url)
+        else:
+            return None
+
+    def get_category(self, obj):
+        if obj.category:
+            return CategorySerializer(obj.category.all(), many=True, pop=['available']).data
+
+    def get_discount_code(self, obj):
+        if obj.discount_code:
+            if obj.is_free or \
+                    UserProduct.objects.filter(
+                        user=self.context['request'].user if self.context[
+                            'request'].user.is_authenticated else None).filter(product__id=obj.id):
+                return obj.discount_code
+            else:
+                pass
+        else:
+            pass
 
     # type = serializers.SerializerMethodField()
 
@@ -407,8 +444,7 @@ class ProductListSerializer(serializers.ModelSerializer):
                   'name', 'priority', 'discount_code', 'expiration_date',
                   'price',
                   'chatrbazi', 'is_free', 'english_name',
-                  'image', 'category', 'label', 'city', 'company', 'slug',
-                  'like', 'link', 'file', 'type', 'count')
+                  'image', 'category', 'label', 'city', 'company', 'slug', 'link', 'file', 'type', 'count')
 
 
 class ScoreSerializer(serializers.ModelSerializer):
