@@ -20,17 +20,17 @@ class FilteredListSerializer(ListSerializer):
         data = data.all()
         meta_data = OrderedDict()
         try:
-            where = self.q.get('where', None)
+            where = self.q.get('where', {})
             order = self.q.get('order', None)
             page = self.q.get('page', None)
             page_size = self.q.get('page_size', 10)
             limit = self.q.get('limit', None)
             random = self.q.get('random', False)
-            if where:
-                if 'expired' not in where:
-                    where['expired'] = False
-                f = FILTERS[self.model_name](where, queryset=data)
-                data = f.qs.all()
+
+            if 'expired' not in where:
+                where['expired'] = False
+            f = FILTERS[self.model_name](where, queryset=data)
+            data = f.qs.all()
             if order:
                 if self.model_name == 'company' and ('score' in order or '-score' in order):
                     data = data.annotate(score=Coalesce(Avg('scores__star'), 0))
