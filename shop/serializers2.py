@@ -52,10 +52,10 @@ class FilteredListSerializer(ListSerializer):
                 data = paginator.page(page)
 
             rep_data = super().to_representation(data)
-            if type(rep_data) == list and len(rep_data) == 1:
-                rep = rep_data[0]
-            else:
-                rep = {'data': rep_data}
+            # if type(rep_data) == list and len(rep_data) == 1:
+            #     rep = rep_data[0]
+            # else:
+            rep = {'data': rep_data}
             rep.update(meta_data)
             return rep
         except EmptyPage:
