@@ -59,15 +59,15 @@ class GetCategory(APIView):
         categoryData = Category.objects.filter(
             available=True).order_by('order', '-id')
         categoryDataSerializer = CategoryMenuSerializer(
-            categoryData, pop=['all_chatrbazi', 'open_chatrbazi', 'company'], many=True,
+            categoryData, pop=['all_chatrbazi', 'open_chatrbazi', 'company', 'english_name', 'available'], many=True,
             context={'request': request}).data
         # TODO Cache Data Category
         # return CustomJSONRenderer().renderData(categoryDataSerializer)
         sumChatrbazi = Product.objects.filter(
             Q(expiration_date__gt=datetime.now()) | Q(expiration_date__isnull=True)).aggregate(Sum('chatrbazi'))
-        newCompanies = Company.objects.order_by('-id')[:new]
-        companySerializerData = CompanySerializer(newCompanies, many=True, pop=['description', 'all_available_codes', ],
-                                                  context={'request': request}).data
+        # newCompanies = Company.objects.order_by('-id')[:new]
+        # companySerializerData = CompanySerializer(newCompanies, many=True, pop=['description', 'all_available_codes', ],
+        #                                           context={'request': request}).data
         # print('sql sum all chatrbaazi: ' , str(sumChatrbazi.query))
         # print('data sum all chatrbaazi', str(sumChatrbazi))
         # if sumChatrbazi.count() > 0:
@@ -77,7 +77,7 @@ class GetCategory(APIView):
         return CustomJSONRenderer().render({
             'categories': categoryDataSerializer,
             'all_chatrbazi': sumChatrbazi['chatrbazi__sum'],
-            'new_companies': companySerializerData,
+            # 'new_companies': companySerializerData,
         })
 
 
@@ -532,8 +532,10 @@ class BestCompanies(APIView, PageNumberPagination):
         if companies is None:
             return CustomJSONRenderer().render404('company', '')
 
-        data = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
-            'request': request}).data
+        data = CompanySerializer(companies, many=True,
+                                 pop=['available', 'description', 'image', 'link', 'all_available_codes',
+                                      'english_name'], context={
+                'request': request}).data
         return CustomJSONRenderer().renderData(
             OrderedDict([
                 ('results', data),

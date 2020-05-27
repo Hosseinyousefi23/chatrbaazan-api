@@ -12,8 +12,8 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail.message import EmailMessage
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.db.models import Case, When, Value, Count, IntegerField
 from django.db.models import Q
-from django.db.models.aggregates import Count
 from django.template.loader import get_template
 from django.utils import timezone
 from rest_framework.compat import MaxValueValidator
@@ -142,8 +142,15 @@ class Company(models.Model):
             print(str(self.slug))
 
     def get_categories(self):
-        return Category.objects.filter(Q(category_company=self) | Q(product_category__company=self)).annotate(
-            count=Count('id')).order_by('-count')
+        q_category = Q(category_company=self)
+        q_pro_category = Q(product_category__company=self) & (~Q(category_company=self))
+        return Category.objects.filter(q_category | q_pro_category).distinct().annotate(
+            count=Case(When(q_category, then=Value('99999999')),
+                       output_field=IntegerField(),
+                       default=Count('id')
+
+                       )).distinct().order_by(
+            '-count')
 
     def score(self):
         lst = [s.star for s in self.scores.all()]

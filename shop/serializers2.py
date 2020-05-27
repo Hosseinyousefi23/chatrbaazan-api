@@ -37,9 +37,8 @@ class FilteredListSerializer(ListSerializer):
                 data = data.order_by(*order)
             if limit:
                 data = self.slice(data, limit, random=random)
-            cnt = self.type_count(data)
-            if self.model_name == 'product' and cnt > 1:
-                meta_data['count'] = cnt
+            if self.model_name == 'product':
+                meta_data['count'] = self.type_count(data)
                 meta_data['code_count'] = self.type_count(data, 4)
                 meta_data['offer_count'] = self.type_count(data, 3)
                 meta_data['app_count'] = self.type_count(data, 2)
