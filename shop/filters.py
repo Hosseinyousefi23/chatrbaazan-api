@@ -37,16 +37,20 @@ class ProductFilter(filters.FilterSet):
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(id__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(id__in=items)
+        else:
+            return queryset
 
     def filter_tags(self, queryset, name, lst):
         items = [item.strip("'\" ") for item in lst.strip('[]').split(',')]
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(label__name__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(label__name__in=items)
+        else:
+            return queryset
 
     def filter_expired(self, queryset, name, value):
         ids = [item.id for item in queryset if item.is_expired == value]
@@ -62,16 +66,20 @@ class ProductFilter(filters.FilterSet):
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(company__id__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(company__id__in=items)
+        else:
+            return queryset
 
     def filter_category_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(category__id__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(category__id__in=items)
+        else:
+            return queryset
 
 
 class CompanyFilter(filters.FilterSet):
@@ -94,16 +102,20 @@ class CompanyFilter(filters.FilterSet):
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(id__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(id__in=items)
+        else:
+            return queryset
 
     def filter_category_ids(self, queryset, name, value):
         items = [item.strip("'\" ") for item in value.strip('[]').split(',')]
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(category__id__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(category__id__in=items)
+        else:
+            return queryset
 
 
 class CategoryFilter(filters.FilterSet):
@@ -123,5 +135,7 @@ class CategoryFilter(filters.FilterSet):
         excludes = [i[1:] for i in items if i.startswith("-")]
         if len(excludes) > 0:
             return queryset.filter(~Q(id__in=excludes))
-        else:
+        elif len(items) > 0:
             return queryset.filter(id__in=items)
+        else:
+            return queryset

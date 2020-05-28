@@ -2,12 +2,18 @@ from collections import OrderedDict
 
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Avg
+from django.db.models import Func
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
 from shop.models import Product, Category, Company
 from shop.static import FIELD_NAMES, FILTERS
+
+
+class Round(Func):
+    function = 'ROUND'
+    template = '%(function)s(%(expressions)s, 2)'
 
 
 class FilteredListSerializer(ListSerializer):
@@ -21,6 +27,7 @@ class FilteredListSerializer(ListSerializer):
         meta_data = OrderedDict()
         try:
             where = self.q.get('where', {})
+            attributes = self.q.get('attributes', None)
             order = self.q.get('order', None)
             page = self.q.get('page', None)
             page_size = self.q.get('page_size', 10)
@@ -32,8 +39,10 @@ class FilteredListSerializer(ListSerializer):
             f = FILTERS[self.model_name](where, queryset=data)
             data = f.qs.all()
             if order:
-                if self.model_name == 'company' and ('score' in order or '-score' in order):
-                    data = data.annotate(score=Coalesce(Avg('scores__star'), 0))
+                if self.model_name == 'company' and ('score' in order or '-score' in order or 'score' in attributes):
+                    data = data.annotate(
+                        score=Coalesce(Round(Avg('scores__star')),
+                                       0))
                 data = data.order_by(*order)
             if limit:
                 data = self.slice(data, limit, random=random)
