@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Avg
-from django.db.models import Func
+from django.db.models import Func, Count
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
@@ -38,11 +38,14 @@ class FilteredListSerializer(ListSerializer):
                 where['expired'] = False
             f = FILTERS[self.model_name](where, queryset=data)
             data = f.qs.all()
+            if self.model_name == 'company' and (
+                        (order and ('score' in order or '-score' in order)) or 'score' in attributes):
+                data = data.annotate(
+                    score=Coalesce(Round(Avg('scores__star')),
+                                   0))
+            if self.model_name == 'company' and 'score_count' in attributes:
+                data = data.annotate(score_count=Count('scores'))
             if order:
-                if self.model_name == 'company' and ('score' in order or '-score' in order or 'score' in attributes):
-                    data = data.annotate(
-                        score=Coalesce(Round(Avg('scores__star')),
-                                       0))
                 data = data.order_by(*order)
             if limit:
                 data = self.slice(data, limit, random=random)
@@ -146,6 +149,8 @@ class QuerySerializer(BaseQuerySerializer):
     def validate_attributes(self, value):
         for item in value:
             if not hasattr(self.model, item):
+                if self.model._meta.model_name == 'company' and (item == 'score' or item == 'score_count'):
+                    continue
                 raise serializers.ValidationError(
                     "Model '%s' has no attribute '%s'" % (self.model._meta.model_name, item))
         return value
@@ -156,19 +161,6 @@ class DynamicQueryResponseSerializer(serializers.ModelSerializer):
         model = None
         fields = '__all__'
         list_serializer_class = FilteredListSerializer
-
-    # def __new__(cls, *args, **kwargs):
-    #     q = kwargs.get('q', None)
-    #     if q:
-    #         where = q.get('where', None)
-    #         model = kwargs.get('model', None)
-    #         instance = kwargs.get('instance', None)
-    #         if where and model and instance:
-    #             model_name = model._meta.model_name
-    #             f = FILTERS[model_name](where, queryset=instance)
-    #             new_instance = f.qs
-    #             kwargs['instance'] = new_instance
-    #     return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, instance=None, model=None, q=None, **kwargs):
         self.q = q

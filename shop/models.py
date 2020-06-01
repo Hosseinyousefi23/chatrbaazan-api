@@ -156,6 +156,9 @@ class Company(models.Model):
         lst = [s.star for s in self.scores.all()]
         return sum(lst) / len(lst) if len(lst) > 0 else 0
 
+    def score_count(self):
+        return Score.objects.filter(company=self).count()
+
     class Meta:
         verbose_name = u'شرکت'
         verbose_name_plural = u'شرکت'

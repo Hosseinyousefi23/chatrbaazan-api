@@ -665,8 +665,10 @@ class Companies(APIView):
                     *order)
             if size:
                 companies = companies[:size]
-            result = CompanySerializer(companies, many=True, pop=['id', 'available', 'description', ], context={
-                'request': request}).data
+            result = CompanySerializer(companies, many=True,
+                                       pop=['image', 'link', 'all_available_codes', 'english_name', 'available',
+                                            'description', ], context={
+                    'request': request}).data
         except FieldError as e:
             raise ValidationError(e)
 
