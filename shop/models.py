@@ -161,6 +161,10 @@ class Company(models.Model):
     def score_count(self):
         return Score.objects.filter(company=self).count()
 
+    def all_available_codes(self):
+        ids = [i.id for i in Product.objects.filter(company=self) if not i.is_expired]
+        return len(ids)
+
     class Meta:
         verbose_name = u'شرکت'
         verbose_name_plural = u'شرکت'

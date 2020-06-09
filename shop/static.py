@@ -21,3 +21,9 @@ FILTERS = {
     'company': CompanyFilter,
     'category': CategoryFilter,
 }
+
+EXTRA_FIELDS = {
+    'product': [],
+    'category': [],
+    'company': ['score', 'score_count', 'all_available_codes'],
+}

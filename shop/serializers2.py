@@ -2,13 +2,13 @@ from collections import OrderedDict
 
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Avg
-from django.db.models import Func, Count
+from django.db.models import Func, Count, Case, When, IntegerField
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer
 
 from shop.models import Product, Category, Company
-from shop.static import FIELD_NAMES, FILTERS
+from shop.static import FIELD_NAMES, FILTERS, EXTRA_FIELDS
 
 
 class Round(Func):
@@ -45,6 +45,12 @@ class FilteredListSerializer(ListSerializer):
                                    0))
             if self.model_name == 'company' and 'score_count' in attributes:
                 data = data.annotate(score_count=Count('scores'))
+            if self.model_name == 'company' and 'all_available_codes' in attributes:
+                ids = [p.id for p in Product.objects.all() if not p.is_expired]
+                data = data.annotate(all_available_codes=Count(Case(
+                    When(product_company__id__in=ids, then=1),
+                    output_field=IntegerField(),
+                )))
             if order:
                 data = data.order_by(*order)
             if limit:
@@ -106,7 +112,7 @@ class ClassField(serializers.Field):
 
 
 class BaseQuerySerializer(serializers.Serializer):
-    attributes = serializers.ListField(child=serializers.CharField(), allow_empty=False)
+    attributes = serializers.ListField(child=serializers.CharField(), allow_empty=True)
     where = serializers.JSONField(required=False)
     order = serializers.ListField(child=serializers.CharField(), allow_empty=True, required=False)
     limit = serializers.IntegerField(min_value=1, required=False)
@@ -132,10 +138,17 @@ class IncludeQuerySeializer(BaseQuerySerializer):
             self.fields['include'] = IncludeQuerySeializer(many=True, required=False, depth=depth + 1)
 
     def validate(self, data):
+        model = data['association']
+        field_names = [('\'' + i.column + '\'') for i in model._meta.fields] + ['\'' + i + '\'' for i in
+                                                                                EXTRA_FIELDS[model._meta.model_name]]
+        if not data['attributes']:
+            raise serializers.ValidationError(
+                "Model '%s' attribute choices are: %s" % (model._meta.model_name, ','.join(field_names)))
         for item in data['attributes']:
-            if not hasattr(data['association'], item):
+            if (not hasattr(data['association'], item)) and (item not in EXTRA_FIELDS[model._meta.model_name]):
                 raise serializers.ValidationError(
-                    "Model '%s' has no attribute '%s'" % (data['association']._meta.model_name, item))
+                    "Model '%s' has no attribute '%s'. choices are: %s" % (
+                        data['association']._meta.model_name, item, ', '.join(field_names)))
         return data
 
 
@@ -147,12 +160,17 @@ class QuerySerializer(BaseQuerySerializer):
         self.model = model
 
     def validate_attributes(self, value):
+        field_names = [('\'' + i.column + '\'') for i in self.model._meta.fields] + ['\'' + i + '\'' for i in
+                                                                                     EXTRA_FIELDS[
+                                                                                         self.model._meta.model_name]]
+        if not value:
+            raise serializers.ValidationError(
+                "Model '%s' attribute choices are: %s" % (self.model._meta.model_name, ', '.join(field_names)))
         for item in value:
-            if not hasattr(self.model, item):
-                if self.model._meta.model_name == 'company' and (item == 'score' or item == 'score_count'):
-                    continue
+            if (not hasattr(self.model, item)) and (item not in EXTRA_FIELDS[self.model._meta.model_name]):
                 raise serializers.ValidationError(
-                    "Model '%s' has no attribute '%s'" % (self.model._meta.model_name, item))
+                    "Model '%s' has no attribute '%s'. choices are: %s" % (
+                        self.model._meta.model_name, item, ','.join(field_names)))
         return value
 
 
