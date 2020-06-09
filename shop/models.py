@@ -142,8 +142,10 @@ class Company(models.Model):
             print(str(self.slug))
 
     def get_categories(self):
+        active_ids = [p.id for p in Product.objects.all() if not p.is_expired]
         q_category = Q(category_company=self)
-        q_pro_category = Q(product_category__company=self) & (~Q(category_company=self))
+        q_pro_category = Q(product_category__company=self) & Q(product_category__id__in=active_ids) & (
+            ~Q(category_company=self))
         return Category.objects.filter(q_category | q_pro_category).distinct().annotate(
             count=Case(When(q_category, then=Value('99999999')),
                        output_field=IntegerField(),
