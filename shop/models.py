@@ -5,10 +5,14 @@ import re
 import threading
 import time
 from datetime import date
+from io import BytesIO
 from urllib.parse import quote
-
+import sys
 import requests
+from PIL import Image
+from django.core.files import File
 from django.core.files.storage import FileSystemStorage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail.message import EmailMessage
 from django.core.validators import MaxValueValidator
 from django.db import models
@@ -67,6 +71,53 @@ def validate_phone(phone):
             raise ValidationError(u'لطفا موبایل خود را به صورت صحیح وارد نمایید.')
 
 
+def convert(obj, file_format, size=None):
+    extentions = {
+        'jpeg2000': 'jp2',
+        'jpeg': 'jpg',
+        'webp': 'webp'
+    }
+    im = Image.open(obj.image).convert('RGB')
+    # if format == 'jpeg' and image.mode == 'RGBA':
+    #     im = image.convert('RGB')
+    # else:
+    #     im = image
+    # create a BytesIO object
+    im_io = BytesIO()
+    # save image to BytesIO object
+    if size:
+        im = im.resize((size, size))
+    im.save(im_io, format=file_format)
+    im_io.seek(0)
+    # create a django-friendly Files object
+    new_image = InMemoryUploadedFile(im_io, 'ImageField',
+                                     add_extention(obj.image.name, extentions[file_format], size),
+                                     'image/%s' % extentions[file_format],
+                                     sys.getsizeof(im_io), None)
+    # new_image = InMemoryUploadedFile(im_io, name=(self.add_extention(self.image.name, extentions[format], size)))
+    return new_image
+
+
+def add_extention(filename, extention, size=None):
+    splited = filename.split('.')
+    pure_name = '.'.join(filename.split('.')[:-1]) if len(splited) > 1 else filename
+    size_post = '_' + str(size) + 'px' if size else ''
+    return pure_name + size_post + '.' + extention
+
+
+formats = {
+    'jp2': 'jpeg2000',
+    'webp': 'webp',
+    'jpg': 'jpeg'
+}
+sizes = {
+    'org': None,
+    'sm': 64,
+    'md': 128,
+    'lg': 256
+}
+
+
 class City(models.Model):
     name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام")
     english_name = models.CharField(max_length=150, blank=False, null=False, verbose_name=u"نام (انگلیسی)")
@@ -123,6 +174,19 @@ class Company(models.Model):
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
     image = models.ImageField(storage=fs, upload_to=generate_filename_company, verbose_name=u"تصویر",
                               blank=True, null=True, max_length=500)
+    image_jp2_org = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jp2_sm = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jp2_md = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jp2_lg = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_webp_org = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_webp_sm = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_webp_md = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_webp_lg = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jpg_org = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jpg_sm = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jpg_md = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+    image_jpg_lg = models.ImageField(storage=fs, upload_to=generate_filename_company, null=True, blank=True)
+
     priority = models.PositiveSmallIntegerField(choices=PRIORITY, default=4, verbose_name=u"اولویت")
     description = models.TextField(verbose_name=u"توضیحات", blank=True, null=True, default=None)
     link = models.CharField(max_length=500, null=True, blank=True, default=None, verbose_name=u'لینک')
@@ -131,6 +195,21 @@ class Company(models.Model):
         return self.name or ''
 
     def save(self, **kwargs):
+        if self.image:
+            for fformat in formats.keys():
+                for ssize in sizes.keys():
+                    size_str = '_' + ssize
+                    field_name = 'image_%s%s' % (fformat, size_str)
+                    field = getattr(self, field_name)
+                    if not field:
+                        setattr(self, field_name, convert(self, formats[fformat], sizes[ssize]))
+        else:
+            for fformat in formats.keys():
+                for ssize in sizes.keys():
+                    size_str = '_' + ssize
+                    field_name = 'image_%s%s' % (fformat, size_str)
+                    setattr(self, field_name, None)
+
         super(Company, self).save(**kwargs)
         if not self.slug:
             self.slug = orig = str((self.name)).replace(' ', '-')
@@ -139,7 +218,6 @@ class Company(models.Model):
                     break
                 self.slug = '%s-%d' % (orig, x)
             self.save()
-            print(str(self.slug))
 
     def get_categories(self):
         active_ids = [p.id for p in Product.objects.all() if not p.is_expired]
@@ -256,6 +334,19 @@ class Product(models.Model):
     english_name = models.CharField(max_length=500, blank=True, null=True, verbose_name=u"نام کالا به انگلیسی‌")
     image = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, verbose_name=u"تصویر",
                               blank=True, null=True, max_length=500)
+    image_jp2_org = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jp2_sm = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jp2_md = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jp2_lg = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_webp_org = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_webp_sm = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_webp_md = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_webp_lg = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jpg_org = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jpg_sm = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jpg_md = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+    image_jpg_lg = models.ImageField(storage=fs, upload_to=generate_filename_ProductPic, null=True, blank=True)
+
     gallery = models.ManyToManyField(ProductGallery, related_name="product_gallery", null=True, blank=True,
                                      verbose_name=u"گالری")
     slug = models.CharField(max_length=200, unique=True, blank=True, verbose_name=u"آدرس")
@@ -282,11 +373,53 @@ class Product(models.Model):
                     break
                 self.slug = '%s-%d' % (orig, x)
 
-        print('slug product write', str(self.slug))
+        # print('slug product write', str(self.slug))
         if self.pk is None:
             t = threading.Thread(target=my_handler, args=(self,))
             t.start()
-            print('this should be running before request')
+            # print('this should be running before request')
+        if self.image:
+            for fformat in formats.keys():
+                for ssize in sizes.keys():
+                    size_str = '_' + ssize
+                    field_name = 'image_%s%s' % (fformat, size_str)
+                    field = getattr(self, field_name)
+                    if not field:
+                        setattr(self, field_name, convert(self, formats[fformat], sizes[ssize]))
+        else:
+            for fformat in formats.keys():
+                for ssize in sizes.keys():
+                    size_str = '_' + ssize
+                    field_name = 'image_%s%s' % (fformat, size_str)
+                    setattr(self, field_name, None)
+
+        # if not self.image_jp2:
+        #         self.image_jp2 = self.convert('jpeg2000')
+        #     if not self.image_jp2_sm:
+        #         self.image_jp2_64 = self.convert('jpeg2000', sizes['sm'])
+        #     if not self.image_jp2_75:
+        #         self.image_jp2_75 = self.convert('jpeg2000', sizes['md'])
+        #     if not self.image_jp2_140:
+        #         self.image_jp2_140 = self.convert('jpeg2000', 140)
+        #
+        #     if not self.image_webp:
+        #         self.image_webp = self.convert('webp')
+        #     if not self.image_webp_64:
+        #         self.image_webp_64 = self.convert('webp', 64)
+        #     if not self.image_webp_75:
+        #         self.image_webp_75 = self.convert('webp', 75)
+        #     if not self.image_webp_140:
+        #         self.image_webp_140 = self.convert('webp', 140)
+        #
+        #     if not self.image_jpg:
+        #         self.image_jpg = self.convert('jpeg')
+        #     if not self.image_jpg_64:
+        #         self.image_jpg_64 = self.convert('jpeg', 64)
+        #     if not self.image_jpg_75:
+        #         self.image_jpg_75 = self.convert('jpeg', 75)
+        #     if not self.image_jpg_140:
+        #         self.image_jpg_140 = self.convert('jpeg', 140)
+        # else:
 
         super(Product, self).save(**kwargs)
         # url = u'https://chatrbaazan.ir/chatrbazan_bot/broadcast.php?send_notification&slug={0}'.format(
