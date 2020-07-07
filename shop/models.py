@@ -195,21 +195,23 @@ class Company(models.Model):
         return self.name or ''
 
     def save(self, **kwargs):
-        if self.image:
-            for fformat in formats.keys():
-                for ssize in sizes.keys():
-                    size_str = '_' + ssize
-                    field_name = 'image_%s%s' % (fformat, size_str)
-                    field = getattr(self, field_name)
-                    if not field:
-                        setattr(self, field_name, convert(self, formats[fformat], sizes[ssize]))
-        else:
-            for fformat in formats.keys():
-                for ssize in sizes.keys():
-                    size_str = '_' + ssize
-                    field_name = 'image_%s%s' % (fformat, size_str)
-                    setattr(self, field_name, None)
-
+        try:
+            if self.image:
+                for fformat in formats.keys():
+                    for ssize in sizes.keys():
+                        size_str = '_' + ssize
+                        field_name = 'image_%s%s' % (fformat, size_str)
+                        field = getattr(self, field_name)
+                        if not field:
+                            setattr(self, field_name, convert(self, formats[fformat], sizes[ssize]))
+            else:
+                for fformat in formats.keys():
+                    for ssize in sizes.keys():
+                        size_str = '_' + ssize
+                        field_name = 'image_%s%s' % (fformat, size_str)
+                        setattr(self, field_name, None)
+        except:
+            pass
         super(Company, self).save(**kwargs)
         if not self.slug:
             self.slug = orig = str((self.name)).replace(' ', '-')
@@ -377,22 +379,25 @@ class Product(models.Model):
         if self.pk is None:
             t = threading.Thread(target=my_handler, args=(self,))
             t.start()
-            # print('this should be running before request')
-        if self.image:
-            for fformat in formats.keys():
-                for ssize in sizes.keys():
-                    size_str = '_' + ssize
-                    field_name = 'image_%s%s' % (fformat, size_str)
-                    field = getattr(self, field_name)
-                    if not field:
-                        setattr(self, field_name, convert(self, formats[fformat], sizes[ssize]))
-        else:
-            for fformat in formats.keys():
-                for ssize in sizes.keys():
-                    size_str = '_' + ssize
-                    field_name = 'image_%s%s' % (fformat, size_str)
-                    setattr(self, field_name, None)
 
+            # print('this should be running before request')
+        try:
+            if self.image:
+                for fformat in formats.keys():
+                    for ssize in sizes.keys():
+                        size_str = '_' + ssize
+                        field_name = 'image_%s%s' % (fformat, size_str)
+                        field = getattr(self, field_name)
+                        if not field:
+                            setattr(self, field_name, convert(self, formats[fformat], sizes[ssize]))
+            else:
+                for fformat in formats.keys():
+                    for ssize in sizes.keys():
+                        size_str = '_' + ssize
+                        field_name = 'image_%s%s' % (fformat, size_str)
+                        setattr(self, field_name, None)
+        except:
+            pass
         # if not self.image_jp2:
         #         self.image_jp2 = self.convert('jpeg2000')
         #     if not self.image_jp2_sm:
